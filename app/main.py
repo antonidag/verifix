@@ -82,7 +82,7 @@ def get_solution(solution_id: int):
 
 
 @app.post("/report")
-async def get_report(query: str, background_tasks: BackgroundTasks) -> dict:
+async def get_report(query: QuestionInput, background_tasks: BackgroundTasks):
     report_type = "research_report"
     researcher = GPTResearcher(query, report_type)
 
