@@ -75,7 +75,6 @@ def add_solution(data: SolutionRequest):
         question = Question(
             text=data.question,
             solution_id=solution.id,
-            verified=True
         )
         db.add(question)
         db.commit()
