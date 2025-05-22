@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine,Column, Integer, String, Boolean, ForeignKey, DateTime, ARRAY
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
-
+from datetime import datetime
 
 # If you're using SQLite locally for testing:
 SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"
@@ -35,7 +35,7 @@ class Solution(Base):
     plant_name = Column(String, index=True)           # e.g., "Plant A", "Line 2"
     department = Column(String, index=True)           # e.g., "Welding", "Assembly", "Packaging"
 
-    tags = Column(ARRAY(String))                      # Flexible filter e.g. ["overheat", "sensor fault"]
+    tags = Column(String)                      # Flexible filter e.g. ["overheat", "sensor fault"]
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

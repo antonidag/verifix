@@ -2,17 +2,17 @@ from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from db import SessionLocal, init_db, Question, Solution
 from vector_db_client import search_similar, add_to_qdrant
-from utils import embed_text
+from utils import embed_text, solution_to_dict
 from typing import Optional
 from gpt_researcher import GPTResearcher
 
 
 class QuestionInput(BaseModel):
-    text: str
+    question: str
 
 
 class SolutionInput(BaseModel):
-    text: str
+    question: str
     solution_text: str
 
 
@@ -43,50 +43,53 @@ def ask_question(q: QuestionInput):
 
 @app.post("/solution")
 def add_solution(data: SolutionInput):
-    embedding = embed_text(data.text)
+    embedding = embed_text(data.question)
 
-    db = SessionLocal()
+    with SessionLocal() as db:
+        existing_question = db.query(Question).filter(
+            Question.text == data.question).first()
+        if existing_question:
+            raise HTTPException(
+                status_code=400, detail="This question already exists.")
 
-    # Check duplication
-    existing_question = db.query(Question).filter(
-        Question.text == data.text).first()
-    if existing_question:
-        db.close()
-        raise HTTPException(
-            status_code=400, detail="This question already exists.")
+        solution = Solution(text=data.solution_text, verified=True)
+        db.add(solution)
+        db.commit()
+        db.refresh(solution)
 
-    solution = Solution(text=data.solution_text, verified=True)
-    db.add(solution)
-    db.commit()
-    db.refresh(solution)  # refresh to get ID etc
+        question = Question(
+            text=data.question,
+            solution_id=solution.id,
+            verified=True
+        )
+        db.add(question)
+        db.commit()
+        db.refresh(question)
 
-    question = Question(
-        text=data.text,
-        solution_id=solution.id,
-        verified=True
-    )
-    db.add(question)
-    db.commit()
-    db.refresh(question)
-    db.close()
+        solution_dict = solution_to_dict(solution)
+        
 
-    add_to_qdrant(data.text, embedding, solution.id)
+    add_to_qdrant(data.question, embedding, solution_dict)
+
     return {
         "message": "Solution added and indexed.",
-        "solution": solution.id
+        "solution": {
+            "id": solution_dict["id"]
+        }
     }
 
 
-@app.get("/solution/{solution_id}", response_model=SolutionOut)
+@app.get("/solution/{solution_id}")
 def get_solution(solution_id: int):
     db = SessionLocal()
     solution = db.query(Solution).filter(Solution.id == solution_id).first()
+    solution_dict = solution_to_dict(solution)
     db.close()
 
     if not solution:
         raise HTTPException(status_code=404, detail="Solution not found")
 
-    return solution
+    return solution_dict
 
 
 @app.post("/investigate")

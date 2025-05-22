@@ -1,4 +1,6 @@
 .venv
 __pycache__
 test.db
+app.db
 .DS_Store
+qdrant_data
