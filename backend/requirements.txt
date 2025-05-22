@@ -4,3 +4,4 @@ sentence-transformers
 sqlalchemy
 gpt-researcher
 qdrant_client
+langgraph

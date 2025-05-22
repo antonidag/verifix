@@ -21,3 +21,9 @@ Run with:
 ```
 uvicorn main:app --reload
 ```
+
+
+Speech to text -> använda ai för att rätta till det.
+
+
+Struktera frågan -> LLM 
