@@ -30,4 +30,3 @@ def search_similar(embedding):
         return hits[0].payload
 
     return None
-
