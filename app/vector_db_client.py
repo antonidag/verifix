@@ -1,7 +1,7 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
 import uuid
-client = QdrantClient(":memory:")  # Use `localhost` or docker for persistent
+client = QdrantClient(path="./qdrant_data")  # Use `localhost` or docker for persistent
 
 COLLECTION = "questions"
 DIM = 384  # Same as your embedding dimension
