@@ -5,6 +5,7 @@ client = QdrantClient(path="./qdrant_data")  # Use `localhost` or docker for per
 
 COLLECTION = "questions"
 DIM = 384  # Same as your embedding dimension
+THRESHOLD=0.8
 
 # Initialize only once, not on every request
 if not client.collection_exists(COLLECTION):
@@ -18,14 +19,14 @@ def add_to_qdrant(text, embedding, solution_id):
         points=[PointStruct(id=point_id, vector=embedding, payload={"text": text, "solution_id": solution_id})]
     )
 
-def search_similar(embedding, threshold):
+def search_similar(embedding):
 
     # Else fallback to vector search
     points = client.scroll(collection_name=COLLECTION, with_vectors=False)
     print(f"Points in collection: {points}")
     hits = client.search(collection_name=COLLECTION, query_vector=embedding, limit=1)
     print(hits)
-    if hits and hits[0].score >= threshold:
+    if hits and hits[0].score >= THRESHOLD:
         return hits[0].payload
 
     return None

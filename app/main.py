@@ -12,47 +12,62 @@ class QuestionInput(BaseModel):
 
 
 class SolutionInput(BaseModel):
-    question: str
-    solution_text: str
-
-
-class SolutionOut(BaseModel):
-    id: int
     text: str
-    document_link: Optional[str] = None  # Allow None here
+    document_link: str
     verified: bool
-
+    # Manufacturing context fields
+    error_code: str           # Machine/system error code
+    machine_name: str  # Name/tag of machine (e.g., "Press #3")
+    machine_type: str        # "Press", "Conveyor", "Robot Arm"
+    manufacturer: str      # e.g., "Siemens", "ABB", "KUKA"
+    model_number: str         # Specific model
+    component: str            # "Motor", "PLC", "Sensor"
+    resolution_type: str   # "Preventive", "Corrective", "Calibration", "Software Fix"
+    downtime_impact: str  # "High", "Medium", "Low" – helps prioritize
+    safety_related: bool  # Flag if the issue has safety implications
+    plant_name: str           # e.g., "Plant A", "Line 2"
+    department: str          # e.g., "Welding", "Assembly", "Packaging"
+    # Flexible filter e.g. ["overheat", "sensor fault"]
+    tags: str
     class Config:
         orm_mode = True
-
 
 app = FastAPI()
 init_db()
 
 
 @app.post("/ask")
-def ask_question(q: QuestionInput):
-    embedding = embed_text(q.text)
-    result = search_similar(embedding, 0.8)
+def ask_question(data: QuestionInput):
+    embedding = embed_text(data.question)
+    result = search_similar(embedding)
 
     if result:
         return {"match": result}
     else:
         return {"message": "No verified solution found. Please document your fix."}
 
-
+class SolutionRequest(BaseModel):
+    solution: SolutionInput
+    question: str
 @app.post("/solution")
-def add_solution(data: SolutionInput):
+def add_solution(data: SolutionRequest):
     embedding = embed_text(data.question)
+    result = search_similar(embedding)
 
+    if result:
+        raise HTTPException(
+                status_code=400, detail={
+                    "message": "This question have a solution.",
+                    "match" : result
+                })
     with SessionLocal() as db:
         existing_question = db.query(Question).filter(
             Question.text == data.question).first()
         if existing_question:
             raise HTTPException(
-                status_code=400, detail="This question already exists.")
+                status_code=400, detail="This question have a solution.")
 
-        solution = Solution(text=data.solution_text, verified=True)
+        solution = Solution(**data.solution.model_dump())
         db.add(solution)
         db.commit()
         db.refresh(solution)
@@ -66,15 +81,14 @@ def add_solution(data: SolutionInput):
         db.commit()
         db.refresh(question)
 
-        solution_dict = solution_to_dict(solution)
-        
+        solution_id = solution.id
 
-    add_to_qdrant(data.question, embedding, solution_dict)
+    add_to_qdrant(data.question, embedding, solution_id)
 
     return {
         "message": "Solution added and indexed.",
         "solution": {
-            "id": solution_dict["id"]
+            "id": solution_id
         }
     }
 
@@ -93,9 +107,9 @@ def get_solution(solution_id: int):
 
 
 @app.post("/investigate")
-async def get_report(query: QuestionInput, background_tasks: BackgroundTasks):
+async def get_report(data: QuestionInput, background_tasks: BackgroundTasks):
     report_type = "research_report"
-    researcher = GPTResearcher(query, report_type)
+    researcher = GPTResearcher(data.question, report_type)
 
     if not researcher:
         raise HTTPException(
@@ -117,15 +131,15 @@ async def get_report(query: QuestionInput, background_tasks: BackgroundTasks):
 
     # Schedule the rest of the work
     background_tasks.add_task(process_and_save_report,
-                              query, researcher, solution_id)
+                              data.question, researcher, solution_id)
 
     return {
-        "message": f"Working on report for query: {query}. It will be saved once ready.",
+        "message": f"Working on report for query: {data.question}. It will be saved once ready.",
         "solution_id": solution_id
     }
 
 
-async def process_and_save_report(query: QuestionInput, researcher: GPTResearcher, solution_id: int):
+async def process_and_save_report(question, researcher: GPTResearcher, solution_id: int):
     research_result = await researcher.conduct_research()
     report = await researcher.write_report()
 
@@ -139,16 +153,15 @@ async def process_and_save_report(query: QuestionInput, researcher: GPTResearche
             db.refresh(solution)
 
             # Store question
-            question = Question(
-                text=query,
+            db.add(Question(
+                text=question,
                 solution_id=solution_id,
                 verified=False
-            )
-            db.add(question)
+            ))
             db.commit()
 
             # Embed and add to vector DB
-            embedding = embed_text(query)
-            add_to_qdrant(query, embedding, solution_id)
+            embedding = embed_text(question)
+            add_to_qdrant(question, embedding, solution_id)
     finally:
         db.close()
