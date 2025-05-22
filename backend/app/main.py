@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
+from llm_model import generate_response
 from db import SessionLocal, init_db, Question, Solution
 from vector_db_client import search_similar, add_to_qdrant
 from utils import embed_text, solution_to_dict
@@ -29,8 +30,10 @@ class SolutionInput(BaseModel):
     department: str          # e.g., "Welding", "Assembly", "Packaging"
     # Flexible filter e.g. ["overheat", "sensor fault"]
     tags: str
+
     class Config:
         orm_mode = True
+
 
 app = FastAPI()
 init_db()
@@ -46,9 +49,12 @@ def ask_question(data: QuestionInput):
     else:
         return {"message": "No verified solution found. Please document your fix."}
 
+
 class SolutionRequest(BaseModel):
     solution: SolutionInput
     question: str
+
+
 @app.post("/solution")
 def add_solution(data: SolutionRequest):
     embedding = embed_text(data.question)
@@ -56,10 +62,10 @@ def add_solution(data: SolutionRequest):
 
     if result:
         raise HTTPException(
-                status_code=400, detail={
-                    "message": "This question have a solution.",
-                    "match" : result
-                })
+            status_code=400, detail={
+                "message": "This question have a solution.",
+                "match": result
+            })
     with SessionLocal() as db:
         existing_question = db.query(Question).filter(
             Question.text == data.question).first()
@@ -103,6 +109,15 @@ def get_solution(solution_id: int):
         raise HTTPException(status_code=404, detail="Solution not found")
 
     return solution_dict
+
+
+@app.post("/llm/chat/")
+def llm_chat(data: QuestionInput):
+    chat_response = generate_response(data.question)
+
+    return {
+        "message": chat_response
+    }
 
 
 @app.post("/investigate")
