@@ -6,12 +6,15 @@ from utils import embed_text
 from typing import Optional
 from gpt_researcher import GPTResearcher
 
+
 class QuestionInput(BaseModel):
     text: str
+
 
 class SolutionInput(BaseModel):
     text: str
     solution_text: str
+
 
 class SolutionOut(BaseModel):
     id: int
@@ -22,13 +25,15 @@ class SolutionOut(BaseModel):
     class Config:
         orm_mode = True
 
+
 app = FastAPI()
 init_db()
+
 
 @app.post("/ask")
 def ask_question(q: QuestionInput):
     embedding = embed_text(q.text)
-    result = search_similar(embedding,0.8)
+    result = search_similar(embedding, 0.8)
 
     if result:
         return {"match": result}
@@ -43,10 +48,12 @@ def add_solution(data: SolutionInput):
     db = SessionLocal()
 
     # Check duplication
-    existing_question = db.query(Question).filter(Question.text == data.text).first()
+    existing_question = db.query(Question).filter(
+        Question.text == data.text).first()
     if existing_question:
         db.close()
-        raise HTTPException(status_code=400, detail="This question already exists.")
+        raise HTTPException(
+            status_code=400, detail="This question already exists.")
 
     solution = Solution(text=data.solution_text, verified=True)
     db.add(solution)
@@ -64,9 +71,10 @@ def add_solution(data: SolutionInput):
     db.close()
 
     add_to_qdrant(data.text, embedding, solution.id)
-    return {"message": "Solution added and indexed.",
-            "solution" : solution.id      
-            }
+    return {
+        "message": "Solution added and indexed.",
+        "solution": solution.id
+    }
 
 
 @app.get("/solution/{solution_id}", response_model=SolutionOut)
@@ -81,46 +89,63 @@ def get_solution(solution_id: int):
     return solution
 
 
-@app.post("/report")
+@app.post("/investigate")
 async def get_report(query: QuestionInput, background_tasks: BackgroundTasks):
     report_type = "research_report"
     researcher = GPTResearcher(query, report_type)
 
     if not researcher:
-        raise HTTPException(status_code=500, detail="Failed to initialize researcher")
+        raise HTTPException(
+            status_code=500, detail="Failed to initialize researcher")
 
-    async def process_and_save_report():
-        research_result = await researcher.conduct_research()
-        report = await researcher.write_report()
+    # Create and store the solution record initially
+    db = SessionLocal()
+    try:
+        solution = Solution(
+            text="",  # Placeholder, will be updated later
+            verified=False
+        )
+        db.add(solution)
+        db.commit()
+        db.refresh(solution)
+        solution_id = solution.id
+    finally:
+        db.close()
 
-        # Save to DB
-        db = SessionLocal()
-        try:
-            solution = Solution(
-                text=report,
-                verified=False  # Not verified yet
-            )
-            db.add(solution)
+    # Schedule the rest of the work
+    background_tasks.add_task(process_and_save_report,
+                              query, researcher, solution_id)
+
+    return {
+        "message": f"Working on report for query: {query}. It will be saved once ready.",
+        "solution_id": solution_id
+    }
+
+
+async def process_and_save_report(query: QuestionInput, researcher: GPTResearcher, solution_id: int):
+    research_result = await researcher.conduct_research()
+    report = await researcher.write_report()
+
+    db = SessionLocal()
+    try:
+        # Update existing solution
+        solution = db.query(Solution).get(solution_id)
+        if solution:
+            solution.text = report
             db.commit()
             db.refresh(solution)
 
+            # Store question
             question = Question(
                 text=query,
-                solution_id=solution.id,
+                solution_id=solution_id,
                 verified=False
             )
             db.add(question)
             db.commit()
-            db.refresh(question)
 
             # Embed and add to vector DB
             embedding = embed_text(query)
-            add_to_qdrant(query, embedding, solution.id)
-        finally:
-            db.close()
-
-    background_tasks.add_task(process_and_save_report)
-
-    return {
-        "message": f"Working on report for query: {query}. It will be saved once ready."
-    }
+            add_to_qdrant(query, embedding, solution_id)
+    finally:
+        db.close()
