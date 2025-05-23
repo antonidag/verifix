@@ -59,3 +59,74 @@ Speech to text -> använda ai för att rätta till det.
 
 
 Struktera frågan -> LLM 
+
+# Manufacturing Solutions API
+
+A FastAPI-based system for managing and retrieving manufacturing solutions and troubleshooting information. This system helps technicians find solutions to common manufacturing problems and document new solutions.
+
+## Features
+
+- Question-answer system with manufacturing context
+- Solution management and retrieval
+- Automated investigation of problems
+- Vector-based similarity search for finding relevant solutions
+- Comprehensive API documentation
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd verifix
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Make sure you have Ollama installed and running (required for LLM functionality):
+```bash
+# Install Ollama from https://ollama.ai/
+```
+
+## Usage
+
+1. Start the FastAPI server:
+```bash
+uvicorn backend.app.main:app --reload
+```
+
+2. Access the API documentation:
+   - Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+   - ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+## API Documentation
+
+The API documentation is automatically generated and can be accessed through two different interfaces:
+
+### ReDoc
+- Clean, three-panel documentation
+- URL: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- Features:
+  - Search functionality
+  - Right-hand schema definitions
+  - Response examples
+
+## Main Endpoints
+
+- `POST /ask`: Submit a question with manufacturing context
+- `POST /solution`: Add a new solution
+- `GET /solution/{solution_id}`: Retrieve a specific solution
+- `POST /investigate`: Start an automated investigation
+
+## Environment Setup
+
+Make sure you have the following prerequisites:
+- Python 3.7+
+- Ollama LLM service
+- Qdrant vector database (for similarity search)
+
+## License
+
+Proprietary - All rights reserved 

@@ -1,56 +1,123 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from llm_model import generate_response
 from db import SessionLocal, init_db, Question, Solution
 from vector_db_client import search_similar, add_to_qdrant
 from utils import embed_text, solution_to_dict
-from typing import Optional
+from typing import Optional, Union, Dict, Any
 from gpt_researcher import GPTResearcher
+from enum import Enum
+
+
+class ResolutionType(str, Enum):
+    PREVENTIVE = "Preventive"
+    CORRECTIVE = "Corrective"
+    CALIBRATION = "Calibration"
+    SOFTWARE_FIX = "Software Fix"
+
+
+class DowntimeImpact(str, Enum):
+    HIGH = "High"
+    MEDIUM = "Medium"
+    LOW = "Low"
 
 
 class QuestionInput(BaseModel):
-    question: str
+    question: str = Field(..., description="The question to be asked")
+
 
 class EnhancedQuestionInput(BaseModel):
-    question: str
-    machine_name: Optional[str] = None
-    machine_type: Optional[str] = None
-    manufacturer: Optional[str] = None
-    model_number: Optional[str] = None
-    component: Optional[str] = None
-    error_code: Optional[str] = None
+    question: str = Field(..., description="The main question or issue to be resolved")
+    machine_name: Optional[str] = Field(None, description="Name/tag of machine (e.g., 'Press #3')")
+    machine_type: Optional[str] = Field(None, description="Type of machine (e.g., 'Press', 'Conveyor', 'Robot Arm')")
+    manufacturer: Optional[str] = Field(None, description="Equipment manufacturer (e.g., 'Siemens', 'ABB', 'KUKA')")
+    model_number: Optional[str] = Field(None, description="Specific model number of the equipment")
+    component: Optional[str] = Field(None, description="Specific component involved (e.g., 'Motor', 'PLC', 'Sensor')")
+    error_code: Optional[str] = Field(None, description="Machine/system error code")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "question": "Machine keeps stopping unexpectedly",
+                "machine_name": "Press #3",
+                "machine_type": "Hydraulic Press",
+                "manufacturer": "Siemens",
+                "component": "Pressure Sensor",
+                "error_code": "E5023"
+            }
+        }
+
 
 class AskInput(BaseModel):
     question: str
     
 class SolutionInput(BaseModel):
-    text: str
-    document_link: str
-    verified: bool
+    text: str = Field(..., description="The solution text")
+    document_link: str = Field(..., description="Link to related documentation")
+    verified: bool = Field(..., description="Whether the solution has been verified")
     # Manufacturing context fields
-    error_code: str           # Machine/system error code
-    machine_name: str  # Name/tag of machine (e.g., "Press #3")
-    machine_type: str        # "Press", "Conveyor", "Robot Arm"
-    manufacturer: str      # e.g., "Siemens", "ABB", "KUKA"
-    model_number: str         # Specific model
-    component: str            # "Motor", "PLC", "Sensor"
-    resolution_type: str   # "Preventive", "Corrective", "Calibration", "Software Fix"
-    downtime_impact: str  # "High", "Medium", "Low" – helps prioritize
-    safety_related: bool  # Flag if the issue has safety implications
-    plant_name: str           # e.g., "Plant A", "Line 2"
-    department: str          # e.g., "Welding", "Assembly", "Packaging"
+    error_code: str = Field(None, description="Machine/system error code")
+    machine_name: str = Field(None, description="Name/tag of machine")
+    machine_type: str = Field(None, description="Type of machine")
+    manufacturer: str = Field(None, description="Equipment manufacturer")
+    model_number: str = Field(None, description="Specific model number")
+    component: str = Field(None, description="Component involved")
+    resolution_type: ResolutionType = Field(None, description="Type of resolution")
+    downtime_impact: DowntimeImpact = Field(None, description="Impact on machine downtime")
+    safety_related: bool = Field(None, description="Whether the issue has safety implications")
+    plant_name: str = Field(None, description="Name of the plant")
+    department: str = Field(None, description="Department name")
     # Flexible filter e.g. ["overheat", "sensor fault"]
-    tags: str
+    tags: str = Field(None, description="Comma-separated tags for filtering")
 
     class Config:
         orm_mode = True
+        schema_extra = {
+            "example": {
+                "text": "Replace the pressure sensor and recalibrate the system",
+                "document_link": "https://docs.example.com/solutions/5023",
+                "verified": True,
+                "error_code": "E5023",
+                "machine_name": "Press #3",
+                "machine_type": "Hydraulic Press",
+                "manufacturer": "Siemens",
+                "component": "Pressure Sensor",
+                "resolution_type": "Corrective",
+                "downtime_impact": "High",
+                "safety_related": True
+            }
+        }
 
 
-app = FastAPI()
+class SolutionRequest(BaseModel):
+    solution: SolutionInput
+    question: str = Field(..., description="The original question this solution answers")
+
+
+app = FastAPI(
+    title="Manufacturing Solutions API",
+    description="""
+    API for managing and retrieving manufacturing solutions and troubleshooting information.
+    This system helps technicians find solutions to common manufacturing problems and document new solutions.
+    """,
+    version="1.0.0",
+    contact={
+        "name": "Manufacturing Support Team",
+        "email": "support@manufacturing.example.com",
+    },
+    license_info={
+        "name": "Proprietary",
+        "url": "https://example.com/license",
+    },
+)
+
 init_db()
 
 
-@app.post("/ask")
+@app.post("/ask", 
+    response_model=Union[Dict[str, Any], Dict[str, str]],
+    summary="Ask a question with manufacturing context",
+    description="Submit a question with optional manufacturing context to find matching solutions")
 def ask_question(data: EnhancedQuestionInput):
     # Build context by joining available fields in specified order
     context_fields = [
@@ -86,12 +153,10 @@ Output:
         return {"message": "No verified solution found. Please document your fix."}
 
 
-class SolutionRequest(BaseModel):
-    solution: SolutionInput
-    question: str
-
-
-@app.post("/solution")
+@app.post("/solution",
+    response_model=Dict[str, Any],
+    summary="Add a new solution",
+    description="Add a new solution with its associated question")
 def add_solution(data: SolutionRequest):
     embedding = embed_text(data.question)
     result = search_similar(embedding)
@@ -134,7 +199,10 @@ def add_solution(data: SolutionRequest):
     }
 
 
-@app.get("/solution/{solution_id}")
+@app.get("/solution/{solution_id}",
+    response_model=Dict[str, Any],
+    summary="Get solution by ID",
+    description="Retrieve a specific solution by its ID")
 def get_solution(solution_id: int):
     db = SessionLocal()
     solution = db.query(Solution).filter(Solution.id == solution_id).first()
@@ -147,7 +215,10 @@ def get_solution(solution_id: int):
     return solution_dict
 
 
-@app.post("/investigate")
+@app.post("/investigate",
+    response_model=Dict[str, Any],
+    summary="Start an investigation",
+    description="Initiate a background research task for a given question")
 async def get_report(data: QuestionInput, background_tasks: BackgroundTasks):
     report_type = "research_report"
     researcher = GPTResearcher(data.question, report_type)
