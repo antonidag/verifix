@@ -17,17 +17,7 @@ def generate_response(query: str):
     
     response = client.generate(
         model='gemma3:12b',
-        prompt=f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
-
-Correct any spelling or grammar issues, remove informal language or excessive punctuation, and rephrase the input into a neutral tone.
-
-Only return the cleaned-up description. Do not explain your reasoning.
-
-Input:
-{query}
-
-Output:
-""",
+        prompt=query,
         #images=[img_base64],  # Pass base64 encoded image data at top level
         #options={"temperature": 0.1}  # Lower temperature for more consistent output
     )

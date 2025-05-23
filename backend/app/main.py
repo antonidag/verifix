@@ -11,7 +11,9 @@ from gpt_researcher import GPTResearcher
 class QuestionInput(BaseModel):
     question: str
 
-
+class AskInput(BaseModel):
+    question: str
+    
 class SolutionInput(BaseModel):
     text: str
     document_link: str
@@ -41,7 +43,21 @@ init_db()
 
 @app.post("/ask")
 def ask_question(data: QuestionInput):
-    embedding = embed_text(data.question)
+
+    preped_question = generate_response(f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
+
+Correct any spelling or grammar issues, remove informal language or excessive punctuation, and rephrase the input into a neutral tone.
+
+Only return the cleaned-up description. Do not explain your reasoning.
+
+Input:
+{data.question}
+
+Output:
+""")
+
+    final_question = f""
+    embedding = embed_text(preped_question)
     result = search_similar(embedding)
 
     if result:
@@ -109,15 +125,6 @@ def get_solution(solution_id: int):
         raise HTTPException(status_code=404, detail="Solution not found")
 
     return solution_dict
-
-
-@app.post("/llm/chat/")
-def llm_chat(data: QuestionInput):
-    chat_response = generate_response(data.question)
-
-    return {
-        "message": chat_response
-    }
 
 
 @app.post("/investigate")
