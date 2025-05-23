@@ -48,7 +48,6 @@ class Question(Base):
     id = Column(Integer, primary_key=True, index=True)
     text = Column(String)
     solution_id = Column(Integer, ForeignKey("solutions.id"))
-
     solution = relationship("Solution")
 
 # Optional: For initializing tables

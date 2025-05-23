@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from enum import Enum
+from datetime import datetime
 
 
 class ResolutionType(str, Enum):
@@ -20,7 +21,7 @@ class QuestionInput(BaseModel):
     question: str = Field(..., description="The question to be asked")
 
 
-class EnhancedQuestionInput(BaseModel):
+class AskRequestModel(BaseModel):
     question: str = Field(..., description="The main question or issue to be resolved")
     machine_name: Optional[str] = Field(None, description="Name/tag of machine (e.g., 'Press #3')")
     machine_type: Optional[str] = Field(None, description="Type of machine (e.g., 'Press', 'Conveyor', 'Robot Arm')")
@@ -42,7 +43,7 @@ class EnhancedQuestionInput(BaseModel):
         }
 
 
-class SolutionInput(BaseModel):
+class SolutionModel(BaseModel):
     text: str = Field(..., description="The solution text")
     document_link: str = Field(..., description="Link to related documentation")
     verified: bool = Field(..., description="Whether the solution has been verified")
@@ -79,5 +80,37 @@ class SolutionInput(BaseModel):
 
 
 class SolutionRequest(BaseModel):
-    solution: SolutionInput
-    question: str = Field(..., description="The original question this solution answers") 
+    solution: SolutionModel
+    question: str = Field(..., description="The original question this solution answers")
+
+
+class SolutionWithIdModel(BaseModel):
+    id: int
+class SolutionResponseModel(BaseModel):
+    message: str
+    solution: SolutionWithIdModel
+
+
+class QuestionModel(BaseModel):
+    id: int
+    text: str
+    solution_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+
+class Match(BaseModel):
+    text: str
+    solution_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class AskResponseModel(BaseModel):
+    match: Optional[Match] = None
+    message: Optional[str] = None
+
+    class Config:
+        orm_mode = True 
