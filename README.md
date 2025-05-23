@@ -56,7 +56,8 @@ uvicorn main:app --reload
 
 
 Speech to text -> använda ai för att rätta till det.
-
+Bild, fråga om muttern är ok? eller för sliten? 
+Ser du några brand faror
 
 Struktera frågan -> LLM 
 
