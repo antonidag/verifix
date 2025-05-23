@@ -1,0 +1,10 @@
+# Exclude compiled files
+**/build/
+**/dist/
+
+# Exclude dependencies
+**/node_modules/
+
+# Docker files
+.dockerignore
+Dockerfile
