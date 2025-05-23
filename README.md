@@ -33,6 +33,7 @@ Searches for a similar problem and returns the most relevant verified solution.
 {
   "question": "PLC error 4096 on line 3"
 }
+```
 
 ## Install
 Install python3.11
