@@ -1,21 +1,18 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from typing import Dict, Any
+from typing import Dict, Any, Optional, Tuple
 from db import SessionLocal, Question, Solution
 from llm_model import generate_response
 from vector_db_client import search_similar, add_to_qdrant
 from utils import embed_text, solution_to_dict
 from models import EnhancedQuestionInput, QuestionInput, SolutionRequest
 from gpt_researcher import GPTResearcher
+from sqlalchemy.exc import SQLAlchemyError
 
 router = APIRouter()
 
 
-@router.post("/ask", 
-    response_model=Dict[str, Any],
-    summary="Ask a question with manufacturing context",
-    description="Submit a question with optional manufacturing context to find matching solutions")
-def ask_question(data: EnhancedQuestionInput):
-    # Build context by joining available fields in specified order
+def create_context_question(data: EnhancedQuestionInput) -> str:
+    """Create a contextualized question from the input data."""
     context_fields = [
         data.manufacturer,
         data.machine_type,
@@ -24,24 +21,79 @@ def ask_question(data: EnhancedQuestionInput):
         data.error_code
     ]
     
-    # Filter out None values and join with spaces
     context_str = " ".join(field for field in context_fields if field)
-    full_question = f"{context_str}: {data.question}" if context_str else data.question
+    return f"{context_str}: {data.question}" if context_str else data.question
 
-    preped_question = generate_response(f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
+
+def prepare_question(question: str) -> str:
+    """Clean and prepare the question using LLM."""
+    return generate_response(f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
 
 Correct any spelling or grammar issues, remove informal language or excessive punctuation, and rephrase the input into a neutral tone while preserving all technical context.
 
 Only return the cleaned-up description. Do not explain your reasoning.
 
 Input:
-{full_question}
+{question}
 
 Output:
 """)
 
-    embedding = embed_text(preped_question)
-    result = search_similar(embedding)
+
+def find_existing_solution(question: str) -> Optional[Dict]:
+    """
+    Search for an existing solution using vector similarity.
+    
+    Args:
+        question: The question text to search for
+        
+    Returns:
+        Optional[Dict]: Matching solution if found, None otherwise
+    """
+    embedding = embed_text(question)
+    return search_similar(embedding)
+
+
+def create_solution_and_question(
+    db: SessionLocal,
+    solution_data: SolutionRequest
+) -> Tuple[int, str]:
+    """Create a new solution and associated question in the database."""
+    try:
+        solution = Solution(**solution_data.solution.model_dump())
+        db.add(solution)
+        db.commit()
+        db.refresh(solution)
+
+        question = Question(
+            text=solution_data.question,
+            solution_id=solution.id,
+        )
+        db.add(question)
+        db.commit()
+
+        return solution.id, solution_data.question
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error while creating solution: {str(e)}"
+        )
+
+
+@router.post("/ask", 
+    response_model=Dict[str, Any],
+    summary="Ask a question with manufacturing context",
+    description="Submit a question with optional manufacturing context to find matching solutions")
+def ask_question(data: EnhancedQuestionInput):
+    # Create contextualized question
+    full_question = create_context_question(data)
+    
+    # Clean and prepare the question
+    preped_question = prepare_question(full_question)
+
+    # Search for existing solution
+    result = find_existing_solution(preped_question)
 
     if result:
         return {"match": result}
@@ -54,45 +106,36 @@ Output:
     summary="Add a new solution",
     description="Add a new solution with its associated question")
 def add_solution(data: SolutionRequest):
-    embedding = embed_text(data.question)
-    result = search_similar(embedding)
-
+    # Search for existing solution using vector similarity
+    result = find_existing_solution(data.question)
     if result:
         raise HTTPException(
-            status_code=400, detail={
-                "message": "This question have a solution.",
+            status_code=400,
+            detail={
+                "message": "A similar question already has a solution.",
                 "match": result
             })
-    with SessionLocal() as db:
-        existing_question = db.query(Question).filter(
-            Question.text == data.question).first()
-        if existing_question:
-            raise HTTPException(
-                status_code=400, detail="This question have a solution.")
 
-        solution = Solution(**data.solution.model_dump())
-        db.add(solution)
-        db.commit()
-        db.refresh(solution)
+    try:
+        with SessionLocal() as db:
+            # Create solution and question
+            solution_id, question = create_solution_and_question(db, data)
+            
+            # Index the question for vector search
+            embedding = embed_text(question)
+            add_to_qdrant(question, embedding, solution_id)
 
-        question = Question(
-            text=data.question,
-            solution_id=solution.id,
-        )
-        db.add(question)
-        db.commit()
-        db.refresh(question)
-
-        solution_id = solution.id
-
-    add_to_qdrant(data.question, embedding, solution_id)
-
-    return {
-        "message": "Solution added and indexed.",
-        "solution": {
-            "id": solution_id
+        return {
+            "message": "Solution added and indexed.",
+            "solution": {
+                "id": solution_id
+            }
         }
-    }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error adding solution: {str(e)}"
+        )
 
 
 @router.get("/solution/{solution_id}",
@@ -100,15 +143,18 @@ def add_solution(data: SolutionRequest):
     summary="Get solution by ID",
     description="Retrieve a specific solution by its ID")
 def get_solution(solution_id: int):
-    db = SessionLocal()
-    solution = db.query(Solution).filter(Solution.id == solution_id).first()
-    solution_dict = solution_to_dict(solution)
-    db.close()
-
-    if not solution:
-        raise HTTPException(status_code=404, detail="Solution not found")
-
-    return solution_dict
+    try:
+        with SessionLocal() as db:
+            solution = db.query(Solution).filter(Solution.id == solution_id).first()
+            if not solution:
+                raise HTTPException(status_code=404, detail="Solution not found")
+            
+            return solution_to_dict(solution)
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error while retrieving solution: {str(e)}"
+        )
 
 
 @router.post("/investigate",
@@ -123,53 +169,71 @@ async def get_report(data: QuestionInput, background_tasks: BackgroundTasks):
         raise HTTPException(
             status_code=500, detail="Failed to initialize researcher")
 
-    # Create and store the solution record initially
-    db = SessionLocal()
     try:
-        solution = Solution(
-            text="",  # Placeholder, will be updated later
-            verified=False
+        with SessionLocal() as db:
+            solution = Solution(
+                text="",  # Placeholder, will be updated later
+                verified=False
+            )
+            db.add(solution)
+            db.commit()
+            db.refresh(solution)
+            solution_id = solution.id
+
+            # Schedule the rest of the work
+            background_tasks.add_task(process_and_save_report,
+                                  data.question, researcher, solution_id)
+
+            return {
+                "message": f"Working on report for query: {data.question}. It will be saved once ready.",
+                "solution_id": solution_id
+            }
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error while initializing investigation: {str(e)}"
         )
-        db.add(solution)
-        db.commit()
-        db.refresh(solution)
-        solution_id = solution.id
-    finally:
-        db.close()
-
-    # Schedule the rest of the work
-    background_tasks.add_task(process_and_save_report,
-                              data.question, researcher, solution_id)
-
-    return {
-        "message": f"Working on report for query: {data.question}. It will be saved once ready.",
-        "solution_id": solution_id
-    }
 
 
 async def process_and_save_report(question: str, researcher: GPTResearcher, solution_id: int):
-    research_result = await researcher.conduct_research()
-    report = await researcher.write_report()
-
-    db = SessionLocal()
     try:
-        # Update existing solution
-        solution = db.query(Solution).get(solution_id)
-        if solution:
-            solution.text = report
-            db.commit()
-            db.refresh(solution)
+        # First get the research results
+        research_result = await researcher.conduct_research()
+        report = await researcher.write_report()
 
-            # Store question
-            db.add(Question(
-                text=question,
-                solution_id=solution_id,
-                verified=False
-            ))
-            db.commit()
+        # Then handle all database operations in a single transaction
+        try:
+            with SessionLocal() as db:
+                # Update existing solution
+                solution = db.query(Solution).get(solution_id)
+                if not solution:
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"Solution {solution_id} not found"
+                    )
 
-            # Embed and add to vector DB
-            embedding = embed_text(question)
-            add_to_qdrant(question, embedding, solution_id)
-    finally:
-        db.close() 
+                solution.text = report
+                db.commit()
+                db.refresh(solution)
+
+                # Store question
+                question_record = Question(
+                    text=question,
+                    solution_id=solution_id,
+                    verified=False
+                )
+                db.add(question_record)
+                db.commit()
+
+                # Embed and add to vector DB
+                embedding = embed_text(question)
+                add_to_qdrant(question, embedding, solution_id)
+
+        except SQLAlchemyError as e:
+            # Log the error since this is a background task
+            print(f"Database error in process_and_save_report: {str(e)}")
+            raise  # Re-raise to be caught by outer try block
+
+    except Exception as e:
+        # Log any errors (including re-raised SQLAlchemyError)
+        print(f"Error in process_and_save_report: {str(e)}") 
