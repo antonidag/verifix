@@ -11,7 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 router = APIRouter()
 
 
-def create_context_question(data: EnhancedQuestionInput) -> str:
+def create_context_question(data: EnhancedQuestionInput, preped_question: str) -> str:
     """Create a contextualized question from the input data."""
     context_fields = [
         data.manufacturer,
@@ -22,7 +22,7 @@ def create_context_question(data: EnhancedQuestionInput) -> str:
     ]
     
     context_str = " ".join(field for field in context_fields if field)
-    return f"{context_str}: {data.question}" if context_str else data.question
+    return f"{context_str}: {preped_question}" if context_str else preped_question
 
 
 def prepare_question(question: str) -> str:
@@ -91,7 +91,7 @@ def ask_question(data: EnhancedQuestionInput):
     # Clean and prepare the question
     preped_question = prepare_question(data.question)
     # Create contextualized question
-    full_question = create_context_question(preped_question)
+    full_question = create_context_question(data, preped_question)
     
     
 
@@ -110,10 +110,10 @@ def ask_question(data: EnhancedQuestionInput):
     description="Add a new solution with its associated question")
 def add_solution(data: SolutionRequest):
 
-        # Clean and prepare the question
+    # Clean and prepare the question
     preped_question = prepare_question(data.question)
     # Create contextualized question
-    full_question = create_context_question(preped_question)
+    full_question = create_context_question(data, preped_question)
     # Search for existing solution using vector similarity
     result = find_existing_solution(full_question)
     if result:
