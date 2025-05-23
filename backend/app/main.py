@@ -11,7 +11,7 @@ app = FastAPI(
     version="1.0.0",
     contact={
         "name": "Manufacturing Support Team",
-        "email": "support@manufacturing.example.com",
+        "email": "antonidag@hotmail.com",
     },
     license_info={
         "name": "Proprietary",

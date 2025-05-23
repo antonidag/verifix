@@ -20,30 +20,34 @@ class DowntimeImpact(str, Enum):
 class QuestionInput(BaseModel):
     question: str = Field(..., description="The question to be asked")
 
-
-class AskRequestModel(BaseModel):
-    question: str = Field(..., description="The main question or issue to be resolved")
+class SolutionPartModel(BaseModel):
     machine_name: Optional[str] = Field(None, description="Name/tag of machine (e.g., 'Press #3')")
     machine_type: Optional[str] = Field(None, description="Type of machine (e.g., 'Press', 'Conveyor', 'Robot Arm')")
     manufacturer: Optional[str] = Field(None, description="Equipment manufacturer (e.g., 'Siemens', 'ABB', 'KUKA')")
     model_number: Optional[str] = Field(None, description="Specific model number of the equipment")
     component: Optional[str] = Field(None, description="Specific component involved (e.g., 'Motor', 'PLC', 'Sensor')")
     error_code: Optional[str] = Field(None, description="Machine/system error code")
+class AskRequestModel(BaseModel):
+    question: str = Field(..., description="The main question or issue to be resolved")
+    solution: Optional[SolutionPartModel] = Field(None, description="Optional solution details")
 
     class Config:
         schema_extra = {
             "example": {
                 "question": "Machine keeps stopping unexpectedly",
-                "machine_name": "Press #3",
-                "machine_type": "Hydraulic Press",
-                "manufacturer": "Siemens",
-                "component": "Pressure Sensor",
-                "error_code": "E5023"
+                "solution": {
+                    "machine_name": "Press #3",
+                    "machine_type": "Hydraulic Press",
+                    "manufacturer": "Siemens",
+                    "component": "Pressure Sensor",
+                    "error_code": "E5023"
+                }
             }
         }
 
 
 class SolutionModel(BaseModel):
+    id: int = Field(None, description="The solution id")
     text: str = Field(..., description="The solution text")
     document_link: str = Field(..., description="Link to related documentation")
     verified: bool = Field(..., description="Whether the solution has been verified")
@@ -84,11 +88,19 @@ class SolutionRequest(BaseModel):
     question: str = Field(..., description="The original question this solution answers")
 
 
-class SolutionWithIdModel(BaseModel):
-    id: int
 class SolutionResponseModel(BaseModel):
     message: str
-    solution: SolutionWithIdModel
+    solution: dict = Field(..., example={"id": 1})
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": "Solution added successfully",
+                "solution": {
+                    "id": 1
+                }
+            }
+        }
 
 
 class QuestionModel(BaseModel):
@@ -101,8 +113,8 @@ class QuestionModel(BaseModel):
 
 
 class Match(BaseModel):
-    text: str
     solution_id: int
+    score: float
 
     class Config:
         orm_mode = True
@@ -110,7 +122,6 @@ class Match(BaseModel):
 
 class AskResponseModel(BaseModel):
     match: Optional[Match] = None
-    message: Optional[str] = None
 
     class Config:
         orm_mode = True 

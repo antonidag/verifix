@@ -27,6 +27,6 @@ def search_similar(embedding):
     hits = client.search(collection_name=COLLECTION, query_vector=embedding, limit=1)
     print(hits)
     if hits and hits[0].score >= THRESHOLD:
-        return hits[0].payload
+        return {**hits[0].payload, "score": hits[0].score}
 
     return None
