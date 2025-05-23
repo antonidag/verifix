@@ -11,6 +11,15 @@ from gpt_researcher import GPTResearcher
 class QuestionInput(BaseModel):
     question: str
 
+class EnhancedQuestionInput(BaseModel):
+    question: str
+    machine_name: Optional[str] = None
+    machine_type: Optional[str] = None
+    manufacturer: Optional[str] = None
+    model_number: Optional[str] = None
+    component: Optional[str] = None
+    error_code: Optional[str] = None
+
 class AskInput(BaseModel):
     question: str
     
@@ -42,21 +51,32 @@ init_db()
 
 
 @app.post("/ask")
-def ask_question(data: QuestionInput):
+def ask_question(data: EnhancedQuestionInput):
+    # Build context by joining available fields in specified order
+    context_fields = [
+        data.manufacturer,
+        data.machine_type,
+        data.machine_name,
+        data.component,
+        data.error_code
+    ]
+    
+    # Filter out None values and join with spaces
+    context_str = " ".join(field for field in context_fields if field)
+    full_question = f"{context_str}: {data.question}" if context_str else data.question
 
     preped_question = generate_response(f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
 
-Correct any spelling or grammar issues, remove informal language or excessive punctuation, and rephrase the input into a neutral tone.
+Correct any spelling or grammar issues, remove informal language or excessive punctuation, and rephrase the input into a neutral tone while preserving all technical context.
 
 Only return the cleaned-up description. Do not explain your reasoning.
 
 Input:
-{data.question}
+{full_question}
 
 Output:
 """)
 
-    final_question = f""
     embedding = embed_text(preped_question)
     result = search_similar(embedding)
 
