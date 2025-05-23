@@ -56,7 +56,8 @@ def find_existing_solution(question: str) -> Optional[Dict]:
 
 def create_solution_and_question(
     db: SessionLocal,
-    solution_data: SolutionRequest
+    solution_data: SolutionRequest,
+    full_question: str
 ) -> Tuple[int, str]:
     """Create a new solution and associated question in the database."""
     try:
@@ -66,13 +67,13 @@ def create_solution_and_question(
         db.refresh(solution)
 
         question = Question(
-            text=solution_data.question,
+            text=full_question,
             solution_id=solution.id,
         )
         db.add(question)
         db.commit()
 
-        return solution.id, solution_data.question
+        return solution.id, full_question
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(
@@ -86,14 +87,16 @@ def create_solution_and_question(
     summary="Ask a question with manufacturing context",
     description="Submit a question with optional manufacturing context to find matching solutions")
 def ask_question(data: EnhancedQuestionInput):
-    # Create contextualized question
-    full_question = create_context_question(data)
     
     # Clean and prepare the question
-    preped_question = prepare_question(full_question)
+    preped_question = prepare_question(data.question)
+    # Create contextualized question
+    full_question = create_context_question(preped_question)
+    
+    
 
     # Search for existing solution
-    result = find_existing_solution(preped_question)
+    result = find_existing_solution(full_question)
 
     if result:
         return {"match": result}
@@ -106,8 +109,13 @@ def ask_question(data: EnhancedQuestionInput):
     summary="Add a new solution",
     description="Add a new solution with its associated question")
 def add_solution(data: SolutionRequest):
+
+        # Clean and prepare the question
+    preped_question = prepare_question(data.question)
+    # Create contextualized question
+    full_question = create_context_question(preped_question)
     # Search for existing solution using vector similarity
-    result = find_existing_solution(data.question)
+    result = find_existing_solution(full_question)
     if result:
         raise HTTPException(
             status_code=400,
@@ -119,7 +127,7 @@ def add_solution(data: SolutionRequest):
     try:
         with SessionLocal() as db:
             # Create solution and question
-            solution_id, question = create_solution_and_question(db, data)
+            solution_id, question = create_solution_and_question(db, data, full_question)
             
             # Index the question for vector search
             embedding = embed_text(question)
