@@ -32,7 +32,7 @@ export const KnowledgeBase = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {solutions.map((solution) => (
+              {solutions.slice(0, 5).map((solution) => (
                 <div
                   key={solution.id}
                   className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
