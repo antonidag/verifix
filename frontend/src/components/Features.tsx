@@ -1,33 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Search,
-  Brain,
-  Database,
-  Zap,
-  FileText,
-  TrendingUp,
-} from "lucide-react";
+import { Search, Brain, Database, Zap, FileText, TrendingUp, Bot, Cpu } from "lucide-react";
 
 const features = [
   {
     icon: Search,
     title: "Semantic Search",
-    description:
-      "Hybrid vector search finds the most relevant past solutions to current problems",
+    description: "Hybrid vector search finds the most relevant past solutions to current problems",
     color: "text-blue-600",
   },
   {
     icon: Brain,
     title: "LLM-Powered Generation",
-    description:
-      "When no solution exists, AI researches and drafts potential fixes",
+    description: "When no solution exists, AI researches and drafts potential fixes",
     color: "text-purple-600",
   },
   {
     icon: Database,
     title: "Verified Solutions",
-    description:
-      "Store and retrieve verified fixes with optional documentation links",
+    description: "Store and retrieve verified fixes with optional documentation links",
     color: "text-green-600",
   },
   {
@@ -50,17 +40,45 @@ const features = [
   },
 ];
 
+export const HeroFeatures = () => (
+  <section className="container mx-auto px-4 py-8">
+    <div className="text-center max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all">
+          <Cpu className="w-8 h-8 text-blue-600 mb-4" />
+          <h3 className="font-semibold text-slate-800 mb-2">Semantic Search</h3>
+          <p className="text-slate-600 text-sm">
+            Hybrid vector search finds the most relevant solutions
+          </p>
+        </div>
+
+        <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all">
+          <Bot className="w-8 h-8 text-cyan-600 mb-4" />
+          <h3 className="font-semibold text-slate-800 mb-2">LLM Generation</h3>
+          <p className="text-slate-600 text-sm">
+            AI researches and drafts solutions when none exist
+          </p>
+        </div>
+
+        <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all">
+          <Database className="w-8 h-8 text-blue-600 mb-4" />
+          <h3 className="font-semibold text-slate-800 mb-2">Self-Learning</h3>
+          <p className="text-slate-600 text-sm">
+            Knowledge base grows smarter with each resolution
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
 export const Features = () => {
   return (
-    <section
-      id="features"
-      className="container mx-auto px-4 py-16 bg-white/30 backdrop-blur-sm"
-    >
+    <section id="features" className="container mx-auto px-4 py-8 bg-white/30 backdrop-blur-sm">
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-slate-800 mb-4">Key Features</h2>
         <p className="text-slate-600 max-w-2xl mx-auto">
-          Advanced AI capabilities designed to revolutionize troubleshooting
-          workflows
+          Advanced AI capabilities designed to revolutionize troubleshooting workflows
         </p>
       </div>
 
