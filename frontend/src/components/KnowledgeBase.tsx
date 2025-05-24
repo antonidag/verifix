@@ -1,10 +1,20 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { solutions } from "@/data/solutions";
+import { Solution, solutions } from "@/data/solutions";
 import { AlertCircle, CheckCircle, Clock, Database, TrendingUp } from "lucide-react";
+import { useState } from "react";
 import { KnowledgeDialog } from "./KnowledgeDialog";
+import { Button } from "./ui/button";
 
 export const KnowledgeBase = () => {
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedSolution, setSelectedSolution] = useState<Solution>(null);
+
+  const handleViewDetails = (solution: Solution) => {
+    setSelectedSolution(solution);
+    setIsDetailModalOpen(true);
+  };
+
   return (
     <section id="knowledge" className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
@@ -30,7 +40,7 @@ export const KnowledgeBase = () => {
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-slate-800">{solution.title}</h3>
-                      {solution.status === "verified" ? (
+                      {solution.verified ? (
                         <CheckCircle className="w-4 h-4 text-green-500" />
                       ) : (
                         <AlertCircle className="w-4 h-4 text-orange-500" />
@@ -53,7 +63,14 @@ export const KnowledgeBase = () => {
                       </span>
                     </div>
 
-                    <KnowledgeDialog solution={solution} />
+                    <Button
+                      onClick={() => handleViewDetails(solution)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      View Details
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -85,6 +102,12 @@ export const KnowledgeBase = () => {
             </CardContent>
           </Card>
         </div>
+
+        <KnowledgeDialog
+          open={isDetailModalOpen}
+          onOpenChange={setIsDetailModalOpen}
+          solution={selectedSolution}
+        />
       </div>
     </section>
   );
