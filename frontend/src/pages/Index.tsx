@@ -1,8 +1,9 @@
-import { Hero } from "@/components/Hero";
-import { ProblemSubmission } from "@/components/ProblemSubmission";
 import { Features, HeroFeatures } from "@/components/Features";
-import { KnowledgeBase } from "@/components/KnowledgeBase";
 import { Footer } from "@/components/Footer";
+import { Hero } from "@/components/Hero";
+import { KnowledgeBase } from "@/components/KnowledgeBase";
+import { LiveChat } from "@/components/LiveChat";
+import { ProblemSubmission } from "@/components/ProblemSubmission";
 
 const Index = () => {
   return (
@@ -14,6 +15,7 @@ const Index = () => {
       <KnowledgeBase />
       <Features />
       <Footer />
+      <LiveChat />
     </div>
   );
 };
