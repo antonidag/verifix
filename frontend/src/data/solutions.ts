@@ -1,5 +1,4 @@
 export type SolutionResult = {
-  type: "knowledge_base" | "ai_generated";
   found: boolean;
   solution: Solution | null;
 };
@@ -9,76 +8,132 @@ export type Solution = {
   title: string;
   description: string;
   steps: string[];
-  status: "verified" | "pending";
+  verified: boolean;
   confidence: number;
   usageCount: number;
   lastUsed: string;
   tags: string[];
-  documentationLinks?: string[];
+  links: { title: string; url: string }[];
+  documents: { name: string; type: string }[];
   createdAt: string; // ISO date string
 };
 
 export const solutions: Solution[] = [
   {
     id: "SOL-001",
-    title: "Motor Controller Communication Fault",
-    description: "PLC error 4096 on production line",
+    title: "Stepper Motor Stalling at High Speeds",
+    description:
+      "Technician-confirmed steps to troubleshoot the issue: stepper motor stalling at high speeds.",
     steps: [
-      "1. Reset the PLC using the master control panel",
-      "2. Check cable connections to ensure they are secure",
-      "3. Verify input settings in panel B match the configuration manual",
-      "4. If issue persists, check for electromagnetic interference from nearby equipment",
-      "5. Contact technical support if error continues after these steps",
+      "1. Inspect connections and tighten loose terminals",
+      "2. Review error logs from the control system",
+      "3. Power cycle affected hardware",
+      "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.95,
-    usageCount: 23,
-    lastUsed: "2 hours ago",
-    tags: ["plc", "error-4096", "communication"],
-    documentationLinks: [
-      "https://internal.docs/plc-errors/4096",
-      "https://manual.plc-systems.com/troubleshooting",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 16,
+    lastUsed: "3 hours ago",
+    tags: ["firmware", "controller", "relay"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/sol-1/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/sol-1",
+      },
     ],
-    createdAt: "2024-05-20T15:30:00Z",
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
+    ],
+    createdAt: "2024-05-24T12:00:00Z",
   },
   {
     id: "SOL-002",
-    title: "Hydraulic Pressure Drop",
-    description: "Pressure alarm on hydraulic system",
+    title: "Inconsistent Temperature Sensor Output",
+    description:
+      "Technician-confirmed steps to troubleshoot the issue: inconsistent temperature sensor output.",
     steps: [
-      "1. Check hydraulic fluid levels in the main reservoir",
-      "2. Inspect all hydraulic lines for leaks or damage",
-      "3. Verify pump operation and pressure settings",
-      "4. Clean or replace hydraulic filters if clogged",
-      "5. Calibrate pressure sensors if readings are inconsistent",
+      "1. Inspect connections and tighten loose terminals",
+      "2. Review error logs from the control system",
+      "3. Power cycle affected hardware",
+      "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.87,
-    usageCount: 8,
-    lastUsed: "1 day ago",
-    tags: ["hydraulic", "pressure", "alarm"],
-    documentationLinks: ["https://internal.docs/hydraulic-systems"],
-    createdAt: "2024-05-22T09:15:00Z",
+    verified: true,
+    confidence: 0.79,
+    usageCount: 22,
+    lastUsed: "1 hours ago",
+    tags: ["pressure", "hydraulic", "alarm"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/sol-2/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/sol-2",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
+    ],
+    createdAt: "2024-05-24T11:45:00Z",
   },
   {
     id: "SOL-003",
-    title: "Temperature Sensor Calibration",
-    description: "Temperature readings inconsistent",
+    title: "Hydraulic Pump Fails to Start",
+    description:
+      "Technician-confirmed steps to troubleshoot the issue: hydraulic pump fails to start.",
     steps: [
-      "1. Power down the system and wait for cool down",
-      "2. Remove temperature sensor and clean the probe",
-      "3. Use calibrated reference thermometer for comparison",
-      "4. Adjust sensor offset in control system settings",
-      "5. Test sensor response across temperature range",
-      "6. Document new calibration values",
+      "1. Inspect connections and tighten loose terminals",
+      "2. Review error logs from the control system",
+      "3. Power cycle affected hardware",
+      "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 15,
-    lastUsed: "3 hours ago",
-    tags: ["temperature", "sensor", "calibration"],
-    documentationLinks: ["https://internal.docs/sensor-calibration"],
-    createdAt: "2024-05-21T11:45:00Z",
+    verified: true,
+    confidence: 0.88,
+    usageCount: 10,
+    lastUsed: "2 hours ago",
+    tags: ["controller", "alarm", "network"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/sol-3/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/sol-3",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
+    ],
+    createdAt: "2024-05-24T11:30:00Z",
   },
   {
     id: "SOL-004",
@@ -91,16 +146,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
+    verified: true,
     confidence: 0.82,
-    usageCount: 18,
-    lastUsed: "1 hours ago",
-    tags: ["hydraulic", "communication", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-4/guide",
-      "https://docs.internal/faq/sol-4",
+    usageCount: 19,
+    lastUsed: "9 hours ago",
+    tags: ["communication", "controller", "motor"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/sol-4/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/sol-4",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T11:15:00Z",
   },
@@ -115,15 +185,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 4,
-    lastUsed: "1 hours ago",
-    tags: ["controller", "communication", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-5/guide",
-      "https://docs.internal/faq/sol-5",
+    verified: true,
+    confidence: 0.84,
+    usageCount: 22,
+    lastUsed: "8 hours ago",
+    tags: ["controller", "calibration", "pressure"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/sol-5/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/sol-5",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T11:00:00Z",
   },
@@ -140,14 +227,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 21,
-    lastUsed: "5 hours ago",
-    tags: ["alarm", "motor", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-6/guide",
-      "https://docs.internal/faq/sol-6",
+    verified: true,
+    confidence: 0.82,
+    usageCount: 10,
+    lastUsed: "1 hours ago",
+    tags: ["network", "pressure", "communication"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/sol-6/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/sol-6",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:45:00Z",
   },
@@ -161,17 +264,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.94,
-    usageCount: 16,
-    lastUsed: "6 hours ago",
-    tags: ["relay", "pressure", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-7/guide",
-      "https://docs.internal/faq/sol-7",
+    verified: true,
+    confidence: 0.87,
+    usageCount: 24,
+    lastUsed: "4 hours ago",
+    tags: ["vibration", "network", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/sol-7/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/sol-7",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:30:00Z",
   },
@@ -188,14 +305,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.92,
-    usageCount: 24,
+    verified: true,
+    confidence: 0.82,
+    usageCount: 11,
     lastUsed: "9 hours ago",
-    tags: ["hydraulic", "controller", "plc"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-8/guide",
-      "https://docs.internal/faq/sol-8",
+    tags: ["plc", "calibration", "alarm"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/sol-8/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/sol-8",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:15:00Z",
   },
@@ -209,16 +342,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.95,
-    usageCount: 20,
-    lastUsed: "5 hours ago",
-    tags: ["calibration", "plc", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-9/guide",
-      "https://docs.internal/faq/sol-9",
+    verified: true,
+    confidence: 0.79,
+    usageCount: 12,
+    lastUsed: "1 hours ago",
+    tags: ["vibration", "temperature", "alarm"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/sol-9/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/sol-9",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:00:00Z",
   },
@@ -231,15 +379,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.79,
-    usageCount: 4,
+    verified: true,
+    confidence: 0.94,
+    usageCount: 3,
     lastUsed: "6 hours ago",
-    tags: ["pressure", "motor", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-10/guide",
-      "https://docs.internal/faq/sol-10",
+    tags: ["temperature", "controller", "vibration"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/sol-10/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/sol-10",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:45:00Z",
   },
@@ -255,14 +421,30 @@ export const solutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.92,
-    usageCount: 15,
+    verified: true,
+    confidence: 0.8,
+    usageCount: 11,
     lastUsed: "2 hours ago",
-    tags: ["network", "sensor", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-11/guide",
-      "https://docs.internal/faq/sol-11",
+    tags: ["hydraulic", "firmware", "calibration"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/sol-11/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/sol-11",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:30:00Z",
   },
@@ -277,14 +459,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 20,
+    verified: true,
+    confidence: 0.82,
+    usageCount: 23,
     lastUsed: "6 hours ago",
-    tags: ["temperature", "vibration", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-12/guide",
-      "https://docs.internal/faq/sol-12",
+    tags: ["controller", "alarm", "plc"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/sol-12/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/sol-12",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:15:00Z",
   },
@@ -300,14 +498,30 @@ export const solutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.86,
-    usageCount: 25,
-    lastUsed: "9 hours ago",
-    tags: ["relay", "communication", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-13/guide",
-      "https://docs.internal/faq/sol-13",
+    verified: true,
+    confidence: 0.91,
+    usageCount: 5,
+    lastUsed: "5 hours ago",
+    tags: ["calibration", "relay", "plc"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/sol-13/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/sol-13",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:00:00Z",
   },
@@ -321,15 +535,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.97,
+    verified: true,
+    confidence: 0.85,
     usageCount: 25,
-    lastUsed: "2 hours ago",
-    tags: ["motor", "communication", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-14/guide",
-      "https://docs.internal/faq/sol-14",
+    lastUsed: "6 hours ago",
+    tags: ["pressure", "motor", "alarm"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/sol-14/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/sol-14",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:45:00Z",
   },
@@ -343,15 +575,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.95,
-    usageCount: 21,
+    verified: true,
+    confidence: 0.91,
+    usageCount: 17,
     lastUsed: "8 hours ago",
-    tags: ["sensor", "temperature", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-15/guide",
-      "https://docs.internal/faq/sol-15",
+    tags: ["firmware", "network", "hydraulic"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/sol-15/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/sol-15",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:30:00Z",
   },
@@ -365,16 +615,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.86,
-    usageCount: 6,
-    lastUsed: "9 hours ago",
-    tags: ["hydraulic", "temperature", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-16/guide",
-      "https://docs.internal/faq/sol-16",
+    verified: true,
+    confidence: 0.8,
+    usageCount: 20,
+    lastUsed: "10 hours ago",
+    tags: ["alarm", "sensor", "firmware"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/sol-16/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/sol-16",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:15:00Z",
   },
@@ -389,15 +654,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.81,
-    usageCount: 10,
+    verified: true,
+    confidence: 0.88,
+    usageCount: 8,
     lastUsed: "2 hours ago",
-    tags: ["network", "temperature", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-17/guide",
-      "https://docs.internal/faq/sol-17",
+    tags: ["motor", "communication", "relay"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/sol-17/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/sol-17",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:00:00Z",
   },
@@ -412,16 +694,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.87,
-    usageCount: 14,
-    lastUsed: "3 hours ago",
-    tags: ["controller", "network", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-18/guide",
-      "https://docs.internal/faq/sol-18",
+    verified: true,
+    confidence: 0.89,
+    usageCount: 11,
+    lastUsed: "1 hours ago",
+    tags: ["network", "sensor", "motor"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/sol-18/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/sol-18",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:45:00Z",
   },
@@ -437,14 +734,30 @@ export const solutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
+    verified: true,
     confidence: 0.88,
-    usageCount: 16,
-    lastUsed: "4 hours ago",
-    tags: ["hydraulic", "sensor", "plc"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-19/guide",
-      "https://docs.internal/faq/sol-19",
+    usageCount: 19,
+    lastUsed: "3 hours ago",
+    tags: ["hydraulic", "vibration", "plc"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/sol-19/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/sol-19",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:30:00Z",
   },
@@ -459,15 +772,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.83,
-    usageCount: 19,
-    lastUsed: "2 hours ago",
-    tags: ["communication", "vibration", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-20/guide",
-      "https://docs.internal/faq/sol-20",
+    verified: true,
+    confidence: 0.96,
+    usageCount: 16,
+    lastUsed: "9 hours ago",
+    tags: ["calibration", "temperature", "network"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/sol-20/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/sol-20",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:15:00Z",
   },
@@ -482,14 +812,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.91,
-    usageCount: 7,
-    lastUsed: "9 hours ago",
-    tags: ["temperature", "alarm", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-21/guide",
-      "https://docs.internal/faq/sol-21",
+    verified: true,
+    confidence: 0.93,
+    usageCount: 20,
+    lastUsed: "4 hours ago",
+    tags: ["firmware", "motor", "pressure"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/sol-21/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/sol-21",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:00:00Z",
   },
@@ -503,15 +849,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.92,
-    usageCount: 25,
+    verified: true,
+    confidence: 0.85,
+    usageCount: 5,
     lastUsed: "9 hours ago",
-    tags: ["vibration", "pressure", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-22/guide",
-      "https://docs.internal/faq/sol-22",
+    tags: ["sensor", "hydraulic", "relay"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/sol-22/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/sol-22",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:45:00Z",
   },
@@ -525,15 +888,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.92,
-    usageCount: 8,
-    lastUsed: "1 hours ago",
-    tags: ["relay", "network", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-23/guide",
-      "https://docs.internal/faq/sol-23",
+    verified: true,
+    confidence: 0.89,
+    usageCount: 22,
+    lastUsed: "4 hours ago",
+    tags: ["relay", "network", "vibration"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/sol-23/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/sol-23",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:30:00Z",
   },
@@ -548,15 +929,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.81,
-    usageCount: 4,
-    lastUsed: "1 hours ago",
-    tags: ["pressure", "calibration", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-24/guide",
-      "https://docs.internal/faq/sol-24",
+    verified: true,
+    confidence: 0.95,
+    usageCount: 21,
+    lastUsed: "4 hours ago",
+    tags: ["temperature", "motor", "communication"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/sol-24/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/sol-24",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:15:00Z",
   },
@@ -569,16 +967,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 20,
-    lastUsed: "3 hours ago",
-    tags: ["alarm", "vibration", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-25/guide",
-      "https://docs.internal/faq/sol-25",
+    verified: true,
+    confidence: 0.96,
+    usageCount: 25,
+    lastUsed: "5 hours ago",
+    tags: ["plc", "controller", "motor"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/sol-25/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/sol-25",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:00:00Z",
   },
@@ -592,16 +1005,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 18,
-    lastUsed: "9 hours ago",
-    tags: ["hydraulic", "network", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-26/guide",
-      "https://docs.internal/faq/sol-26",
+    verified: true,
+    confidence: 0.92,
+    usageCount: 13,
+    lastUsed: "2 hours ago",
+    tags: ["vibration", "calibration", "plc"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/sol-26/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/sol-26",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:45:00Z",
   },
@@ -615,15 +1043,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.93,
-    usageCount: 20,
-    lastUsed: "1 hours ago",
-    tags: ["pressure", "relay", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-27/guide",
-      "https://docs.internal/faq/sol-27",
+    verified: true,
+    confidence: 0.85,
+    usageCount: 3,
+    lastUsed: "4 hours ago",
+    tags: ["motor", "temperature", "firmware"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/sol-27/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/sol-27",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:30:00Z",
   },
@@ -640,14 +1086,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.9,
-    usageCount: 17,
-    lastUsed: "6 hours ago",
-    tags: ["network", "sensor", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-28/guide",
-      "https://docs.internal/faq/sol-28",
+    verified: true,
+    confidence: 0.92,
+    usageCount: 20,
+    lastUsed: "2 hours ago",
+    tags: ["temperature", "alarm", "controller"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/sol-28/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/sol-28",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:15:00Z",
   },
@@ -664,14 +1126,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.96,
-    usageCount: 11,
-    lastUsed: "8 hours ago",
-    tags: ["hydraulic", "controller", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-29/guide",
-      "https://docs.internal/faq/sol-29",
+    verified: true,
+    confidence: 0.93,
+    usageCount: 18,
+    lastUsed: "10 hours ago",
+    tags: ["vibration", "alarm", "calibration"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/sol-29/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/sol-29",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:00:00Z",
   },
@@ -685,15 +1163,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 11,
+    verified: true,
+    confidence: 0.82,
+    usageCount: 7,
     lastUsed: "4 hours ago",
-    tags: ["controller", "relay", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-30/guide",
-      "https://docs.internal/faq/sol-30",
+    tags: ["sensor", "hydraulic", "plc"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/sol-30/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/sol-30",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:45:00Z",
   },
@@ -708,16 +1204,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.85,
-    usageCount: 20,
-    lastUsed: "3 hours ago",
-    tags: ["temperature", "relay", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-31/guide",
-      "https://docs.internal/faq/sol-31",
+    verified: true,
+    confidence: 0.91,
+    usageCount: 18,
+    lastUsed: "2 hours ago",
+    tags: ["pressure", "relay", "sensor"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/sol-31/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/sol-31",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:30:00Z",
   },
@@ -732,15 +1243,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.93,
-    usageCount: 23,
-    lastUsed: "9 hours ago",
-    tags: ["relay", "firmware", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-32/guide",
-      "https://docs.internal/faq/sol-32",
+    verified: true,
+    confidence: 0.79,
+    usageCount: 20,
+    lastUsed: "2 hours ago",
+    tags: ["relay", "network", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/sol-32/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/sol-32",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:15:00Z",
   },
@@ -754,16 +1282,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.97,
-    usageCount: 13,
-    lastUsed: "4 hours ago",
-    tags: ["calibration", "alarm", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-33/guide",
-      "https://docs.internal/faq/sol-33",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 17,
+    lastUsed: "3 hours ago",
+    tags: ["plc", "calibration", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/sol-33/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/sol-33",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:00:00Z",
   },
@@ -777,17 +1320,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.82,
-    usageCount: 4,
+    verified: true,
+    confidence: 0.92,
+    usageCount: 24,
     lastUsed: "10 hours ago",
-    tags: ["plc", "alarm", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-34/guide",
-      "https://docs.internal/faq/sol-34",
+    tags: ["vibration", "plc", "motor"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/sol-34/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/sol-34",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:45:00Z",
   },
@@ -802,14 +1359,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.82,
-    usageCount: 21,
-    lastUsed: "1 hours ago",
-    tags: ["network", "communication", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-35/guide",
-      "https://docs.internal/faq/sol-35",
+    verified: true,
+    confidence: 0.88,
+    usageCount: 19,
+    lastUsed: "6 hours ago",
+    tags: ["hydraulic", "communication", "sensor"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/sol-35/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/sol-35",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:30:00Z",
   },
@@ -825,14 +1398,30 @@ export const solutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.8,
-    usageCount: 22,
-    lastUsed: "9 hours ago",
-    tags: ["firmware", "controller", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-36/guide",
-      "https://docs.internal/faq/sol-36",
+    verified: true,
+    confidence: 0.93,
+    usageCount: 14,
+    lastUsed: "3 hours ago",
+    tags: ["communication", "plc", "controller"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/sol-36/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/sol-36",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:15:00Z",
   },
@@ -848,14 +1437,30 @@ export const solutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.91,
-    usageCount: 14,
-    lastUsed: "7 hours ago",
-    tags: ["hydraulic", "vibration", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-37/guide",
-      "https://docs.internal/faq/sol-37",
+    verified: true,
+    confidence: 0.93,
+    usageCount: 10,
+    lastUsed: "10 hours ago",
+    tags: ["plc", "motor", "relay"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/sol-37/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/sol-37",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:00:00Z",
   },
@@ -869,17 +1474,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.88,
-    usageCount: 19,
-    lastUsed: "8 hours ago",
-    tags: ["sensor", "network", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-38/guide",
-      "https://docs.internal/faq/sol-38",
+    verified: true,
+    confidence: 0.79,
+    usageCount: 22,
+    lastUsed: "4 hours ago",
+    tags: ["calibration", "temperature", "sensor"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/sol-38/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/sol-38",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:45:00Z",
   },
@@ -894,14 +1513,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 14,
+    verified: true,
+    confidence: 0.86,
+    usageCount: 11,
     lastUsed: "2 hours ago",
-    tags: ["hydraulic", "communication", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-39/guide",
-      "https://docs.internal/faq/sol-39",
+    tags: ["controller", "hydraulic", "motor"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/sol-39/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/sol-39",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:30:00Z",
   },
@@ -914,17 +1549,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.83,
-    usageCount: 23,
-    lastUsed: "7 hours ago",
-    tags: ["controller", "vibration", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-40/guide",
-      "https://docs.internal/faq/sol-40",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 19,
+    lastUsed: "2 hours ago",
+    tags: ["motor", "firmware", "plc"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/sol-40/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/sol-40",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:15:00Z",
   },
@@ -938,16 +1587,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.78,
-    usageCount: 17,
-    lastUsed: "3 hours ago",
-    tags: ["alarm", "pressure", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-41/guide",
-      "https://docs.internal/faq/sol-41",
+    verified: true,
+    confidence: 0.83,
+    usageCount: 23,
+    lastUsed: "2 hours ago",
+    tags: ["alarm", "sensor", "plc"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/sol-41/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/sol-41",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:00:00Z",
   },
@@ -962,16 +1626,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.87,
-    usageCount: 13,
-    lastUsed: "2 hours ago",
-    tags: ["plc", "pressure", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-42/guide",
-      "https://docs.internal/faq/sol-42",
+    verified: true,
+    confidence: 0.88,
+    usageCount: 10,
+    lastUsed: "9 hours ago",
+    tags: ["pressure", "temperature", "network"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/sol-42/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/sol-42",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:45:00Z",
   },
@@ -988,14 +1667,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
+    verified: true,
     confidence: 0.9,
-    usageCount: 8,
-    lastUsed: "10 hours ago",
-    tags: ["network", "controller", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-43/guide",
-      "https://docs.internal/faq/sol-43",
+    usageCount: 15,
+    lastUsed: "7 hours ago",
+    tags: ["firmware", "calibration", "controller"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/sol-43/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/sol-43",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:30:00Z",
   },
@@ -1012,14 +1707,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.96,
-    usageCount: 13,
-    lastUsed: "10 hours ago",
-    tags: ["vibration", "controller", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-44/guide",
-      "https://docs.internal/faq/sol-44",
+    verified: true,
+    confidence: 0.91,
+    usageCount: 22,
+    lastUsed: "6 hours ago",
+    tags: ["motor", "network", "temperature"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/sol-44/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/sol-44",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:15:00Z",
   },
@@ -1034,16 +1745,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.9,
-    usageCount: 12,
-    lastUsed: "2 hours ago",
-    tags: ["calibration", "communication", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-45/guide",
-      "https://docs.internal/faq/sol-45",
+    verified: true,
+    confidence: 0.95,
+    usageCount: 7,
+    lastUsed: "1 hours ago",
+    tags: ["controller", "relay", "pressure"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/sol-45/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/sol-45",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:00:00Z",
   },
@@ -1058,15 +1784,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.93,
-    usageCount: 9,
-    lastUsed: "2 hours ago",
-    tags: ["firmware", "network", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-46/guide",
-      "https://docs.internal/faq/sol-46",
+    verified: true,
+    confidence: 0.82,
+    usageCount: 21,
+    lastUsed: "8 hours ago",
+    tags: ["firmware", "pressure", "motor"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/sol-46/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/sol-46",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:45:00Z",
   },
@@ -1080,17 +1823,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.85,
-    usageCount: 23,
-    lastUsed: "2 hours ago",
-    tags: ["communication", "calibration", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-47/guide",
-      "https://docs.internal/faq/sol-47",
+    verified: true,
+    confidence: 0.96,
+    usageCount: 15,
+    lastUsed: "7 hours ago",
+    tags: ["network", "pressure", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/sol-47/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/sol-47",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:30:00Z",
   },
@@ -1104,16 +1861,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 13,
-    lastUsed: "9 hours ago",
-    tags: ["hydraulic", "communication", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-48/guide",
-      "https://docs.internal/faq/sol-48",
+    verified: true,
+    confidence: 0.9,
+    usageCount: 5,
+    lastUsed: "5 hours ago",
+    tags: ["alarm", "pressure", "sensor"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/sol-48/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/sol-48",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:15:00Z",
   },
@@ -1128,15 +1900,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.95,
-    usageCount: 22,
+    verified: true,
+    confidence: 0.84,
+    usageCount: 19,
     lastUsed: "7 hours ago",
-    tags: ["relay", "vibration", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-49/guide",
-      "https://docs.internal/faq/sol-49",
+    tags: ["plc", "relay", "controller"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/sol-49/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/sol-49",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:00:00Z",
   },
@@ -1150,15 +1939,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.78,
-    usageCount: 9,
-    lastUsed: "10 hours ago",
-    tags: ["hydraulic", "alarm", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-50/guide",
-      "https://docs.internal/faq/sol-50",
+    verified: true,
+    confidence: 0.95,
+    usageCount: 16,
+    lastUsed: "3 hours ago",
+    tags: ["temperature", "hydraulic", "plc"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/sol-50/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/sol-50",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:45:00Z",
   },
@@ -1172,17 +1979,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
+    verified: true,
     confidence: 0.89,
-    usageCount: 18,
-    lastUsed: "4 hours ago",
-    tags: ["relay", "controller", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-51/guide",
-      "https://docs.internal/faq/sol-51",
+    usageCount: 9,
+    lastUsed: "5 hours ago",
+    tags: ["temperature", "alarm", "sensor"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/sol-51/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/sol-51",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:30:00Z",
   },
@@ -1196,17 +2017,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.84,
-    usageCount: 24,
-    lastUsed: "6 hours ago",
-    tags: ["controller", "firmware", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-52/guide",
-      "https://docs.internal/faq/sol-52",
+    verified: true,
+    confidence: 0.87,
+    usageCount: 11,
+    lastUsed: "3 hours ago",
+    tags: ["pressure", "network", "calibration"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/sol-52/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/sol-52",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:15:00Z",
   },
@@ -1220,15 +2055,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.94,
-    usageCount: 11,
-    lastUsed: "4 hours ago",
-    tags: ["temperature", "firmware", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-53/guide",
-      "https://docs.internal/faq/sol-53",
+    verified: true,
+    confidence: 0.81,
+    usageCount: 9,
+    lastUsed: "5 hours ago",
+    tags: ["alarm", "network", "sensor"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/sol-53/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/sol-53",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:00:00Z",
   },
@@ -1242,16 +2095,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.87,
-    usageCount: 19,
-    lastUsed: "1 hours ago",
-    tags: ["firmware", "vibration", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-54/guide",
-      "https://docs.internal/faq/sol-54",
+    verified: true,
+    confidence: 0.89,
+    usageCount: 13,
+    lastUsed: "8 hours ago",
+    tags: ["calibration", "sensor", "vibration"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/sol-54/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/sol-54",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:45:00Z",
   },
@@ -1266,14 +2134,30 @@ export const solutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
+    verified: true,
     confidence: 0.85,
-    usageCount: 8,
-    lastUsed: "3 hours ago",
-    tags: ["hydraulic", "temperature", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-55/guide",
-      "https://docs.internal/faq/sol-55",
+    usageCount: 5,
+    lastUsed: "2 hours ago",
+    tags: ["communication", "calibration", "firmware"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/sol-55/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/sol-55",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:30:00Z",
   },
@@ -1288,16 +2172,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 19,
-    lastUsed: "10 hours ago",
-    tags: ["relay", "pressure", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-56/guide",
-      "https://docs.internal/faq/sol-56",
+    verified: true,
+    confidence: 0.78,
+    usageCount: 7,
+    lastUsed: "5 hours ago",
+    tags: ["sensor", "motor", "plc"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/sol-56/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/sol-56",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:15:00Z",
   },
@@ -1311,15 +2210,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.82,
-    usageCount: 20,
-    lastUsed: "7 hours ago",
-    tags: ["controller", "temperature", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-57/guide",
-      "https://docs.internal/faq/sol-57",
+    verified: true,
+    confidence: 0.88,
+    usageCount: 10,
+    lastUsed: "2 hours ago",
+    tags: ["relay", "hydraulic", "controller"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/sol-57/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/sol-57",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:00:00Z",
   },
@@ -1333,15 +2250,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.91,
-    usageCount: 24,
-    lastUsed: "9 hours ago",
-    tags: ["calibration", "plc", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-58/guide",
-      "https://docs.internal/faq/sol-58",
+    verified: true,
+    confidence: 0.82,
+    usageCount: 25,
+    lastUsed: "3 hours ago",
+    tags: ["pressure", "calibration", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/sol-58/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/sol-58",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:45:00Z",
   },
@@ -1358,14 +2293,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.92,
-    usageCount: 14,
-    lastUsed: "6 hours ago",
-    tags: ["sensor", "controller", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-59/guide",
-      "https://docs.internal/faq/sol-59",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 16,
+    lastUsed: "1 hours ago",
+    tags: ["communication", "temperature", "calibration"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/sol-59/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/sol-59",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:30:00Z",
   },
@@ -1379,15 +2330,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.88,
-    usageCount: 17,
-    lastUsed: "8 hours ago",
-    tags: ["network", "communication", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-60/guide",
-      "https://docs.internal/faq/sol-60",
+    verified: true,
+    confidence: 0.91,
+    usageCount: 21,
+    lastUsed: "6 hours ago",
+    tags: ["plc", "motor", "sensor"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/sol-60/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/sol-60",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:15:00Z",
   },
@@ -1401,15 +2369,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.97,
-    usageCount: 7,
-    lastUsed: "10 hours ago",
-    tags: ["vibration", "motor", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-61/guide",
-      "https://docs.internal/faq/sol-61",
+    verified: true,
+    confidence: 0.79,
+    usageCount: 4,
+    lastUsed: "3 hours ago",
+    tags: ["vibration", "alarm", "firmware"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/sol-61/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/sol-61",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:00:00Z",
   },
@@ -1423,17 +2408,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.91,
-    usageCount: 20,
-    lastUsed: "3 hours ago",
-    tags: ["hydraulic", "pressure", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-62/guide",
-      "https://docs.internal/faq/sol-62",
+    verified: true,
+    confidence: 0.89,
+    usageCount: 17,
+    lastUsed: "2 hours ago",
+    tags: ["pressure", "motor", "sensor"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/sol-62/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/sol-62",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:45:00Z",
   },
@@ -1447,17 +2446,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.85,
-    usageCount: 9,
-    lastUsed: "5 hours ago",
-    tags: ["controller", "communication", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-63/guide",
-      "https://docs.internal/faq/sol-63",
+    verified: true,
+    confidence: 0.93,
+    usageCount: 13,
+    lastUsed: "10 hours ago",
+    tags: ["network", "firmware", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/sol-63/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/sol-63",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:30:00Z",
   },
@@ -1474,14 +2487,30 @@ export const solutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.95,
-    usageCount: 14,
-    lastUsed: "1 hours ago",
-    tags: ["vibration", "plc", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-64/guide",
-      "https://docs.internal/faq/sol-64",
+    verified: true,
+    confidence: 0.87,
+    usageCount: 19,
+    lastUsed: "3 hours ago",
+    tags: ["hydraulic", "temperature", "network"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/sol-64/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/sol-64",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:15:00Z",
   },
@@ -1495,17 +2524,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.89,
-    usageCount: 4,
-    lastUsed: "8 hours ago",
-    tags: ["vibration", "sensor", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-65/guide",
-      "https://docs.internal/faq/sol-65",
+    verified: true,
+    confidence: 0.79,
+    usageCount: 11,
+    lastUsed: "5 hours ago",
+    tags: ["sensor", "controller", "motor"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/sol-65/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/sol-65",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:00:00Z",
   },
@@ -1519,15 +2562,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.82,
-    usageCount: 20,
-    lastUsed: "4 hours ago",
-    tags: ["vibration", "controller", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-66/guide",
-      "https://docs.internal/faq/sol-66",
+    verified: true,
+    confidence: 0.97,
+    usageCount: 16,
+    lastUsed: "10 hours ago",
+    tags: ["alarm", "communication", "plc"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/sol-66/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/sol-66",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:45:00Z",
   },
@@ -1541,17 +2602,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.83,
+    verified: true,
+    confidence: 0.96,
     usageCount: 12,
-    lastUsed: "6 hours ago",
-    tags: ["communication", "network", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-67/guide",
-      "https://docs.internal/faq/sol-67",
+    lastUsed: "3 hours ago",
+    tags: ["hydraulic", "vibration", "sensor"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/sol-67/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/sol-67",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:30:00Z",
   },
@@ -1565,16 +2640,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.81,
-    usageCount: 7,
-    lastUsed: "2 hours ago",
-    tags: ["temperature", "alarm", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-68/guide",
-      "https://docs.internal/faq/sol-68",
+    verified: true,
+    confidence: 0.93,
+    usageCount: 16,
+    lastUsed: "7 hours ago",
+    tags: ["network", "pressure", "relay"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/sol-68/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/sol-68",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:15:00Z",
   },
@@ -1589,16 +2679,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.87,
-    usageCount: 14,
-    lastUsed: "6 hours ago",
-    tags: ["temperature", "calibration", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-69/guide",
-      "https://docs.internal/faq/sol-69",
+    verified: true,
+    confidence: 0.97,
+    usageCount: 8,
+    lastUsed: "8 hours ago",
+    tags: ["network", "temperature", "controller"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/sol-69/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/sol-69",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:00:00Z",
   },
@@ -1612,15 +2717,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.82,
-    usageCount: 23,
-    lastUsed: "5 hours ago",
-    tags: ["sensor", "calibration", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-70/guide",
-      "https://docs.internal/faq/sol-70",
+    verified: true,
+    confidence: 0.83,
+    usageCount: 12,
+    lastUsed: "6 hours ago",
+    tags: ["firmware", "motor", "alarm"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/sol-70/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/sol-70",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:45:00Z",
   },
@@ -1634,17 +2756,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.89,
-    usageCount: 8,
-    lastUsed: "6 hours ago",
-    tags: ["communication", "hydraulic", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-71/guide",
-      "https://docs.internal/faq/sol-71",
+    verified: true,
+    confidence: 0.91,
+    usageCount: 23,
+    lastUsed: "2 hours ago",
+    tags: ["communication", "plc", "network"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/sol-71/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/sol-71",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:30:00Z",
   },
@@ -1658,15 +2794,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
+    verified: true,
     confidence: 0.95,
-    usageCount: 13,
-    lastUsed: "5 hours ago",
-    tags: ["alarm", "plc", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-72/guide",
-      "https://docs.internal/faq/sol-72",
+    usageCount: 8,
+    lastUsed: "1 hours ago",
+    tags: ["calibration", "hydraulic", "relay"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/sol-72/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/sol-72",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:15:00Z",
   },
@@ -1681,16 +2834,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.96,
-    usageCount: 22,
-    lastUsed: "10 hours ago",
-    tags: ["plc", "vibration", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-73/guide",
-      "https://docs.internal/faq/sol-73",
+    verified: true,
+    confidence: 0.83,
+    usageCount: 3,
+    lastUsed: "2 hours ago",
+    tags: ["motor", "communication", "calibration"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/sol-73/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/sol-73",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:00:00Z",
   },
@@ -1704,15 +2872,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.83,
-    usageCount: 7,
-    lastUsed: "6 hours ago",
-    tags: ["firmware", "communication", "plc"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-74/guide",
-      "https://docs.internal/faq/sol-74",
+    verified: true,
+    confidence: 0.87,
+    usageCount: 20,
+    lastUsed: "4 hours ago",
+    tags: ["controller", "pressure", "calibration"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/sol-74/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/sol-74",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:45:00Z",
   },
@@ -1726,15 +2911,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.9,
-    usageCount: 20,
-    lastUsed: "6 hours ago",
-    tags: ["relay", "plc", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-75/guide",
-      "https://docs.internal/faq/sol-75",
+    verified: true,
+    confidence: 0.87,
+    usageCount: 14,
+    lastUsed: "2 hours ago",
+    tags: ["pressure", "relay", "vibration"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/sol-75/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/sol-75",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:30:00Z",
   },
@@ -1749,15 +2952,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 8,
-    lastUsed: "8 hours ago",
-    tags: ["relay", "pressure", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-76/guide",
-      "https://docs.internal/faq/sol-76",
+    verified: true,
+    confidence: 0.81,
+    usageCount: 20,
+    lastUsed: "7 hours ago",
+    tags: ["temperature", "pressure", "sensor"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/sol-76/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/sol-76",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:15:00Z",
   },
@@ -1772,14 +2992,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.95,
-    usageCount: 23,
+    verified: true,
+    confidence: 0.79,
+    usageCount: 11,
     lastUsed: "7 hours ago",
-    tags: ["motor", "temperature", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-77/guide",
-      "https://docs.internal/faq/sol-77",
+    tags: ["alarm", "plc", "sensor"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/sol-77/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/sol-77",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:00:00Z",
   },
@@ -1793,15 +3029,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.79,
-    usageCount: 5,
-    lastUsed: "8 hours ago",
-    tags: ["pressure", "sensor", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-78/guide",
-      "https://docs.internal/faq/sol-78",
+    verified: true,
+    confidence: 0.8,
+    usageCount: 14,
+    lastUsed: "4 hours ago",
+    tags: ["vibration", "pressure", "sensor"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/sol-78/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/sol-78",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:45:00Z",
   },
@@ -1815,17 +3069,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.91,
-    usageCount: 25,
+    verified: true,
+    confidence: 0.92,
+    usageCount: 6,
     lastUsed: "4 hours ago",
-    tags: ["firmware", "plc", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-79/guide",
-      "https://docs.internal/faq/sol-79",
+    tags: ["relay", "pressure", "controller"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/sol-79/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/sol-79",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:30:00Z",
   },
@@ -1840,15 +3108,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.86,
-    usageCount: 8,
-    lastUsed: "5 hours ago",
-    tags: ["communication", "motor", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-80/guide",
-      "https://docs.internal/faq/sol-80",
+    verified: true,
+    confidence: 0.93,
+    usageCount: 19,
+    lastUsed: "6 hours ago",
+    tags: ["plc", "temperature", "communication"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/sol-80/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/sol-80",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:15:00Z",
   },
@@ -1863,16 +3148,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.95,
-    usageCount: 8,
-    lastUsed: "7 hours ago",
-    tags: ["firmware", "calibration", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-81/guide",
-      "https://docs.internal/faq/sol-81",
+    verified: true,
+    confidence: 0.83,
+    usageCount: 22,
+    lastUsed: "6 hours ago",
+    tags: ["motor", "vibration", "calibration"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/sol-81/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/sol-81",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:00:00Z",
   },
@@ -1886,15 +3186,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.78,
-    usageCount: 17,
-    lastUsed: "5 hours ago",
-    tags: ["communication", "vibration", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-82/guide",
-      "https://docs.internal/faq/sol-82",
+    verified: true,
+    confidence: 0.95,
+    usageCount: 8,
+    lastUsed: "6 hours ago",
+    tags: ["sensor", "hydraulic", "firmware"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/sol-82/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/sol-82",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:45:00Z",
   },
@@ -1908,17 +3226,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
+    verified: true,
     confidence: 0.9,
-    usageCount: 24,
-    lastUsed: "5 hours ago",
-    tags: ["sensor", "network", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-83/guide",
-      "https://docs.internal/faq/sol-83",
+    usageCount: 6,
+    lastUsed: "3 hours ago",
+    tags: ["temperature", "sensor", "vibration"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/sol-83/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/sol-83",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:30:00Z",
   },
@@ -1933,16 +3265,31 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 12,
-    lastUsed: "3 hours ago",
-    tags: ["controller", "sensor", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-84/guide",
-      "https://docs.internal/faq/sol-84",
+    verified: true,
+    confidence: 0.78,
+    usageCount: 6,
+    lastUsed: "5 hours ago",
+    tags: ["plc", "firmware", "alarm"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/sol-84/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/sol-84",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:15:00Z",
   },
@@ -1955,15 +3302,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.89,
-    usageCount: 22,
-    lastUsed: "5 hours ago",
-    tags: ["network", "plc", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-85/guide",
-      "https://docs.internal/faq/sol-85",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 8,
+    lastUsed: "7 hours ago",
+    tags: ["relay", "alarm", "firmware"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/sol-85/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/sol-85",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:00:00Z",
   },
@@ -1978,14 +3342,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.9,
-    usageCount: 12,
-    lastUsed: "8 hours ago",
-    tags: ["calibration", "motor", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-86/guide",
-      "https://docs.internal/faq/sol-86",
+    verified: true,
+    confidence: 0.86,
+    usageCount: 6,
+    lastUsed: "2 hours ago",
+    tags: ["controller", "calibration", "firmware"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/sol-86/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/sol-86",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:45:00Z",
   },
@@ -2000,15 +3380,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.94,
-    usageCount: 14,
-    lastUsed: "2 hours ago",
-    tags: ["temperature", "hydraulic", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-87/guide",
-      "https://docs.internal/faq/sol-87",
+    verified: true,
+    confidence: 0.97,
+    usageCount: 5,
+    lastUsed: "4 hours ago",
+    tags: ["calibration", "firmware", "controller"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/sol-87/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/sol-87",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:30:00Z",
   },
@@ -2023,15 +3420,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.84,
-    usageCount: 5,
-    lastUsed: "9 hours ago",
-    tags: ["network", "temperature", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-88/guide",
-      "https://docs.internal/faq/sol-88",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 7,
+    lastUsed: "8 hours ago",
+    tags: ["motor", "plc", "pressure"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/sol-88/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/sol-88",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:15:00Z",
   },
@@ -2046,14 +3460,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.79,
-    usageCount: 14,
-    lastUsed: "3 hours ago",
-    tags: ["firmware", "relay", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-89/guide",
-      "https://docs.internal/faq/sol-89",
+    verified: true,
+    confidence: 0.92,
+    usageCount: 10,
+    lastUsed: "5 hours ago",
+    tags: ["sensor", "vibration", "controller"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/sol-89/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/sol-89",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:00:00Z",
   },
@@ -2067,17 +3497,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 9,
-    lastUsed: "9 hours ago",
-    tags: ["hydraulic", "network", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-90/guide",
-      "https://docs.internal/faq/sol-90",
+    verified: true,
+    confidence: 0.82,
+    usageCount: 14,
+    lastUsed: "4 hours ago",
+    tags: ["calibration", "hydraulic", "relay"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/sol-90/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/sol-90",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:45:00Z",
   },
@@ -2092,14 +3536,30 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.91,
-    usageCount: 6,
-    lastUsed: "3 hours ago",
-    tags: ["pressure", "temperature", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-91/guide",
-      "https://docs.internal/faq/sol-91",
+    verified: true,
+    confidence: 0.89,
+    usageCount: 9,
+    lastUsed: "2 hours ago",
+    tags: ["firmware", "motor", "plc"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/sol-91/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/sol-91",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:30:00Z",
   },
@@ -2114,15 +3574,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.81,
-    usageCount: 8,
-    lastUsed: "10 hours ago",
-    tags: ["plc", "temperature", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-92/guide",
-      "https://docs.internal/faq/sol-92",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 23,
+    lastUsed: "9 hours ago",
+    tags: ["relay", "calibration", "controller"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/sol-92/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/sol-92",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:15:00Z",
   },
@@ -2136,15 +3613,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.93,
-    usageCount: 11,
-    lastUsed: "2 hours ago",
-    tags: ["network", "alarm", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-93/guide",
-      "https://docs.internal/faq/sol-93",
+    verified: true,
+    confidence: 0.79,
+    usageCount: 8,
+    lastUsed: "10 hours ago",
+    tags: ["motor", "plc", "controller"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/sol-93/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/sol-93",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:00:00Z",
   },
@@ -2158,16 +3652,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.82,
-    usageCount: 21,
-    lastUsed: "4 hours ago",
-    tags: ["relay", "plc", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-94/guide",
-      "https://docs.internal/faq/sol-94",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 19,
+    lastUsed: "7 hours ago",
+    tags: ["firmware", "sensor", "temperature"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/sol-94/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/sol-94",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:45:00Z",
   },
@@ -2181,16 +3690,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.93,
-    usageCount: 3,
-    lastUsed: "9 hours ago",
-    tags: ["firmware", "temperature", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-95/guide",
-      "https://docs.internal/faq/sol-95",
+    verified: true,
+    confidence: 0.9,
+    usageCount: 17,
+    lastUsed: "8 hours ago",
+    tags: ["firmware", "network", "alarm"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/sol-95/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/sol-95",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:30:00Z",
   },
@@ -2205,15 +3729,32 @@ export const solutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.84,
-    usageCount: 10,
-    lastUsed: "8 hours ago",
-    tags: ["communication", "pressure", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-96/guide",
-      "https://docs.internal/faq/sol-96",
+    verified: true,
+    confidence: 0.86,
+    usageCount: 5,
+    lastUsed: "2 hours ago",
+    tags: ["controller", "sensor", "calibration"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/sol-96/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/sol-96",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:15:00Z",
   },
@@ -2229,14 +3770,30 @@ export const solutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.81,
-    usageCount: 14,
-    lastUsed: "5 hours ago",
-    tags: ["hydraulic", "motor", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-97/guide",
-      "https://docs.internal/faq/sol-97",
+    verified: true,
+    confidence: 0.94,
+    usageCount: 10,
+    lastUsed: "7 hours ago",
+    tags: ["network", "sensor", "calibration"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/sol-97/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/sol-97",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:00:00Z",
   },
@@ -2250,17 +3807,31 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.86,
-    usageCount: 9,
-    lastUsed: "8 hours ago",
-    tags: ["alarm", "hydraulic", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-98/guide",
-      "https://docs.internal/faq/sol-98",
+    verified: true,
+    confidence: 0.89,
+    usageCount: 10,
+    lastUsed: "2 hours ago",
+    tags: ["relay", "communication", "firmware"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/sol-98/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/sol-98",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T11:45:00Z",
   },
@@ -2274,15 +3845,33 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.94,
-    usageCount: 21,
-    lastUsed: "7 hours ago",
-    tags: ["pressure", "network", "plc"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-99/guide",
-      "https://docs.internal/faq/sol-99",
+    verified: true,
+    confidence: 0.88,
+    usageCount: 22,
+    lastUsed: "10 hours ago",
+    tags: ["hydraulic", "temperature", "network"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/sol-99/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/sol-99",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T11:30:00Z",
   },
@@ -2295,15 +3884,32 @@ export const solutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.95,
-    usageCount: 17,
+    verified: true,
+    confidence: 0.92,
+    usageCount: 25,
     lastUsed: "3 hours ago",
-    tags: ["network", "hydraulic", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/sol-100/guide",
-      "https://docs.internal/faq/sol-100",
+    tags: ["relay", "pressure", "vibration"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/sol-100/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/sol-100",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T11:15:00Z",
   },
@@ -2312,26 +3918,41 @@ export const solutions: Solution[] = [
 export const aiSolutions: Solution[] = [
   {
     id: "AI-SOL-001",
-    title: "AI-Generated Solution for PLC Error",
+    title: "Stepper Motor Stalling at High Speeds",
     description:
-      "Based on my analysis, PLC Error 4096 typically indicates a communication timeout with the motor controller. Here are the recommended troubleshooting steps:",
+      "AI-generated steps to troubleshoot the issue: stepper motor stalling at high speeds.",
     steps: [
-      "1. Check all cable connections between the PLC and motor controller",
-      "2. Verify power supply to the motor controller (24V DC)",
-      "3. Reset the PLC module by cycling power",
-      "4. Check for electromagnetic interference near communication cables",
-      "5. Verify communication parameters (baud rate, address) match between devices",
+      "1. Inspect connections and tighten loose terminals",
+      "2. Review error logs from the control system",
+      "3. Power cycle affected hardware",
+      "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.78,
-    usageCount: 5,
-    lastUsed: "1 hour ago",
-    tags: ["PLC", "AI", "Error 4096"],
-    documentationLinks: [
-      "https://ai-generated-docs/plc-error-4096",
-      "https://ai-generated-docs/troubleshooting",
+    verified: false,
+    confidence: 0.92,
+    usageCount: 14,
+    lastUsed: "3 hours ago",
+    tags: ["alarm", "communication", "sensor"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/ai-sol-1/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/ai-sol-1",
+      },
     ],
-    createdAt: "2024-05-23T10:00:00Z",
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
+    ],
+    createdAt: "2024-05-24T12:00:00Z",
   },
   {
     id: "AI-SOL-002",
@@ -2344,14 +3965,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.78,
-    usageCount: 14,
-    lastUsed: "4 hours ago",
-    tags: ["sensor", "pressure", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-2/guide",
-      "https://docs.internal/faq/ai-sol-2",
+    verified: false,
+    confidence: 0.83,
+    usageCount: 18,
+    lastUsed: "7 hours ago",
+    tags: ["vibration", "alarm", "calibration"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/ai-sol-2/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/ai-sol-2",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T11:45:00Z",
   },
@@ -2364,15 +4001,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.81,
-    usageCount: 6,
-    lastUsed: "1 hours ago",
-    tags: ["communication", "controller", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-3/guide",
-      "https://docs.internal/faq/ai-sol-3",
+    verified: false,
+    confidence: 0.88,
+    usageCount: 13,
+    lastUsed: "3 hours ago",
+    tags: ["firmware", "vibration", "controller"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/ai-sol-3/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/ai-sol-3",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T11:30:00Z",
   },
@@ -2386,15 +4041,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.95,
-    usageCount: 18,
-    lastUsed: "8 hours ago",
-    tags: ["motor", "calibration", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-4/guide",
-      "https://docs.internal/faq/ai-sol-4",
+    verified: false,
+    confidence: 0.87,
+    usageCount: 16,
+    lastUsed: "9 hours ago",
+    tags: ["vibration", "hydraulic", "sensor"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/ai-sol-4/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/ai-sol-4",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T11:15:00Z",
   },
@@ -2407,15 +4080,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.85,
-    usageCount: 12,
-    lastUsed: "1 hours ago",
-    tags: ["communication", "sensor", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-5/guide",
-      "https://docs.internal/faq/ai-sol-5",
+    verified: false,
+    confidence: 0.86,
+    usageCount: 4,
+    lastUsed: "4 hours ago",
+    tags: ["relay", "temperature", "sensor"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/ai-sol-5/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/ai-sol-5",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T11:00:00Z",
   },
@@ -2429,17 +4120,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.79,
-    usageCount: 7,
-    lastUsed: "9 hours ago",
-    tags: ["alarm", "firmware", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-6/guide",
-      "https://docs.internal/faq/ai-sol-6",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 11,
+    lastUsed: "8 hours ago",
+    tags: ["hydraulic", "sensor", "plc"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/ai-sol-6/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/ai-sol-6",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:45:00Z",
   },
@@ -2452,17 +4157,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
+    verified: false,
     confidence: 0.96,
-    usageCount: 3,
-    lastUsed: "5 hours ago",
-    tags: ["motor", "vibration", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-7/guide",
-      "https://docs.internal/faq/ai-sol-7",
+    usageCount: 17,
+    lastUsed: "8 hours ago",
+    tags: ["plc", "pressure", "motor"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/ai-sol-7/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/ai-sol-7",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:30:00Z",
   },
@@ -2479,14 +4198,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
+    verified: false,
     confidence: 0.89,
-    usageCount: 13,
-    lastUsed: "2 hours ago",
-    tags: ["hydraulic", "network", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-8/guide",
-      "https://docs.internal/faq/ai-sol-8",
+    usageCount: 18,
+    lastUsed: "8 hours ago",
+    tags: ["hydraulic", "firmware", "controller"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/ai-sol-8/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/ai-sol-8",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:15:00Z",
   },
@@ -2502,14 +4237,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.91,
-    usageCount: 21,
+    verified: false,
+    confidence: 0.84,
+    usageCount: 24,
     lastUsed: "10 hours ago",
-    tags: ["network", "controller", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-9/guide",
-      "https://docs.internal/faq/ai-sol-9",
+    tags: ["communication", "motor", "plc"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/ai-sol-9/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/ai-sol-9",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T10:00:00Z",
   },
@@ -2523,15 +4274,32 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.86,
+    verified: false,
+    confidence: 0.9,
     usageCount: 7,
-    lastUsed: "3 hours ago",
-    tags: ["alarm", "communication", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-10/guide",
-      "https://docs.internal/faq/ai-sol-10",
+    lastUsed: "8 hours ago",
+    tags: ["communication", "sensor", "calibration"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/ai-sol-10/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/ai-sol-10",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:45:00Z",
   },
@@ -2545,16 +4313,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.87,
-    usageCount: 12,
-    lastUsed: "7 hours ago",
-    tags: ["network", "sensor", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-11/guide",
-      "https://docs.internal/faq/ai-sol-11",
+    verified: false,
+    confidence: 0.89,
+    usageCount: 3,
+    lastUsed: "6 hours ago",
+    tags: ["network", "temperature", "sensor"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/ai-sol-11/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/ai-sol-11",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:30:00Z",
   },
@@ -2568,15 +4351,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.94,
-    usageCount: 11,
-    lastUsed: "3 hours ago",
-    tags: ["firmware", "temperature", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-12/guide",
-      "https://docs.internal/faq/ai-sol-12",
+    verified: false,
+    confidence: 0.79,
+    usageCount: 3,
+    lastUsed: "10 hours ago",
+    tags: ["network", "alarm", "sensor"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/ai-sol-12/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/ai-sol-12",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:15:00Z",
   },
@@ -2591,14 +4391,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.87,
-    usageCount: 19,
-    lastUsed: "1 hours ago",
-    tags: ["alarm", "pressure", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-13/guide",
-      "https://docs.internal/faq/ai-sol-13",
+    verified: false,
+    confidence: 0.9,
+    usageCount: 10,
+    lastUsed: "6 hours ago",
+    tags: ["communication", "pressure", "vibration"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/ai-sol-13/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/ai-sol-13",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T09:00:00Z",
   },
@@ -2612,15 +4428,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.95,
-    usageCount: 3,
+    verified: false,
+    confidence: 0.86,
+    usageCount: 11,
     lastUsed: "6 hours ago",
-    tags: ["plc", "controller", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-14/guide",
-      "https://docs.internal/faq/ai-sol-14",
+    tags: ["motor", "controller", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/ai-sol-14/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/ai-sol-14",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:45:00Z",
   },
@@ -2635,16 +4468,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.82,
-    usageCount: 24,
-    lastUsed: "5 hours ago",
-    tags: ["communication", "network", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-15/guide",
-      "https://docs.internal/faq/ai-sol-15",
+    verified: false,
+    confidence: 0.9,
+    usageCount: 19,
+    lastUsed: "2 hours ago",
+    tags: ["sensor", "firmware", "temperature"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/ai-sol-15/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/ai-sol-15",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:30:00Z",
   },
@@ -2658,15 +4506,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.83,
-    usageCount: 12,
-    lastUsed: "6 hours ago",
-    tags: ["pressure", "plc", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-16/guide",
-      "https://docs.internal/faq/ai-sol-16",
+    verified: false,
+    confidence: 0.85,
+    usageCount: 21,
+    lastUsed: "9 hours ago",
+    tags: ["communication", "relay", "controller"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/ai-sol-16/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/ai-sol-16",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:15:00Z",
   },
@@ -2681,14 +4546,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.81,
-    usageCount: 22,
-    lastUsed: "3 hours ago",
-    tags: ["firmware", "calibration", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-17/guide",
-      "https://docs.internal/faq/ai-sol-17",
+    verified: false,
+    confidence: 0.86,
+    usageCount: 11,
+    lastUsed: "1 hours ago",
+    tags: ["firmware", "hydraulic", "plc"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/ai-sol-17/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/ai-sol-17",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T08:00:00Z",
   },
@@ -2704,14 +4585,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.79,
-    usageCount: 24,
-    lastUsed: "1 hours ago",
-    tags: ["hydraulic", "relay", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-18/guide",
-      "https://docs.internal/faq/ai-sol-18",
+    verified: false,
+    confidence: 0.82,
+    usageCount: 10,
+    lastUsed: "8 hours ago",
+    tags: ["alarm", "motor", "pressure"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/ai-sol-18/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/ai-sol-18",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:45:00Z",
   },
@@ -2725,16 +4622,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.86,
-    usageCount: 11,
-    lastUsed: "6 hours ago",
-    tags: ["relay", "plc", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-19/guide",
-      "https://docs.internal/faq/ai-sol-19",
+    verified: false,
+    confidence: 0.85,
+    usageCount: 6,
+    lastUsed: "8 hours ago",
+    tags: ["plc", "alarm", "firmware"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/ai-sol-19/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/ai-sol-19",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:30:00Z",
   },
@@ -2747,15 +4659,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.97,
-    usageCount: 4,
-    lastUsed: "8 hours ago",
-    tags: ["hydraulic", "pressure", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-20/guide",
-      "https://docs.internal/faq/ai-sol-20",
+    verified: false,
+    confidence: 0.83,
+    usageCount: 16,
+    lastUsed: "1 hours ago",
+    tags: ["motor", "controller", "communication"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/ai-sol-20/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/ai-sol-20",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:15:00Z",
   },
@@ -2769,15 +4698,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.93,
-    usageCount: 22,
-    lastUsed: "7 hours ago",
-    tags: ["firmware", "pressure", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-21/guide",
-      "https://docs.internal/faq/ai-sol-21",
+    verified: false,
+    confidence: 0.78,
+    usageCount: 4,
+    lastUsed: "9 hours ago",
+    tags: ["temperature", "firmware", "pressure"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/ai-sol-21/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/ai-sol-21",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T07:00:00Z",
   },
@@ -2791,14 +4738,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.95,
-    usageCount: 18,
-    lastUsed: "1 hours ago",
-    tags: ["vibration", "alarm", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-22/guide",
-      "https://docs.internal/faq/ai-sol-22",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 13,
+    lastUsed: "5 hours ago",
+    tags: ["pressure", "sensor", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/ai-sol-22/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/ai-sol-22",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:45:00Z",
   },
@@ -2812,17 +4775,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.85,
-    usageCount: 19,
+    verified: false,
+    confidence: 0.9,
+    usageCount: 17,
     lastUsed: "5 hours ago",
-    tags: ["pressure", "calibration", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-23/guide",
-      "https://docs.internal/faq/ai-sol-23",
+    tags: ["hydraulic", "pressure", "plc"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/ai-sol-23/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/ai-sol-23",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:30:00Z",
   },
@@ -2836,15 +4813,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 7,
-    lastUsed: "4 hours ago",
-    tags: ["plc", "firmware", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-24/guide",
-      "https://docs.internal/faq/ai-sol-24",
+    verified: false,
+    confidence: 0.8,
+    usageCount: 23,
+    lastUsed: "7 hours ago",
+    tags: ["firmware", "controller", "vibration"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/ai-sol-24/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/ai-sol-24",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:15:00Z",
   },
@@ -2857,16 +4852,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.86,
-    usageCount: 14,
+    verified: false,
+    confidence: 0.88,
+    usageCount: 5,
     lastUsed: "8 hours ago",
-    tags: ["hydraulic", "alarm", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-25/guide",
-      "https://docs.internal/faq/ai-sol-25",
+    tags: ["calibration", "firmware", "vibration"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/ai-sol-25/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/ai-sol-25",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T06:00:00Z",
   },
@@ -2882,14 +4892,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.86,
-    usageCount: 17,
-    lastUsed: "1 hours ago",
-    tags: ["communication", "controller", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-26/guide",
-      "https://docs.internal/faq/ai-sol-26",
+    verified: false,
+    confidence: 0.87,
+    usageCount: 9,
+    lastUsed: "5 hours ago",
+    tags: ["alarm", "communication", "motor"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/ai-sol-26/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/ai-sol-26",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:45:00Z",
   },
@@ -2904,15 +4930,32 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.9,
-    usageCount: 23,
+    verified: false,
+    confidence: 0.85,
+    usageCount: 12,
     lastUsed: "7 hours ago",
-    tags: ["hydraulic", "sensor", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-27/guide",
-      "https://docs.internal/faq/ai-sol-27",
+    tags: ["plc", "controller", "firmware"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/ai-sol-27/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/ai-sol-27",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:30:00Z",
   },
@@ -2927,16 +4970,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 10,
-    lastUsed: "1 hours ago",
-    tags: ["controller", "motor", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-28/guide",
-      "https://docs.internal/faq/ai-sol-28",
+    verified: false,
+    confidence: 0.79,
+    usageCount: 13,
+    lastUsed: "9 hours ago",
+    tags: ["firmware", "calibration", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/ai-sol-28/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/ai-sol-28",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:15:00Z",
   },
@@ -2951,14 +5009,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.91,
-    usageCount: 3,
-    lastUsed: "6 hours ago",
-    tags: ["temperature", "firmware", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-29/guide",
-      "https://docs.internal/faq/ai-sol-29",
+    verified: false,
+    confidence: 0.78,
+    usageCount: 20,
+    lastUsed: "2 hours ago",
+    tags: ["plc", "sensor", "pressure"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/ai-sol-29/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/ai-sol-29",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T05:00:00Z",
   },
@@ -2975,14 +5049,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.85,
-    usageCount: 24,
-    lastUsed: "1 hours ago",
-    tags: ["plc", "pressure", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-30/guide",
-      "https://docs.internal/faq/ai-sol-30",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 18,
+    lastUsed: "5 hours ago",
+    tags: ["firmware", "controller", "sensor"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/ai-sol-30/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/ai-sol-30",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:45:00Z",
   },
@@ -2999,14 +5089,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.78,
-    usageCount: 9,
+    verified: false,
+    confidence: 0.86,
+    usageCount: 22,
     lastUsed: "2 hours ago",
-    tags: ["hydraulic", "communication", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-31/guide",
-      "https://docs.internal/faq/ai-sol-31",
+    tags: ["controller", "alarm", "sensor"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/ai-sol-31/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/ai-sol-31",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:30:00Z",
   },
@@ -3023,14 +5129,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.83,
-    usageCount: 15,
-    lastUsed: "10 hours ago",
-    tags: ["motor", "controller", "plc"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-32/guide",
-      "https://docs.internal/faq/ai-sol-32",
+    verified: false,
+    confidence: 0.92,
+    usageCount: 3,
+    lastUsed: "6 hours ago",
+    tags: ["controller", "relay", "vibration"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/ai-sol-32/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/ai-sol-32",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:15:00Z",
   },
@@ -3046,14 +5168,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.94,
-    usageCount: 15,
-    lastUsed: "5 hours ago",
-    tags: ["hydraulic", "pressure", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-33/guide",
-      "https://docs.internal/faq/ai-sol-33",
+    verified: false,
+    confidence: 0.83,
+    usageCount: 8,
+    lastUsed: "1 hours ago",
+    tags: ["vibration", "sensor", "controller"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/ai-sol-33/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/ai-sol-33",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T04:00:00Z",
   },
@@ -3067,16 +5205,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.95,
-    usageCount: 12,
-    lastUsed: "2 hours ago",
-    tags: ["firmware", "controller", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-34/guide",
-      "https://docs.internal/faq/ai-sol-34",
+    verified: false,
+    confidence: 0.8,
+    usageCount: 7,
+    lastUsed: "1 hours ago",
+    tags: ["calibration", "network", "communication"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/ai-sol-34/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/ai-sol-34",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:45:00Z",
   },
@@ -3089,15 +5242,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.95,
-    usageCount: 25,
-    lastUsed: "7 hours ago",
-    tags: ["relay", "firmware", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-35/guide",
-      "https://docs.internal/faq/ai-sol-35",
+    verified: false,
+    confidence: 0.84,
+    usageCount: 12,
+    lastUsed: "8 hours ago",
+    tags: ["plc", "firmware", "controller"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/ai-sol-35/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/ai-sol-35",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:30:00Z",
   },
@@ -3111,16 +5281,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.79,
-    usageCount: 6,
-    lastUsed: "9 hours ago",
-    tags: ["sensor", "temperature", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-36/guide",
-      "https://docs.internal/faq/ai-sol-36",
+    verified: false,
+    confidence: 0.97,
+    usageCount: 10,
+    lastUsed: "1 hours ago",
+    tags: ["vibration", "pressure", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/ai-sol-36/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/ai-sol-36",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:15:00Z",
   },
@@ -3133,15 +5318,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.85,
-    usageCount: 20,
-    lastUsed: "8 hours ago",
-    tags: ["plc", "controller", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-37/guide",
-      "https://docs.internal/faq/ai-sol-37",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 25,
+    lastUsed: "5 hours ago",
+    tags: ["calibration", "sensor", "plc"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/ai-sol-37/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/ai-sol-37",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T03:00:00Z",
   },
@@ -3155,17 +5357,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 4,
-    lastUsed: "2 hours ago",
-    tags: ["plc", "firmware", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-38/guide",
-      "https://docs.internal/faq/ai-sol-38",
+    verified: false,
+    confidence: 0.84,
+    usageCount: 20,
+    lastUsed: "5 hours ago",
+    tags: ["alarm", "sensor", "vibration"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/ai-sol-38/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/ai-sol-38",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:45:00Z",
   },
@@ -3179,15 +5395,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.94,
-    usageCount: 7,
-    lastUsed: "7 hours ago",
-    tags: ["firmware", "network", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-39/guide",
-      "https://docs.internal/faq/ai-sol-39",
+    verified: false,
+    confidence: 0.85,
+    usageCount: 9,
+    lastUsed: "3 hours ago",
+    tags: ["temperature", "pressure", "firmware"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/ai-sol-39/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/ai-sol-39",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:30:00Z",
   },
@@ -3202,14 +5435,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.86,
-    usageCount: 8,
-    lastUsed: "2 hours ago",
-    tags: ["sensor", "network", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-40/guide",
-      "https://docs.internal/faq/ai-sol-40",
+    verified: false,
+    confidence: 0.9,
+    usageCount: 24,
+    lastUsed: "7 hours ago",
+    tags: ["vibration", "calibration", "pressure"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/ai-sol-40/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/ai-sol-40",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:15:00Z",
   },
@@ -3225,14 +5474,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 22,
-    lastUsed: "7 hours ago",
-    tags: ["temperature", "vibration", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-41/guide",
-      "https://docs.internal/faq/ai-sol-41",
+    verified: false,
+    confidence: 0.83,
+    usageCount: 11,
+    lastUsed: "3 hours ago",
+    tags: ["network", "communication", "sensor"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/ai-sol-41/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/ai-sol-41",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T02:00:00Z",
   },
@@ -3247,16 +5512,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.83,
-    usageCount: 19,
-    lastUsed: "10 hours ago",
-    tags: ["hydraulic", "calibration", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-42/guide",
-      "https://docs.internal/faq/ai-sol-42",
+    verified: false,
+    confidence: 0.86,
+    usageCount: 11,
+    lastUsed: "5 hours ago",
+    tags: ["plc", "communication", "alarm"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/ai-sol-42/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/ai-sol-42",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:45:00Z",
   },
@@ -3271,16 +5551,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.91,
-    usageCount: 8,
-    lastUsed: "6 hours ago",
-    tags: ["relay", "plc", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-43/guide",
-      "https://docs.internal/faq/ai-sol-43",
+    verified: false,
+    confidence: 0.84,
+    usageCount: 21,
+    lastUsed: "9 hours ago",
+    tags: ["pressure", "alarm", "controller"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/ai-sol-43/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/ai-sol-43",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:30:00Z",
   },
@@ -3297,14 +5592,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.81,
-    usageCount: 14,
-    lastUsed: "2 hours ago",
-    tags: ["controller", "motor", "relay"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-44/guide",
-      "https://docs.internal/faq/ai-sol-44",
+    verified: false,
+    confidence: 0.91,
+    usageCount: 6,
+    lastUsed: "4 hours ago",
+    tags: ["pressure", "network", "vibration"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/ai-sol-44/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/ai-sol-44",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:15:00Z",
   },
@@ -3318,15 +5629,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.89,
-    usageCount: 15,
-    lastUsed: "2 hours ago",
-    tags: ["vibration", "relay", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-45/guide",
-      "https://docs.internal/faq/ai-sol-45",
+    verified: false,
+    confidence: 0.83,
+    usageCount: 25,
+    lastUsed: "1 hours ago",
+    tags: ["plc", "firmware", "temperature"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/ai-sol-45/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/ai-sol-45",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T01:00:00Z",
   },
@@ -3341,14 +5670,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.8,
+    verified: false,
+    confidence: 0.84,
     usageCount: 8,
-    lastUsed: "2 hours ago",
-    tags: ["relay", "motor", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-46/guide",
-      "https://docs.internal/faq/ai-sol-46",
+    lastUsed: "9 hours ago",
+    tags: ["hydraulic", "calibration", "vibration"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/ai-sol-46/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/ai-sol-46",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:45:00Z",
   },
@@ -3364,14 +5709,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.96,
-    usageCount: 15,
-    lastUsed: "6 hours ago",
-    tags: ["sensor", "network", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-47/guide",
-      "https://docs.internal/faq/ai-sol-47",
+    verified: false,
+    confidence: 0.95,
+    usageCount: 16,
+    lastUsed: "1 hours ago",
+    tags: ["calibration", "firmware", "controller"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/ai-sol-47/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/ai-sol-47",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:30:00Z",
   },
@@ -3385,15 +5746,32 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.81,
-    usageCount: 25,
-    lastUsed: "2 hours ago",
-    tags: ["controller", "pressure", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-48/guide",
-      "https://docs.internal/faq/ai-sol-48",
+    verified: false,
+    confidence: 0.88,
+    usageCount: 12,
+    lastUsed: "7 hours ago",
+    tags: ["sensor", "plc", "vibration"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/ai-sol-48/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/ai-sol-48",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:15:00Z",
   },
@@ -3408,16 +5786,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.9,
-    usageCount: 13,
-    lastUsed: "1 hours ago",
-    tags: ["hydraulic", "alarm", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-49/guide",
-      "https://docs.internal/faq/ai-sol-49",
+    verified: false,
+    confidence: 0.8,
+    usageCount: 16,
+    lastUsed: "3 hours ago",
+    tags: ["plc", "firmware", "relay"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/ai-sol-49/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/ai-sol-49",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-24T00:00:00Z",
   },
@@ -3430,17 +5823,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 17,
-    lastUsed: "2 hours ago",
-    tags: ["motor", "network", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-50/guide",
-      "https://docs.internal/faq/ai-sol-50",
+    verified: false,
+    confidence: 0.88,
+    usageCount: 22,
+    lastUsed: "8 hours ago",
+    tags: ["hydraulic", "temperature", "relay"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/ai-sol-50/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/ai-sol-50",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:45:00Z",
   },
@@ -3455,14 +5862,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.97,
-    usageCount: 12,
-    lastUsed: "2 hours ago",
-    tags: ["alarm", "sensor", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-51/guide",
-      "https://docs.internal/faq/ai-sol-51",
+    verified: false,
+    confidence: 0.84,
+    usageCount: 24,
+    lastUsed: "4 hours ago",
+    tags: ["controller", "temperature", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/ai-sol-51/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/ai-sol-51",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:30:00Z",
   },
@@ -3478,14 +5901,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.87,
-    usageCount: 7,
-    lastUsed: "9 hours ago",
-    tags: ["controller", "calibration", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-52/guide",
-      "https://docs.internal/faq/ai-sol-52",
+    verified: false,
+    confidence: 0.91,
+    usageCount: 12,
+    lastUsed: "7 hours ago",
+    tags: ["calibration", "motor", "pressure"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/ai-sol-52/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/ai-sol-52",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:15:00Z",
   },
@@ -3499,15 +5938,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.81,
-    usageCount: 20,
-    lastUsed: "1 hours ago",
-    tags: ["firmware", "pressure", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-53/guide",
-      "https://docs.internal/faq/ai-sol-53",
+    verified: false,
+    confidence: 0.86,
+    usageCount: 18,
+    lastUsed: "2 hours ago",
+    tags: ["temperature", "relay", "alarm"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/ai-sol-53/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/ai-sol-53",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T23:00:00Z",
   },
@@ -3521,17 +5978,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 10,
-    lastUsed: "1 hours ago",
-    tags: ["vibration", "communication", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-54/guide",
-      "https://docs.internal/faq/ai-sol-54",
+    verified: false,
+    confidence: 0.91,
+    usageCount: 13,
+    lastUsed: "5 hours ago",
+    tags: ["vibration", "sensor", "communication"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/ai-sol-54/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/ai-sol-54",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:45:00Z",
   },
@@ -3544,17 +6015,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 6,
-    lastUsed: "7 hours ago",
-    tags: ["network", "pressure", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-55/guide",
-      "https://docs.internal/faq/ai-sol-55",
+    verified: false,
+    confidence: 0.9,
+    usageCount: 8,
+    lastUsed: "9 hours ago",
+    tags: ["controller", "temperature", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/ai-sol-55/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/ai-sol-55",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:30:00Z",
   },
@@ -3571,14 +6056,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.85,
-    usageCount: 4,
-    lastUsed: "2 hours ago",
-    tags: ["firmware", "hydraulic", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-56/guide",
-      "https://docs.internal/faq/ai-sol-56",
+    verified: false,
+    confidence: 0.82,
+    usageCount: 24,
+    lastUsed: "3 hours ago",
+    tags: ["temperature", "communication", "pressure"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/ai-sol-56/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/ai-sol-56",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:15:00Z",
   },
@@ -3594,14 +6095,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
+    verified: false,
     confidence: 0.95,
-    usageCount: 3,
-    lastUsed: "1 hours ago",
-    tags: ["vibration", "communication", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-57/guide",
-      "https://docs.internal/faq/ai-sol-57",
+    usageCount: 19,
+    lastUsed: "6 hours ago",
+    tags: ["alarm", "communication", "calibration"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/ai-sol-57/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/ai-sol-57",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T22:00:00Z",
   },
@@ -3615,15 +6132,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.9,
+    verified: false,
+    confidence: 0.86,
     usageCount: 25,
-    lastUsed: "7 hours ago",
-    tags: ["alarm", "motor", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-58/guide",
-      "https://docs.internal/faq/ai-sol-58",
+    lastUsed: "8 hours ago",
+    tags: ["communication", "network", "pressure"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/ai-sol-58/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/ai-sol-58",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:45:00Z",
   },
@@ -3637,15 +6171,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.8,
-    usageCount: 20,
-    lastUsed: "6 hours ago",
-    tags: ["firmware", "controller", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-59/guide",
-      "https://docs.internal/faq/ai-sol-59",
+    verified: false,
+    confidence: 0.91,
+    usageCount: 16,
+    lastUsed: "8 hours ago",
+    tags: ["vibration", "relay", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/ai-sol-59/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/ai-sol-59",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:30:00Z",
   },
@@ -3660,14 +6211,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
+    verified: false,
     confidence: 0.81,
-    usageCount: 16,
-    lastUsed: "8 hours ago",
-    tags: ["calibration", "sensor", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-60/guide",
-      "https://docs.internal/faq/ai-sol-60",
+    usageCount: 10,
+    lastUsed: "6 hours ago",
+    tags: ["calibration", "vibration", "firmware"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/ai-sol-60/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/ai-sol-60",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:15:00Z",
   },
@@ -3683,14 +6250,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.96,
-    usageCount: 18,
-    lastUsed: "7 hours ago",
-    tags: ["alarm", "firmware", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-61/guide",
-      "https://docs.internal/faq/ai-sol-61",
+    verified: false,
+    confidence: 0.92,
+    usageCount: 9,
+    lastUsed: "6 hours ago",
+    tags: ["sensor", "communication", "calibration"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/ai-sol-61/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/ai-sol-61",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T21:00:00Z",
   },
@@ -3704,15 +6287,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.88,
-    usageCount: 25,
-    lastUsed: "4 hours ago",
-    tags: ["alarm", "relay", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-62/guide",
-      "https://docs.internal/faq/ai-sol-62",
+    verified: false,
+    confidence: 0.91,
+    usageCount: 17,
+    lastUsed: "9 hours ago",
+    tags: ["firmware", "motor", "plc"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/ai-sol-62/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/ai-sol-62",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:45:00Z",
   },
@@ -3725,15 +6326,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.92,
-    usageCount: 20,
+    verified: false,
+    confidence: 0.94,
+    usageCount: 12,
     lastUsed: "9 hours ago",
-    tags: ["network", "pressure", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-63/guide",
-      "https://docs.internal/faq/ai-sol-63",
+    tags: ["calibration", "motor", "temperature"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/ai-sol-63/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/ai-sol-63",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:30:00Z",
   },
@@ -3750,14 +6368,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.85,
-    usageCount: 9,
-    lastUsed: "2 hours ago",
-    tags: ["motor", "network", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-64/guide",
-      "https://docs.internal/faq/ai-sol-64",
+    verified: false,
+    confidence: 0.82,
+    usageCount: 5,
+    lastUsed: "8 hours ago",
+    tags: ["network", "plc", "pressure"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/ai-sol-64/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/ai-sol-64",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:15:00Z",
   },
@@ -3770,15 +6404,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.87,
-    usageCount: 5,
-    lastUsed: "2 hours ago",
-    tags: ["vibration", "pressure", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-65/guide",
-      "https://docs.internal/faq/ai-sol-65",
+    verified: false,
+    confidence: 0.93,
+    usageCount: 6,
+    lastUsed: "8 hours ago",
+    tags: ["communication", "plc", "pressure"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/ai-sol-65/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/ai-sol-65",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T20:00:00Z",
   },
@@ -3792,17 +6443,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.89,
-    usageCount: 22,
-    lastUsed: "4 hours ago",
-    tags: ["relay", "vibration", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-66/guide",
-      "https://docs.internal/faq/ai-sol-66",
+    verified: false,
+    confidence: 0.92,
+    usageCount: 23,
+    lastUsed: "2 hours ago",
+    tags: ["firmware", "calibration", "temperature"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/ai-sol-66/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/ai-sol-66",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:45:00Z",
   },
@@ -3816,14 +6481,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.88,
-    usageCount: 21,
+    verified: false,
+    confidence: 0.83,
+    usageCount: 7,
     lastUsed: "2 hours ago",
-    tags: ["pressure", "calibration", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-67/guide",
-      "https://docs.internal/faq/ai-sol-67",
+    tags: ["relay", "sensor", "alarm"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/ai-sol-67/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/ai-sol-67",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:30:00Z",
   },
@@ -3837,15 +6518,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.91,
-    usageCount: 6,
-    lastUsed: "8 hours ago",
-    tags: ["communication", "hydraulic", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-68/guide",
-      "https://docs.internal/faq/ai-sol-68",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 24,
+    lastUsed: "5 hours ago",
+    tags: ["calibration", "alarm", "sensor"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/ai-sol-68/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/ai-sol-68",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:15:00Z",
   },
@@ -3860,16 +6559,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.84,
-    usageCount: 8,
-    lastUsed: "1 hours ago",
-    tags: ["vibration", "network", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-69/guide",
-      "https://docs.internal/faq/ai-sol-69",
+    verified: false,
+    confidence: 0.93,
+    usageCount: 16,
+    lastUsed: "2 hours ago",
+    tags: ["plc", "network", "motor"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/ai-sol-69/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/ai-sol-69",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T19:00:00Z",
   },
@@ -3884,14 +6598,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.79,
-    usageCount: 12,
-    lastUsed: "6 hours ago",
-    tags: ["communication", "controller", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-70/guide",
-      "https://docs.internal/faq/ai-sol-70",
+    verified: false,
+    confidence: 0.86,
+    usageCount: 11,
+    lastUsed: "8 hours ago",
+    tags: ["sensor", "pressure", "vibration"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/ai-sol-70/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/ai-sol-70",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:45:00Z",
   },
@@ -3906,14 +6636,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "verified",
-    confidence: 0.83,
-    usageCount: 15,
-    lastUsed: "7 hours ago",
-    tags: ["motor", "vibration", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-71/guide",
-      "https://docs.internal/faq/ai-sol-71",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 10,
+    lastUsed: "4 hours ago",
+    tags: ["vibration", "temperature", "plc"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/ai-sol-71/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/ai-sol-71",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:30:00Z",
   },
@@ -3929,14 +6675,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.91,
-    usageCount: 9,
-    lastUsed: "7 hours ago",
-    tags: ["calibration", "sensor", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-72/guide",
-      "https://docs.internal/faq/ai-sol-72",
+    verified: false,
+    confidence: 0.87,
+    usageCount: 21,
+    lastUsed: "3 hours ago",
+    tags: ["pressure", "plc", "relay"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/ai-sol-72/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/ai-sol-72",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:15:00Z",
   },
@@ -3953,14 +6715,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.97,
-    usageCount: 11,
-    lastUsed: "2 hours ago",
-    tags: ["alarm", "communication", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-73/guide",
-      "https://docs.internal/faq/ai-sol-73",
+    verified: false,
+    confidence: 0.89,
+    usageCount: 25,
+    lastUsed: "7 hours ago",
+    tags: ["network", "communication", "temperature"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/ai-sol-73/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/ai-sol-73",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T18:00:00Z",
   },
@@ -3975,15 +6753,32 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.89,
-    usageCount: 17,
-    lastUsed: "10 hours ago",
-    tags: ["temperature", "calibration", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-74/guide",
-      "https://docs.internal/faq/ai-sol-74",
+    verified: false,
+    confidence: 0.81,
+    usageCount: 6,
+    lastUsed: "9 hours ago",
+    tags: ["sensor", "relay", "communication"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/ai-sol-74/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/ai-sol-74",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:45:00Z",
   },
@@ -3997,16 +6792,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.96,
-    usageCount: 14,
-    lastUsed: "1 hours ago",
-    tags: ["controller", "relay", "temperature"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-75/guide",
-      "https://docs.internal/faq/ai-sol-75",
+    verified: false,
+    confidence: 0.79,
+    usageCount: 20,
+    lastUsed: "2 hours ago",
+    tags: ["temperature", "firmware", "network"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/ai-sol-75/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/ai-sol-75",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:30:00Z",
   },
@@ -4020,16 +6830,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.9,
-    usageCount: 14,
-    lastUsed: "6 hours ago",
-    tags: ["sensor", "hydraulic", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-76/guide",
-      "https://docs.internal/faq/ai-sol-76",
+    verified: false,
+    confidence: 0.84,
+    usageCount: 5,
+    lastUsed: "3 hours ago",
+    tags: ["network", "plc", "temperature"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/ai-sol-76/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/ai-sol-76",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:15:00Z",
   },
@@ -4043,15 +6868,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.88,
-    usageCount: 25,
-    lastUsed: "7 hours ago",
-    tags: ["pressure", "temperature", "plc"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-77/guide",
-      "https://docs.internal/faq/ai-sol-77",
+    verified: false,
+    confidence: 0.8,
+    usageCount: 20,
+    lastUsed: "6 hours ago",
+    tags: ["pressure", "calibration", "temperature"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/ai-sol-77/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/ai-sol-77",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T17:00:00Z",
   },
@@ -4064,15 +6906,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.86,
-    usageCount: 7,
-    lastUsed: "5 hours ago",
-    tags: ["alarm", "temperature", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-78/guide",
-      "https://docs.internal/faq/ai-sol-78",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 25,
+    lastUsed: "4 hours ago",
+    tags: ["calibration", "motor", "plc"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/ai-sol-78/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/ai-sol-78",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:45:00Z",
   },
@@ -4087,14 +6946,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.93,
-    usageCount: 7,
+    verified: false,
+    confidence: 0.9,
+    usageCount: 25,
     lastUsed: "7 hours ago",
-    tags: ["vibration", "alarm", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-79/guide",
-      "https://docs.internal/faq/ai-sol-79",
+    tags: ["controller", "plc", "calibration"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/ai-sol-79/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/ai-sol-79",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:30:00Z",
   },
@@ -4107,15 +6982,32 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.92,
-    usageCount: 18,
-    lastUsed: "5 hours ago",
-    tags: ["controller", "pressure", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-80/guide",
-      "https://docs.internal/faq/ai-sol-80",
+    verified: false,
+    confidence: 0.95,
+    usageCount: 5,
+    lastUsed: "3 hours ago",
+    tags: ["vibration", "plc", "calibration"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/ai-sol-80/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/ai-sol-80",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:15:00Z",
   },
@@ -4129,17 +7021,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.78,
-    usageCount: 16,
-    lastUsed: "5 hours ago",
-    tags: ["vibration", "hydraulic", "controller"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-81/guide",
-      "https://docs.internal/faq/ai-sol-81",
+    verified: false,
+    confidence: 0.82,
+    usageCount: 8,
+    lastUsed: "7 hours ago",
+    tags: ["plc", "calibration", "firmware"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/ai-sol-81/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/ai-sol-81",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T16:00:00Z",
   },
@@ -4154,14 +7060,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
+    verified: false,
     confidence: 0.84,
-    usageCount: 9,
-    lastUsed: "10 hours ago",
-    tags: ["network", "alarm", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-82/guide",
-      "https://docs.internal/faq/ai-sol-82",
+    usageCount: 14,
+    lastUsed: "9 hours ago",
+    tags: ["temperature", "calibration", "firmware"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/ai-sol-82/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/ai-sol-82",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:45:00Z",
   },
@@ -4176,16 +7098,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.9,
-    usageCount: 10,
-    lastUsed: "2 hours ago",
-    tags: ["vibration", "communication", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-83/guide",
-      "https://docs.internal/faq/ai-sol-83",
+    verified: false,
+    confidence: 0.79,
+    usageCount: 12,
+    lastUsed: "6 hours ago",
+    tags: ["alarm", "temperature", "sensor"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/ai-sol-83/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/ai-sol-83",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:30:00Z",
   },
@@ -4200,16 +7137,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.88,
-    usageCount: 20,
+    verified: false,
+    confidence: 0.95,
+    usageCount: 10,
     lastUsed: "7 hours ago",
-    tags: ["communication", "controller", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-84/guide",
-      "https://docs.internal/faq/ai-sol-84",
+    tags: ["alarm", "firmware", "sensor"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/ai-sol-84/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/ai-sol-84",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:15:00Z",
   },
@@ -4223,15 +7175,32 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.97,
+    verified: false,
+    confidence: 0.91,
     usageCount: 4,
-    lastUsed: "10 hours ago",
-    tags: ["network", "vibration", "communication"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-85/guide",
-      "https://docs.internal/faq/ai-sol-85",
+    lastUsed: "2 hours ago",
+    tags: ["relay", "pressure", "temperature"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/ai-sol-85/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/ai-sol-85",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T15:00:00Z",
   },
@@ -4248,14 +7217,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 15,
-    lastUsed: "1 hours ago",
-    tags: ["plc", "calibration", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-86/guide",
-      "https://docs.internal/faq/ai-sol-86",
+    verified: false,
+    confidence: 0.95,
+    usageCount: 16,
+    lastUsed: "3 hours ago",
+    tags: ["controller", "network", "sensor"],
+    links: [
+      {
+        title: "Guide for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.industrial.support/solution/ai-sol-86/guide",
+      },
+      {
+        title: "FAQ for Overvoltage Detected in Control Cabinet",
+        url: "https://docs.internal/faq/ai-sol-86",
+      },
+    ],
+    documents: [
+      {
+        name: "Overvoltage Detected in Control Cabinet Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Overvoltage Detected in Control Cabinet Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:45:00Z",
   },
@@ -4270,14 +7255,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.91,
-    usageCount: 7,
-    lastUsed: "3 hours ago",
-    tags: ["vibration", "plc", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-87/guide",
-      "https://docs.internal/faq/ai-sol-87",
+    verified: false,
+    confidence: 0.81,
+    usageCount: 21,
+    lastUsed: "9 hours ago",
+    tags: ["network", "relay", "firmware"],
+    links: [
+      {
+        title: "Guide for Analog Signal Clipping at ADC Input",
+        url: "https://docs.industrial.support/solution/ai-sol-87/guide",
+      },
+      {
+        title: "FAQ for Analog Signal Clipping at ADC Input",
+        url: "https://docs.internal/faq/ai-sol-87",
+      },
+    ],
+    documents: [
+      {
+        name: "Analog Signal Clipping at ADC Input Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Analog Signal Clipping at ADC Input Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:30:00Z",
   },
@@ -4291,17 +7292,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.93,
-    usageCount: 16,
-    lastUsed: "4 hours ago",
-    tags: ["alarm", "pressure", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-88/guide",
-      "https://docs.internal/faq/ai-sol-88",
+    verified: false,
+    confidence: 0.9,
+    usageCount: 25,
+    lastUsed: "6 hours ago",
+    tags: ["calibration", "temperature", "firmware"],
+    links: [
+      {
+        title: "Guide for Inverter Module Communication Timeout",
+        url: "https://docs.industrial.support/solution/ai-sol-88/guide",
+      },
+      {
+        title: "FAQ for Inverter Module Communication Timeout",
+        url: "https://docs.internal/faq/ai-sol-88",
+      },
+    ],
+    documents: [
+      {
+        name: "Inverter Module Communication Timeout Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inverter Module Communication Timeout Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:15:00Z",
   },
@@ -4315,16 +7330,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.92,
-    usageCount: 11,
-    lastUsed: "5 hours ago",
-    tags: ["hydraulic", "relay", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-89/guide",
-      "https://docs.internal/faq/ai-sol-89",
+    verified: false,
+    confidence: 0.96,
+    usageCount: 19,
+    lastUsed: "6 hours ago",
+    tags: ["controller", "plc", "alarm"],
+    links: [
+      {
+        title: "Guide for Sudden Drop in Production Line Speed",
+        url: "https://docs.industrial.support/solution/ai-sol-89/guide",
+      },
+      {
+        title: "FAQ for Sudden Drop in Production Line Speed",
+        url: "https://docs.internal/faq/ai-sol-89",
+      },
+    ],
+    documents: [
+      {
+        name: "Sudden Drop in Production Line Speed Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Sudden Drop in Production Line Speed Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T14:00:00Z",
   },
@@ -4338,17 +7368,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.94,
-    usageCount: 4,
-    lastUsed: "2 hours ago",
-    tags: ["hydraulic", "controller", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-90/guide",
-      "https://docs.internal/faq/ai-sol-90",
+    verified: false,
+    confidence: 0.88,
+    usageCount: 16,
+    lastUsed: "1 hours ago",
+    tags: ["plc", "calibration", "motor"],
+    links: [
+      {
+        title: "Guide for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.industrial.support/solution/ai-sol-90/guide",
+      },
+      {
+        title: "FAQ for PID Loop Oscillations in Temperature Control",
+        url: "https://docs.internal/faq/ai-sol-90",
+      },
+    ],
+    documents: [
+      {
+        name: "PID Loop Oscillations in Temperature Control Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PID Loop Oscillations in Temperature Control Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:45:00Z",
   },
@@ -4363,14 +7407,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.86,
-    usageCount: 16,
-    lastUsed: "5 hours ago",
-    tags: ["communication", "network", "pressure"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-91/guide",
-      "https://docs.internal/faq/ai-sol-91",
+    verified: false,
+    confidence: 0.8,
+    usageCount: 17,
+    lastUsed: "2 hours ago",
+    tags: ["sensor", "vibration", "communication"],
+    links: [
+      {
+        title: "Guide for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.industrial.support/solution/ai-sol-91/guide",
+      },
+      {
+        title: "FAQ for Stepper Motor Stalling at High Speeds",
+        url: "https://docs.internal/faq/ai-sol-91",
+      },
+    ],
+    documents: [
+      {
+        name: "Stepper Motor Stalling at High Speeds Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Stepper Motor Stalling at High Speeds Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:30:00Z",
   },
@@ -4387,14 +7447,30 @@ export const aiSolutions: Solution[] = [
       "5. Validate sensor readings against reference instruments",
       "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.93,
-    usageCount: 7,
-    lastUsed: "6 hours ago",
-    tags: ["alarm", "calibration", "sensor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-92/guide",
-      "https://docs.internal/faq/ai-sol-92",
+    verified: false,
+    confidence: 0.87,
+    usageCount: 19,
+    lastUsed: "7 hours ago",
+    tags: ["hydraulic", "pressure", "network"],
+    links: [
+      {
+        title: "Guide for Inconsistent Temperature Sensor Output",
+        url: "https://docs.industrial.support/solution/ai-sol-92/guide",
+      },
+      {
+        title: "FAQ for Inconsistent Temperature Sensor Output",
+        url: "https://docs.internal/faq/ai-sol-92",
+      },
+    ],
+    documents: [
+      {
+        name: "Inconsistent Temperature Sensor Output Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Inconsistent Temperature Sensor Output Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:15:00Z",
   },
@@ -4408,16 +7484,31 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
-      "6. Verify firmware version compatibility",
     ],
-    status: "pending",
-    confidence: 0.81,
-    usageCount: 22,
-    lastUsed: "5 hours ago",
-    tags: ["firmware", "alarm", "vibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-93/guide",
-      "https://docs.internal/faq/ai-sol-93",
+    verified: false,
+    confidence: 0.89,
+    usageCount: 25,
+    lastUsed: "4 hours ago",
+    tags: ["network", "calibration", "hydraulic"],
+    links: [
+      {
+        title: "Guide for Hydraulic Pump Fails to Start",
+        url: "https://docs.industrial.support/solution/ai-sol-93/guide",
+      },
+      {
+        title: "FAQ for Hydraulic Pump Fails to Start",
+        url: "https://docs.internal/faq/ai-sol-93",
+      },
+    ],
+    documents: [
+      {
+        name: "Hydraulic Pump Fails to Start Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Hydraulic Pump Fails to Start Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T13:00:00Z",
   },
@@ -4431,16 +7522,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.8,
-    usageCount: 7,
-    lastUsed: "10 hours ago",
-    tags: ["pressure", "calibration", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-94/guide",
-      "https://docs.internal/faq/ai-sol-94",
+    verified: false,
+    confidence: 0.78,
+    usageCount: 18,
+    lastUsed: "1 hours ago",
+    tags: ["sensor", "plc", "controller"],
+    links: [
+      {
+        title: "Guide for Vibration Levels Exceeding Threshold",
+        url: "https://docs.industrial.support/solution/ai-sol-94/guide",
+      },
+      {
+        title: "FAQ for Vibration Levels Exceeding Threshold",
+        url: "https://docs.internal/faq/ai-sol-94",
+      },
+    ],
+    documents: [
+      {
+        name: "Vibration Levels Exceeding Threshold Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Vibration Levels Exceeding Threshold Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:45:00Z",
   },
@@ -4453,15 +7559,33 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
+      "5. Validate sensor readings against reference instruments",
+      "6. Verify firmware version compatibility",
     ],
-    status: "verified",
-    confidence: 0.94,
-    usageCount: 18,
-    lastUsed: "8 hours ago",
-    tags: ["vibration", "plc", "network"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-95/guide",
-      "https://docs.internal/faq/ai-sol-95",
+    verified: false,
+    confidence: 0.89,
+    usageCount: 9,
+    lastUsed: "2 hours ago",
+    tags: ["pressure", "calibration", "motor"],
+    links: [
+      {
+        title: "Guide for PLC Not Recognizing Input Module",
+        url: "https://docs.industrial.support/solution/ai-sol-95/guide",
+      },
+      {
+        title: "FAQ for PLC Not Recognizing Input Module",
+        url: "https://docs.internal/faq/ai-sol-95",
+      },
+    ],
+    documents: [
+      {
+        name: "PLC Not Recognizing Input Module Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "PLC Not Recognizing Input Module Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:30:00Z",
   },
@@ -4477,14 +7601,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.86,
-    usageCount: 19,
-    lastUsed: "3 hours ago",
-    tags: ["motor", "temperature", "alarm"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-96/guide",
-      "https://docs.internal/faq/ai-sol-96",
+    verified: false,
+    confidence: 0.84,
+    usageCount: 7,
+    lastUsed: "4 hours ago",
+    tags: ["motor", "plc", "sensor"],
+    links: [
+      {
+        title: "Guide for Slow Network Response from Control System",
+        url: "https://docs.industrial.support/solution/ai-sol-96/guide",
+      },
+      {
+        title: "FAQ for Slow Network Response from Control System",
+        url: "https://docs.internal/faq/ai-sol-96",
+      },
+    ],
+    documents: [
+      {
+        name: "Slow Network Response from Control System Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Slow Network Response from Control System Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:15:00Z",
   },
@@ -4498,14 +7638,30 @@ export const aiSolutions: Solution[] = [
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
     ],
-    status: "pending",
-    confidence: 0.84,
-    usageCount: 23,
-    lastUsed: "1 hours ago",
-    tags: ["temperature", "pressure", "motor"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-97/guide",
-      "https://docs.internal/faq/ai-sol-97",
+    verified: false,
+    confidence: 0.93,
+    usageCount: 3,
+    lastUsed: "7 hours ago",
+    tags: ["relay", "calibration", "motor"],
+    links: [
+      {
+        title: "Guide for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.industrial.support/solution/ai-sol-97/guide",
+      },
+      {
+        title: "FAQ for Unexpected Alarm on Cooling Fan",
+        url: "https://docs.internal/faq/ai-sol-97",
+      },
+    ],
+    documents: [
+      {
+        name: "Unexpected Alarm on Cooling Fan Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Unexpected Alarm on Cooling Fan Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T12:00:00Z",
   },
@@ -4519,16 +7675,31 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.93,
-    usageCount: 7,
-    lastUsed: "2 hours ago",
-    tags: ["firmware", "plc", "hydraulic"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-98/guide",
-      "https://docs.internal/faq/ai-sol-98",
+    verified: false,
+    confidence: 0.94,
+    usageCount: 23,
+    lastUsed: "5 hours ago",
+    tags: ["calibration", "network", "vibration"],
+    links: [
+      {
+        title: "Guide for Pressure Valve Misreporting Readings",
+        url: "https://docs.industrial.support/solution/ai-sol-98/guide",
+      },
+      {
+        title: "FAQ for Pressure Valve Misreporting Readings",
+        url: "https://docs.internal/faq/ai-sol-98",
+      },
+    ],
+    documents: [
+      {
+        name: "Pressure Valve Misreporting Readings Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Pressure Valve Misreporting Readings Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T11:45:00Z",
   },
@@ -4544,14 +7715,30 @@ export const aiSolutions: Solution[] = [
       "4. Check for environmental causes like temperature or EMI",
       "5. Validate sensor readings against reference instruments",
     ],
-    status: "verified",
-    confidence: 0.96,
-    usageCount: 16,
-    lastUsed: "7 hours ago",
-    tags: ["plc", "sensor", "firmware"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-99/guide",
-      "https://docs.internal/faq/ai-sol-99",
+    verified: false,
+    confidence: 0.9,
+    usageCount: 25,
+    lastUsed: "1 hours ago",
+    tags: ["motor", "relay", "alarm"],
+    links: [
+      {
+        title: "Guide for Firmware Update Failure on Controller",
+        url: "https://docs.industrial.support/solution/ai-sol-99/guide",
+      },
+      {
+        title: "FAQ for Firmware Update Failure on Controller",
+        url: "https://docs.internal/faq/ai-sol-99",
+      },
+    ],
+    documents: [
+      {
+        name: "Firmware Update Failure on Controller Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Firmware Update Failure on Controller Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T11:30:00Z",
   },
@@ -4564,17 +7751,35 @@ export const aiSolutions: Solution[] = [
       "2. Review error logs from the control system",
       "3. Power cycle affected hardware",
       "4. Check for environmental causes like temperature or EMI",
-      "5. Validate sensor readings against reference instruments",
     ],
-    status: "pending",
-    confidence: 0.89,
-    usageCount: 6,
-    lastUsed: "3 hours ago",
-    tags: ["plc", "temperature", "calibration"],
-    documentationLinks: [
-      "https://docs.industrial.support/solution/ai-sol-100/guide",
-      "https://docs.internal/faq/ai-sol-100",
+    verified: false,
+    confidence: 0.87,
+    usageCount: 19,
+    lastUsed: "10 hours ago",
+    tags: ["temperature", "hydraulic", "relay"],
+    links: [
+      {
+        title: "Guide for Relay Module Not Engaging",
+        url: "https://docs.industrial.support/solution/ai-sol-100/guide",
+      },
+      {
+        title: "FAQ for Relay Module Not Engaging",
+        url: "https://docs.internal/faq/ai-sol-100",
+      },
+    ],
+    documents: [
+      {
+        name: "Relay Module Not Engaging Troubleshooting.pdf",
+        type: "pdf",
+      },
+      {
+        name: "Relay Module Not Engaging Configuration.json",
+        type: "json",
+      },
     ],
     createdAt: "2024-05-23T11:15:00Z",
   },
 ];
+
+export const aiDisclaimer =
+  "This solution was generated by AI based on common troubleshooting patterns. Please verify with technical documentation.";
