@@ -1,9 +1,10 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from db import init_db
 from api import router
 
 app = FastAPI(
-    title="Manufacturing Solutions API",
+    title="Verfi AI API",
     description="""
     API for managing and retrieving manufacturing solutions and troubleshooting information.
     This system helps technicians find solutions to common manufacturing problems and document new solutions.
@@ -19,6 +20,15 @@ app = FastAPI(
     },
 )
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # React's default port
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Initialize database
 init_db()
 
@@ -26,5 +36,4 @@ init_db()
 app.include_router(
     router,
     prefix="/api/v1",
-    tags=["solutions"]
 )

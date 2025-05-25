@@ -89,13 +89,14 @@ def create_solution_and_question(
 @router.post("/ask", 
     response_model=AskResponseModel,
     summary="Ask a question with manufacturing context",
-    description="Submit a question with optional manufacturing context to find matching solutions")
-def ask_question(data: AskRequestModel):
+    description="Submit a question with optional manufacturing context to find matching solutions",
+    operation_id="ask")
+async def ask_question(request: AskRequestModel):
     
     # Clean and prepare the question
-    preped_question = prepare_question(data.question)
+    preped_question = prepare_question(request.question)
     # Create contextualized question
-    full_question = create_context_question(data, preped_question)
+    full_question = create_context_question(request, preped_question)
     
     # Search for existing solution
     result = find_existing_solution(full_question)
@@ -109,11 +110,12 @@ def ask_question(data: AskRequestModel):
     )
 
 
-@router.post("/solution",
+@router.post("/solutions", 
     response_model=SolutionResponseModel,
     summary="Add a new solution",
-    description="Add a new solution with its associated question")
-def add_solution(data: SolutionRequest):
+    description="Add a new solution with its associated question",
+    operation_id="createSolution")
+async def add_solution(data: SolutionRequest):
 
     # Clean and prepare the question
     preped_question = prepare_question(data.question)
@@ -151,11 +153,12 @@ def add_solution(data: SolutionRequest):
         )
 
 
-@router.get("/solution/{solution_id}",
+@router.get("/solutions/{solution_id}",
     response_model=SolutionModel,
     summary="Get solution by ID",
-    description="Retrieve a specific solution by its ID")
-def get_solution(solution_id: int):
+    description="Retrieve a specific solution by its ID",
+    operation_id="getSolution")
+async def get_solution(solution_id: int):
     try:
         with SessionLocal() as db:
             solution = db.query(Solution).filter(Solution.id == solution_id).first()
@@ -173,7 +176,8 @@ def get_solution(solution_id: int):
 @router.post("/investigate",
     response_model=SolutionResponseModel,
     summary="Start an investigation",
-    description="Initiate a background research task for a given question")
+    description="Initiate a background research task for a given question",
+    operation_id="investigate")
 async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
     
     # Clean and prepare the question
@@ -263,7 +267,8 @@ async def process_and_save_report(question: str, researcher: GPTResearcher, solu
 @router.get("/questions",
     response_model=List[QuestionModel],
     summary="Get all questions",
-    description="Retrieve all questions and their associated solutions from the database")
+    description="Retrieve all questions and their associated solutions from the database",
+    operation_id="listQuestions")
 def get_all_questions():
     try:
         with SessionLocal() as db:
