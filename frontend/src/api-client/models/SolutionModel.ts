@@ -8,7 +8,7 @@ export type SolutionModel = {
     /**
      * The solution id
      */
-    id?: number;
+    id?: (number | null);
     /**
      * The solution text
      */
@@ -16,7 +16,7 @@ export type SolutionModel = {
     /**
      * Link to related documentation
      */
-    document_link: string;
+    document_link?: (string | null);
     /**
      * Whether the solution has been verified
      */
@@ -24,50 +24,54 @@ export type SolutionModel = {
     /**
      * Machine/system error code
      */
-    error_code?: string;
+    error_code?: (string | null);
     /**
      * Name/tag of machine
      */
-    machine_name?: string;
+    machine_name?: (string | null);
     /**
      * Type of machine
      */
-    machine_type?: string;
+    machine_type?: (string | null);
     /**
      * Equipment manufacturer
      */
-    manufacturer?: string;
+    manufacturer?: (string | null);
     /**
      * Specific model number
      */
-    model_number?: string;
+    model_number?: (string | null);
     /**
      * Component involved
      */
-    component?: string;
+    component?: (string | null);
     /**
      * Type of resolution
      */
-    resolution_type?: ResolutionType;
+    resolution_type?: (ResolutionType | null);
     /**
      * Impact on machine downtime
      */
-    downtime_impact?: DowntimeImpact;
+    downtime_impact?: (DowntimeImpact | null);
     /**
      * Whether the issue has safety implications
      */
-    safety_related?: boolean;
+    safety_related?: (boolean | null);
     /**
      * Name of the plant
      */
-    plant_name?: string;
+    plant_name?: (string | null);
     /**
      * Department name
      */
-    department?: string;
+    department?: (string | null);
     /**
      * Comma-separated tags for filtering
      */
-    tags?: string;
+    tags?: (string | null);
+    /**
+     * Title of the solution
+     */
+    title?: (string | null);
 };
 

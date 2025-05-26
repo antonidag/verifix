@@ -12,6 +12,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AskRequestModel } from './models/AskRequestModel';
 export type { AskResponseModel } from './models/AskResponseModel';
+export type { ChatResponseModel } from './models/ChatResponseModel';
 export { DowntimeImpact } from './models/DowntimeImpact';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { Match } from './models/Match';

@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AskRequestModel } from '../models/AskRequestModel';
 import type { AskResponseModel } from '../models/AskResponseModel';
+import type { ChatResponseModel } from '../models/ChatResponseModel';
 import type { QuestionModel } from '../models/QuestionModel';
 import type { SolutionModel } from '../models/SolutionModel';
 import type { SolutionRequest } from '../models/SolutionRequest';
@@ -30,6 +31,18 @@ export class DefaultService {
             errors: {
                 422: `Validation Error`,
             },
+        });
+    }
+    /**
+     * Get all solutions
+     * Retrieve all solutions from the database
+     * @returns SolutionModel Successful Response
+     * @throws ApiError
+     */
+    public listSolutions(): CancelablePromise<Array<SolutionModel>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/v1/solutions',
         });
     }
     /**
@@ -103,6 +116,26 @@ export class DefaultService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/v1/questions',
+        });
+    }
+    /**
+     * Chat with the solution
+     * Chat with the solution
+     * @param requestBody
+     * @returns ChatResponseModel Successful Response
+     * @throws ApiError
+     */
+    public chat(
+        requestBody: AskRequestModel,
+    ): CancelablePromise<ChatResponseModel> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/v1/chat',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
         });
     }
 }
