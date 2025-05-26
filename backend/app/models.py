@@ -126,3 +126,13 @@ class AskResponseModel(BaseModel):
 
     class Config:
         orm_mode = True 
+
+class ChatResponseModel(BaseModel):
+    message: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": "Hello, world!"
+            }
+        }

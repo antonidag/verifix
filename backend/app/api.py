@@ -4,7 +4,7 @@ from db import SessionLocal, Question, Solution
 from llm_model import generate_response
 from vector_db_client import search_similar, add_to_qdrant
 from utils import embed_text
-from models import AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel,QuestionModel, SolutionResponseModel, SolutionPartModel
+from models import AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel,QuestionModel, SolutionResponseModel, SolutionPartModel, ChatResponseModel
 from gpt_researcher import GPTResearcher
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -303,3 +303,19 @@ def get_all_solutions():
             status_code=500,
             detail=f"Database error while retrieving solutions: {str(e)}"
         ) 
+    
+@router.post("/chat",
+    response_model=ChatResponseModel,
+    summary="Chat with the solution",
+    description="Chat with the solution",
+    operation_id="chat")
+async def chat(data: AskRequestModel):
+    response = generate_response(f"""
+    You are a helpful assistant that can answer questions about the solutions in the database.
+    The solutions are stored in the database and are indexed for vector similarity.
+    The solutions are: {get_all_solutions()}
+    The question is: {data.question}
+    The response should be in the same language as the question.
+    The response should be helpful and informative.
+    """)
+    return {"message": response}
