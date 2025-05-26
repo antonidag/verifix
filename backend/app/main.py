@@ -2,6 +2,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from db import init_db
 from api import router
+from dotenv import load_dotenv
+import os
+from pathlib import Path
+import vertexai
+
+# Load environment variables from .env file in the backend directory
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
+# Initialize Vertex AI with project and location
+project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+location = os.getenv('VERTEXAI_LOCATION', 'us-central1')
+vertexai.init(project=project_id, location=location)
 
 app = FastAPI(
     title="Verfi AI API",

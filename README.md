@@ -55,6 +55,12 @@ Run with:
 uvicorn main:app --reload
 ```
 
+Restart shell: 
+```
+exec zsh
+
+```
+
 
 Speech to text -> använda ai för att rätta till det.
 Bild, fråga om muttern är ok? eller för sliten? 

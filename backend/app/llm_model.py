@@ -1,24 +1,49 @@
-from ollama import Client
+from google import genai
+from google.genai import types
 import base64
-
-client = Client(
-    host='http://localhost:11434'
-)
 
 
 def generate_response(query: str):
-
-    # Read the image file as binary data
-    #with open("test.png", 'rb') as img_file:
-        #img_data = img_file.read()
-    
-    # Convert image to base64 for Ollama
-    #img_base64 = base64.b64encode(img_data).decode('utf-8')
-    
-    response = client.generate(
-        model='gemma3:12b',
-        prompt=query,
-        #images=[img_base64],  # Pass base64 encoded image data at top level
-        #options={"temperature": 0.1}  # Lower temperature for more consistent output
+    client = genai.Client(
+        vertexai=True,
+        project="even-hull-461009-j8",
+        location="global",
     )
-    return response.response
+
+    model = "gemini-2.5-flash-preview-05-20"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part(text=query)
+            ]
+
+        )
+    ]
+
+    generate_content_config = types.GenerateContentConfig(
+        temperature=1,
+        top_p=1,
+        seed=0,
+        max_output_tokens=65535,
+        safety_settings=[types.SafetySetting(
+            category="HARM_CATEGORY_HATE_SPEECH",
+            threshold="OFF"
+        ), types.SafetySetting(
+            category="HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold="OFF"
+        ), types.SafetySetting(
+            category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold="OFF"
+        ), types.SafetySetting(
+            category="HARM_CATEGORY_HARASSMENT",
+            threshold="OFF"
+        )],
+    )
+
+    response = client.models.generate_content(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    )
+    return response.text

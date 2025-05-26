@@ -66,6 +66,7 @@ def create_solution_and_question(
     """Create a new solution and associated question in the database."""
     try:
         solution = Solution(**solution_data.solution.model_dump())
+        solution.title = full_question
         db.add(solution)
         db.commit()
         db.refresh(solution)
@@ -209,7 +210,7 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
 
             return {
                 "message": f"Working on report for query: {data.question}. It will be saved once ready.",
-                "solution_id": {
+                "solution": {
                     "id": solution_id
                 }
             }
@@ -244,8 +245,7 @@ async def process_and_save_report(question: str, researcher: GPTResearcher, solu
                 # Store question
                 question_record = Question(
                     text=question,
-                    solution_id=solution_id,
-                    verified=False
+                    solution_id=solution_id
                 )
                 db.add(question_record)
                 db.commit()
@@ -282,4 +282,24 @@ def get_all_questions():
         raise HTTPException(
             status_code=500,
             detail=f"Database error while retrieving questions: {str(e)}"
+        ) 
+    
+@router.get("/solutions",
+    response_model=List[SolutionModel],
+    summary="Get all solutions",
+    description="Retrieve all solutions from the database",
+    operation_id="listSolutions")
+def get_all_solutions():
+    try:
+        with SessionLocal() as db:
+            solutions = (
+                db.query(Solution)
+                .all()
+            )
+            return solutions
+            
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error while retrieving solutions: {str(e)}"
         ) 

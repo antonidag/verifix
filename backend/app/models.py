@@ -47,22 +47,23 @@ class AskRequestModel(BaseModel):
 
 
 class SolutionModel(BaseModel):
-    id: int = Field(None, description="The solution id")
+    id: Optional[int] = Field(None, description="The solution id")
     text: str = Field(..., description="The solution text")
-    document_link: str = Field(..., description="Link to related documentation")
+    document_link: Optional[str] = Field("", description="Link to related documentation")
     verified: bool = Field(..., description="Whether the solution has been verified")
-    error_code: str = Field(None, description="Machine/system error code")
-    machine_name: str = Field(None, description="Name/tag of machine")
-    machine_type: str = Field(None, description="Type of machine")
-    manufacturer: str = Field(None, description="Equipment manufacturer")
-    model_number: str = Field(None, description="Specific model number")
-    component: str = Field(None, description="Component involved")
-    resolution_type: ResolutionType = Field(None, description="Type of resolution")
-    downtime_impact: DowntimeImpact = Field(None, description="Impact on machine downtime")
-    safety_related: bool = Field(None, description="Whether the issue has safety implications")
-    plant_name: str = Field(None, description="Name of the plant")
-    department: str = Field(None, description="Department name")
-    tags: str = Field(None, description="Comma-separated tags for filtering")
+    error_code: Optional[str] = Field("", description="Machine/system error code")
+    machine_name: Optional[str] = Field("", description="Name/tag of machine")
+    machine_type: Optional[str] = Field("", description="Type of machine")
+    manufacturer: Optional[str] = Field("", description="Equipment manufacturer")
+    model_number: Optional[str] = Field("", description="Specific model number")
+    component: Optional[str] = Field("", description="Component involved")
+    resolution_type: Optional[ResolutionType] = Field(None, description="Type of resolution")
+    downtime_impact: Optional[DowntimeImpact] = Field(None, description="Impact on machine downtime")
+    safety_related: Optional[bool] = Field(False, description="Whether the issue has safety implications")
+    plant_name: Optional[str] = Field("", description="Name of the plant")
+    department: Optional[str] = Field("", description="Department name")
+    tags: Optional[str] = Field("", description="Comma-separated tags for filtering")
+    title: Optional[str] = Field("", description="Title of the solution")
 
     class Config:
         orm_mode = True

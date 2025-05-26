@@ -19,6 +19,7 @@ class Solution(Base):
     text = Column(String)
     document_link = Column(String)
     verified = Column(Boolean, default=False)
+    title = Column(String, default="")  # Adding title field
 
     # Manufacturing context fields
     error_code = Column(String, index=True)           # Machine/system error code
