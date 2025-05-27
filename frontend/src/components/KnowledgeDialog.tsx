@@ -1,10 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Solution } from "@/data/solutions";
 import { openChatWithContext } from "@/hooks/use-chat-context";
 import { toast } from "@/hooks/use-toast";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { SolutionModel } from "@/api-client";
 import {
   AlertTriangle,
   Bot,
@@ -19,10 +19,10 @@ import {
 interface KnowledgeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  solution?: Solution;
+  solution?: SolutionModel;
 }
 
-const copyToClipboard = (solution: Solution) => {
+const copyToClipboard = (solution: SolutionModel) => {
   navigator.clipboard.writeText(JSON.stringify(solution, null, 2));
   toast({
     title: "Copied to clipboard",
@@ -40,7 +40,7 @@ export const KnowledgeDialog = ({ open, onOpenChange, solution }: KnowledgeDialo
           ) : (
             <Bot className="w-5 h-5 text-orange-600" />
           )}
-          {solution?.title}
+          {solution?.title || solution?.text || "Solution Details"}
         </DialogTitle>
       </DialogHeader>
 
@@ -52,37 +52,50 @@ export const KnowledgeDialog = ({ open, onOpenChange, solution }: KnowledgeDialo
               <>
                 <Badge className="bg-green-100 text-green-700">Verified Solution</Badge>
                 <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                  {Math.round(solution.confidence * 100)}% match
+                  {solution.confidence ? solution.confidence  : 0}% confidence
                 </Badge>
               </>
             ) : (
               <>
                 <Badge className="bg-orange-100 text-orange-700">AI Generated</Badge>
                 <Badge variant="outline" className="text-orange-600 border-orange-300">
-                  {Math.round(solution.confidence * 100)}% confidence
+                  {solution.confidence ? solution.confidence  : 0}% confidence
                 </Badge>
               </>
             )}
-            {solution.tags?.map((tag: string) => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
+            {solution.tags && (
+              Array.isArray(solution.tags) 
+                ? solution.tags.map((tag: string) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))
+                : typeof solution.tags === 'string' 
+                  ? solution.tags.split(',').filter(Boolean).map((tag: string) => (
+                      <Badge key={tag} variant="outline" className="text-xs">
+                        {tag.trim()}
+                      </Badge>
+                    ))
+                  : null
+            )}
           </div>
 
           {/* Description */}
           <DialogDescription>
             <h3 className="font-semibold text-slate-800 mb-2">Description</h3>
-            <p className="text-slate-700">{solution.description}</p>
+            <p className="text-slate-700">{solution.description || solution.text}</p>
+            {solution.description && solution.text && solution.description !== solution.text && (
+              <p className="text-slate-700 mt-2">{solution.text}</p>
+            )}
           </DialogDescription>
 
           {/* Detailed Steps */}
-          {solution.steps && (
+          {solution.solution_steps && solution.solution_steps.length > 0 && (
             <div>
               <h3 className="font-semibold text-slate-800 mb-3">Solution Steps</h3>
               <div className="bg-slate-50 rounded-lg p-4">
                 <ol className="space-y-3">
-                  {solution.steps.map((step: string, index: number) => (
+                  {solution.solution_steps.map((step: string, index: number) => (
                     <li key={index} className="text-slate-700 text-sm flex items-start gap-3">
                       <span className="bg-blue-100 text-blue-700 rounded-full w-7 h-7 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
                         {index + 1}
@@ -95,54 +108,25 @@ export const KnowledgeDialog = ({ open, onOpenChange, solution }: KnowledgeDialo
             </div>
           )}
 
-          {/* Documents Section */}
-          {solution.documents && solution.documents.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-slate-800 mb-3">Related Documents</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {solution.documents.map((doc, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                  >
-                    <FileText className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800 truncate">{doc.name}</p>
-                      <p className="text-xs text-slate-500 uppercase">{doc.type}</p>
-                    </div>
-                    <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Links Section */}
-          {solution.links && solution.links.length > 0 && (
+          {solution.document_link && (
             <div>
               <h3 className="font-semibold text-slate-800 mb-3">Helpful Links</h3>
               <div className="space-y-2">
-                {solution.links.map((link, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                  >
-                    <Link2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                    <div className="flex-1">
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                      >
-                        {link.title}
-                      </a>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-slate-400" />
+                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                  <Link2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <div className="flex-1">
+                    <a
+                      href={solution.document_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                    >
+                      Documentation
+                    </a>
                   </div>
-                ))}
+                  <ExternalLink className="w-4 h-4 text-slate-400" />
+                </div>
               </div>
             </div>
           )}
@@ -154,20 +138,21 @@ export const KnowledgeDialog = ({ open, onOpenChange, solution }: KnowledgeDialo
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-green-50 p-3 rounded-lg text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {Math.round(solution.confidence * 100)}%
+                    {solution.confidence ? solution.confidence : 0}%
                   </div>
                   <div className="text-xs text-green-700">Match Rate</div>
                 </div>
+                {/* Note: These statistics might need to be added to the API model if needed */}
                 <div className="bg-blue-50 p-3 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-blue-600">15</div>
+                  <div className="text-2xl font-bold text-blue-600">-</div>
                   <div className="text-xs text-blue-700">Times Used</div>
                 </div>
                 <div className="bg-purple-50 p-3 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-purple-600">98%</div>
+                  <div className="text-2xl font-bold text-purple-600">-</div>
                   <div className="text-xs text-purple-700">Success Rate</div>
                 </div>
                 <div className="bg-orange-50 p-3 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-orange-600">4.8</div>
+                  <div className="text-2xl font-bold text-orange-600">-</div>
                   <div className="text-xs text-orange-700">User Rating</div>
                 </div>
               </div>

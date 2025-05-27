@@ -1,8 +1,8 @@
-import { Solution } from "@/data/solutions";
+import { SolutionModel } from "@/api-client";
 import * as React from "react";
 
 interface ChatContext {
-  solution?: Solution;
+  solution?: SolutionModel;
 }
 
 interface ChatContextState {

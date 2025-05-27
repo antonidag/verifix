@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { aiDisclaimer, aiSolutions, Solution, SolutionResult, solutions } from "@/data/solutions";
+import { aiDisclaimer, Solution } from "@/data/solutions";
 import { toast } from "@/hooks/use-toast";
+import { VefiApi, AskRequestModel, SolutionPartModel } from '@/api-client';
 import {
   AlertTriangle,
   Bot,
@@ -26,12 +27,28 @@ import React, { useState } from "react";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { SolutionForm } from "./SolutionForm";
 
+// Initialize the API client
+const api = new VefiApi({
+    BASE: 'http://localhost:8000'
+});
+
+// Helper function to add match score to the Solution type
+interface SolutionWithMatch extends Solution {
+  matchScore: string;
+}
+
+// Add a helper function to safely convert match score to percentage
+const getMatchScorePercentage = (score: string): number => {
+  const parsed = parseFloat(score);
+  return isNaN(parsed) ? 0 : Math.floor(parsed * 100);
+};
+
 export const ProblemSubmission = () => {
   const [problem, setProblem] = useState("");
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [isListening, setIsListening] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [solution, setSolution] = useState<Solution>(null);
+  const [solution, setSolution] = useState<SolutionWithMatch | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [feedback, setFeedback] = useState<{ [key: string]: "helpful" | "not-helpful" | null }>({});
 
@@ -66,16 +83,51 @@ export const ProblemSubmission = () => {
     setIsSearching(true);
     setSolution(null);
 
-    setTimeout(() => {
-      const hasKnowledgeBaseSolution = Math.random() > 0.3;
+    try {
+      const askRequest: AskRequestModel = {
+        question: problem.trim(),
+        solution: {} as SolutionPartModel
+      };
 
-      if (hasKnowledgeBaseSolution) {
-        setSolution(solutions[Math.floor(Math.random() * solutions.length)]);
+      const response = await api.default.ask(askRequest);
+
+      if (response.match) {
+        const solutions = await api.default.listSolutions();
+        const foundSolution = solutions.find(s => s.id === response.match?.solution_id);
+        
+        if (foundSolution) {
+          setSolution({
+            id: foundSolution.id?.toString() || "",
+            title: foundSolution.title || "",
+            description: foundSolution.description || foundSolution.text || "",
+            steps: foundSolution.solution_steps || foundSolution.text?.split('\n').filter(line => line.trim()) || [],
+            verified: foundSolution.verified,
+            confidence: foundSolution.confidence || "0", // Solution's own confidence
+            matchScore: response.match.score?.toString() || "0", // Match score from ask operation
+            usageCount: 0,
+            lastUsed: foundSolution.created_at?.toLocaleString() || "Recently",
+            tags: foundSolution.tags?.split(",").map(tag => tag.trim()) || [],
+            links: [{ title: "Documentation", url: foundSolution.document_link || "" }],
+            documents: [],
+            createdAt: foundSolution.created_at?.toLocaleString() || new Date().toISOString()
+          });
+        }
       } else {
-        setSolution(aiSolutions[Math.floor(Math.random() * aiSolutions.length)]);
+        toast({
+          title: "No matches found",
+          description: "No matching solutions were found in our database.",
+        });
       }
+    } catch (error) {
+      console.error('Error searching for solution:', error);
+      toast({
+        title: "Error",
+        description: "Failed to search for solutions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsSearching(false);
-    }, 1500);
+    }
   };
 
   const clearForm = () => {
@@ -229,8 +281,11 @@ export const ProblemSubmission = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="font-semibold text-slate-800">{solution.title}</h3>
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                            {getMatchScorePercentage(solution.matchScore)}% match
+                          </Badge>
                           <Badge variant="secondary" className="bg-green-100 text-green-700">
-                            {Math.round(solution.confidence * 100)}% match
+                            {solution.confidence || "0"}% confidence
                           </Badge>
                           {solution.verified && (
                             <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
@@ -253,69 +308,70 @@ export const ProblemSubmission = () => {
                                 {step}
                               </li>
                             ))}
-                            {solution.steps.length > 3 && (
-                              <li className="text-sm text-slate-500">
-                                ...and {solution.steps.length - 3} more steps
-                              </li>
-                            )}
                           </ul>
+                          {solution.steps.length > 3 && (
+                            <Button
+                              variant="link"
+                              className="text-blue-600 hover:text-blue-700 mt-2 pl-0"
+                              onClick={handleViewDetails}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              View All Steps
+                            </Button>
+                          )}
                         </div>
 
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-green-600" />
-                              <span className="text-xs text-slate-500">Verified solution</span>
+                        {/* Documents Preview */}
+                        {solution.documents.length > 0 && (
+                          <div className="bg-white/70 p-4 rounded-lg mb-4">
+                            <h4 className="font-medium text-slate-800 mb-2">
+                              Related Documents:
+                            </h4>
+                            <div className="grid grid-cols-2 gap-2">
+                              {solution.documents.map((doc, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center gap-2 text-sm text-slate-600"
+                                >
+                                  <FileText className="w-4 h-4" />
+                                  {doc.name}
+                                </div>
+                              ))}
                             </div>
-                            {solution.documents.length > 0 && (
-                              <div className="flex items-center gap-1">
-                                <FileText className="w-4 h-4 text-blue-600" />
-                                <span className="text-xs text-slate-500">
-                                  {solution.documents.length} documents
-                                </span>
-                              </div>
-                            )}
                           </div>
-                          <div className="flex items-center gap-2">
+                        )}
+
+                        {/* Feedback Section */}
+                        <div className="mt-4 flex items-center gap-4">
+                          <span className="text-sm text-slate-600">
+                            Was this solution helpful?
+                          </span>
+                          <div className="flex gap-2">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={handleViewDetails}
-                              className="border-green-300 text-green-700 hover:bg-green-50"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View Details
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Feedback Section */}
-                        <div className="flex items-center gap-3 pt-3 border-t border-green-200">
-                          <span className="text-sm text-slate-600">Was this solution helpful?</span>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleFeedback(solution.id, "helpful")}
-                              className={`${
+                              className={`border-slate-200 ${
                                 feedback[solution.id] === "helpful"
-                                  ? "bg-green-100 text-green-700"
-                                  : "text-slate-500 hover:text-green-600"
+                                  ? "bg-green-50 text-green-600"
+                                  : ""
                               }`}
+                              onClick={() => handleFeedback(solution.id, "helpful")}
                             >
-                              <ThumbsUp className="w-4 h-4" />
+                              <ThumbsUp className="w-4 h-4 mr-1" />
+                              Yes
                             </Button>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              onClick={() => handleFeedback(solution.id, "not-helpful")}
-                              className={`${
+                              className={`border-slate-200 ${
                                 feedback[solution.id] === "not-helpful"
-                                  ? "bg-red-100 text-red-700"
-                                  : "text-slate-500 hover:text-red-600"
+                                  ? "bg-red-50 text-red-600"
+                                  : ""
                               }`}
+                              onClick={() => handleFeedback(solution.id, "not-helpful")}
                             >
-                              <ThumbsDown className="w-4 h-4" />
+                              <ThumbsDown className="w-4 h-4 mr-1" />
+                              No
                             </Button>
                           </div>
                         </div>
@@ -324,7 +380,7 @@ export const ProblemSubmission = () => {
                   </div>
                 )}
 
-                {/* AI Generated Result */}
+                {/* AI Solution Alternative */}
                 {solution && !solution.verified && (
                   <div className="mt-8 p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-200">
                     <div className="flex items-start gap-4">
@@ -336,9 +392,12 @@ export const ProblemSubmission = () => {
                           <h3 className="font-semibold text-slate-800">{solution.title}</h3>
                           <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                             AI Generated
-                          </Badge>
+                          </Badge>                        
                           <Badge variant="outline" className="text-orange-600 border-orange-300">
-                            {Math.round(solution.confidence * 100)}% confidence
+                            {solution.confidence || "0"}% confidence
+                          </Badge>
+                          <Badge variant="outline" className="text-blue-600 border-blue-300">
+                            {getMatchScorePercentage(solution.matchScore)}% match
                           </Badge>
                         </div>
                         <p className="text-slate-700 mb-4">{solution.description}</p>
@@ -360,11 +419,6 @@ export const ProblemSubmission = () => {
                                 {step}
                               </li>
                             ))}
-                            {solution.steps.length > 3 && (
-                              <li className="text-sm text-slate-500">
-                                ...and {solution.steps.length - 3} more steps
-                              </li>
-                            )}
                           </ul>
                         </div>
 
@@ -420,6 +474,15 @@ export const ProblemSubmission = () => {
                     </div>
                   </div>
                 )}
+
+                <div className="text-center">
+                  {solution && (
+                    <>
+                      <div className="text-3xl font-bold text-blue-600">1</div>
+                      <div className="text-sm text-blue-700">Match Found</div>
+                    </>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
