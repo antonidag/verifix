@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DowntimeImpact } from './DowntimeImpact';
-import type { ResolutionType } from './ResolutionType';
 export type SolutionModel = {
     /**
      * The solution id
@@ -48,11 +46,11 @@ export type SolutionModel = {
     /**
      * Type of resolution
      */
-    resolution_type?: (ResolutionType | null);
+    resolution_type?: (string | null);
     /**
      * Impact on machine downtime
      */
-    downtime_impact?: (DowntimeImpact | null);
+    downtime_impact?: (string | null);
     /**
      * Whether the issue has safety implications
      */
@@ -73,5 +71,21 @@ export type SolutionModel = {
      * Title of the solution
      */
     title?: (string | null);
+    /**
+     * Description of the solution
+     */
+    description?: (string | null);
+    /**
+     * List of solution steps
+     */
+    solution_steps?: (Array<string> | null);
+    /**
+     * Confidence of the solution
+     */
+    confidence?: (string | null);
+    /**
+     * Creation date of the solution
+     */
+    created_at?: (string | null);
 };
 
