@@ -3,20 +3,6 @@ from typing import Optional, List
 from enum import Enum
 from datetime import datetime
 
-
-class ResolutionType(str, Enum):
-    PREVENTIVE = "Preventive"
-    CORRECTIVE = "Corrective"
-    CALIBRATION = "Calibration"
-    SOFTWARE_FIX = "Software Fix"
-
-
-class DowntimeImpact(str, Enum):
-    HIGH = "High"
-    MEDIUM = "Medium"
-    LOW = "Low"
-
-
 class QuestionInput(BaseModel):
     question: str = Field(..., description="The question to be asked")
 
