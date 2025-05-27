@@ -11,11 +11,6 @@ const api = new VefiApi({
     BASE: 'http://localhost:8000'
 });
 
-// Helper function to format confidence for display
-const formatConfidence = (confidence: string | null | undefined): string => {
-  if (!confidence) return "0% confidence";
-  return `${Math.round(parseFloat(confidence) * 100)}% confidence`;
-};
 
 export const KnowledgeBase = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -65,14 +60,14 @@ export const KnowledgeBase = () => {
               ) : solutions.length === 0 ? (
                 <div className="text-center py-8 text-slate-500">No solutions found</div>
               ) : (
-                solutions.slice(0, 5).map((solution) => (
+                solutions.map((solution) => (
                   <div
                     key={solution.id}
                     className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-slate-800">{solution.title || solution.text}</h3>
+                        <h3 className="font-semibold text-slate-800">{solution.title}</h3>
                         {solution.verified ? (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
@@ -84,11 +79,11 @@ export const KnowledgeBase = () => {
                       </Badge>
                     </div>
 
-                    <p className="text-sm text-slate-600 mb-3">{solution.description || solution.text}</p>
+                    <p className="text-sm text-slate-600 mb-3">{solution.description.slice(0, 100)}...</p>
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 text-xs text-slate-500">
-                        <span>{formatConfidence(solution.confidence)}</span>
+                        <span>{solution.confidence || "0"}% confidence</span>
                         {solution.created_at && (
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />

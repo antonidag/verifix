@@ -83,10 +83,7 @@ export const KnowledgeDialog = ({ open, onOpenChange, solution }: KnowledgeDialo
           {/* Description */}
           <DialogDescription>
             <h3 className="font-semibold text-slate-800 mb-2">Description</h3>
-            <p className="text-slate-700">{solution.description || solution.text}</p>
-            {solution.description && solution.text && solution.description !== solution.text && (
-              <p className="text-slate-700 mt-2">{solution.text}</p>
-            )}
+            <p className="text-slate-700">{solution.description}</p>
           </DialogDescription>
 
           {/* Detailed Steps */}

@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { aiDisclaimer, Solution } from "@/data/solutions";
+import { aiDisclaimer } from "@/data/solutions";
 import { toast } from "@/hooks/use-toast";
-import { VefiApi, AskRequestModel, SolutionPartModel } from '@/api-client';
+import { VefiApi, AskRequestModel, SolutionPartModel, SolutionModel } from '@/api-client';
 import {
   AlertTriangle,
   Bot,
@@ -32,8 +32,8 @@ const api = new VefiApi({
     BASE: 'http://localhost:8000'
 });
 
-// Helper function to add match score to the Solution type
-interface SolutionWithMatch extends Solution {
+// Helper function to add match score to the SolutionModel type
+interface SolutionWithMatch extends SolutionModel {
   matchScore: string;
 }
 
@@ -97,19 +97,8 @@ export const ProblemSubmission = () => {
         
         if (foundSolution) {
           setSolution({
-            id: foundSolution.id?.toString() || "",
-            title: foundSolution.title || "",
-            description: foundSolution.description || foundSolution.text || "",
-            steps: foundSolution.solution_steps || foundSolution.text?.split('\n').filter(line => line.trim()) || [],
-            verified: foundSolution.verified,
-            confidence: foundSolution.confidence || "0", // Solution's own confidence
-            matchScore: response.match.score?.toString() || "0", // Match score from ask operation
-            usageCount: 0,
-            lastUsed: foundSolution.created_at?.toLocaleString() || "Recently",
-            tags: foundSolution.tags?.split(",").map(tag => tag.trim()) || [],
-            links: [{ title: "Documentation", url: foundSolution.document_link || "" }],
-            documents: [],
-            createdAt: foundSolution.created_at?.toLocaleString() || new Date().toISOString()
+            ...foundSolution,
+            matchScore: response.match.score?.toString() || "0" // Add match score to the solution
           });
         }
       } else {
@@ -122,7 +111,7 @@ export const ProblemSubmission = () => {
       console.error('Error searching for solution:', error);
       toast({
         title: "Error",
-        description: "Failed to search for solutions. Please try again.",
+        description: "Did not find any solutions. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -140,8 +129,10 @@ export const ProblemSubmission = () => {
     setIsDetailModalOpen(true);
   };
 
-  const handleFeedback = (solutionId: string, type: "helpful" | "not-helpful") => {
-    setFeedback((prev) => ({ ...prev, [solutionId]: type }));
+  const handleFeedback = (solutionId: number | null | undefined, type: "helpful" | "not-helpful") => {
+    if (solutionId === null || solutionId === undefined) return;
+    
+    setFeedback((prev) => ({ ...prev, [solutionId.toString()]: type }));
     toast({
       title: "Feedback submitted",
       description: `Thank you for rating this solution as ${
@@ -280,7 +271,7 @@ export const ProblemSubmission = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-slate-800">{solution.title}</h3>
+                          <h3 className="font-semibold text-slate-800">{solution.title }</h3>
                           <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                             {getMatchScorePercentage(solution.matchScore)}% match
                           </Badge>
@@ -297,7 +288,7 @@ export const ProblemSubmission = () => {
                         <div className="bg-white/70 p-4 rounded-lg mb-4">
                           <h4 className="font-medium text-slate-800 mb-2">Solution Steps:</h4>
                           <ul className="space-y-1">
-                            {solution.steps.slice(0, 3).map((step: string, index: number) => (
+                            {(solution.solution_steps || []).slice(0, 3).map((step: string, index: number) => (
                               <li
                                 key={index}
                                 className="text-sm text-slate-700 flex items-start gap-2"
@@ -309,34 +300,35 @@ export const ProblemSubmission = () => {
                               </li>
                             ))}
                           </ul>
-                          {solution.steps.length > 3 && (
+                          <div className="mt-3 flex justify-end">
                             <Button
-                              variant="link"
-                              className="text-blue-600 hover:text-blue-700 mt-2 pl-0"
+                              variant="outline"
+                              size="sm"
                               onClick={handleViewDetails}
+                              className="text-blue-600 hover:text-blue-700"
                             >
                               <Eye className="w-4 h-4 mr-1" />
-                              View All Steps
+                              View Details
                             </Button>
-                          )}
+                          </div>
                         </div>
 
-                        {/* Documents Preview */}
-                        {solution.documents.length > 0 && (
+                        {/* Document Link */}
+                        {solution.document_link && (
                           <div className="bg-white/70 p-4 rounded-lg mb-4">
                             <h4 className="font-medium text-slate-800 mb-2">
                               Related Documents:
                             </h4>
-                            <div className="grid grid-cols-2 gap-2">
-                              {solution.documents.map((doc, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center gap-2 text-sm text-slate-600"
-                                >
-                                  <FileText className="w-4 h-4" />
-                                  {doc.name}
-                                </div>
-                              ))}
+                            <div className="flex items-center gap-2 text-sm text-slate-600">
+                              <FileText className="w-4 h-4" />
+                              <a 
+                                href={solution.document_link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-700"
+                              >
+                                View Documentation
+                              </a>
                             </div>
                           </div>
                         )}
@@ -351,7 +343,7 @@ export const ProblemSubmission = () => {
                               variant="outline"
                               size="sm"
                               className={`border-slate-200 ${
-                                feedback[solution.id] === "helpful"
+                                solution.id !== null && feedback[solution.id.toString()] === "helpful"
                                   ? "bg-green-50 text-green-600"
                                   : ""
                               }`}
@@ -364,7 +356,7 @@ export const ProblemSubmission = () => {
                               variant="outline"
                               size="sm"
                               className={`border-slate-200 ${
-                                feedback[solution.id] === "not-helpful"
+                                solution.id !== null && feedback[solution.id.toString()] === "not-helpful"
                                   ? "bg-red-50 text-red-600"
                                   : ""
                               }`}
@@ -390,15 +382,15 @@ export const ProblemSubmission = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="font-semibold text-slate-800">{solution.title}</h3>
+                          <Badge variant="outline" className="text-blue-600 border-blue-300">
+                            Question {getMatchScorePercentage(solution.matchScore)}% match
+                          </Badge>
                           <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                             AI Generated
                           </Badge>                        
                           <Badge variant="outline" className="text-orange-600 border-orange-300">
                             {solution.confidence || "0"}% confidence
-                          </Badge>
-                          <Badge variant="outline" className="text-blue-600 border-blue-300">
-                            {getMatchScorePercentage(solution.matchScore)}% match
-                          </Badge>
+                          </Badge>                        
                         </div>
                         <p className="text-slate-700 mb-4">{solution.description}</p>
 
@@ -408,7 +400,7 @@ export const ProblemSubmission = () => {
                             Troubleshooting Steps:
                           </h4>
                           <ul className="space-y-1">
-                            {solution.steps.slice(0, 3).map((step: string, index: number) => (
+                            {(solution.solution_steps || []).slice(0, 3).map((step: string, index: number) => (
                               <li
                                 key={index}
                                 className="text-sm text-slate-700 flex items-start gap-2"
@@ -420,24 +412,24 @@ export const ProblemSubmission = () => {
                               </li>
                             ))}
                           </ul>
+                          <div className="mt-3 flex justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleViewDetails}
+                              className="text-orange-600 hover:text-orange-700"
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              View Details
+                            </Button>
+                          </div>
                         </div>
 
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-start gap-2 p-3 bg-orange-100/50 rounded-lg flex-1 mr-3">
-                            <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                            <p className="text-xs text-orange-700">
-                              <strong>AI Disclaimer:</strong> {aiDisclaimer}
-                            </p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleViewDetails}
-                            className="border-orange-300 text-orange-700 hover:bg-orange-50"
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            View Details
-                          </Button>
+                        <div className="flex items-start gap-2 p-3 bg-orange-100/50 rounded-lg flex-1 mr-3">
+                          <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-orange-700">
+                            <strong>AI Disclaimer:</strong> {aiDisclaimer}
+                          </p>
                         </div>
 
                         {/* Feedback Section for AI Solutions */}
@@ -449,7 +441,7 @@ export const ProblemSubmission = () => {
                               size="sm"
                               onClick={() => handleFeedback(solution.id, "helpful")}
                               className={`${
-                                feedback[solution.id] === "helpful"
+                                solution.id !== null && feedback[solution.id.toString()] === "helpful"
                                   ? "bg-green-100 text-green-700"
                                   : "text-slate-500 hover:text-green-600"
                               }`}
@@ -461,7 +453,7 @@ export const ProblemSubmission = () => {
                               size="sm"
                               onClick={() => handleFeedback(solution.id, "not-helpful")}
                               className={`${
-                                feedback[solution.id] === "not-helpful"
+                                solution.id !== null && feedback[solution.id.toString()] === "not-helpful"
                                   ? "bg-red-100 text-red-700"
                                   : "text-slate-500 hover:text-red-600"
                               }`}
