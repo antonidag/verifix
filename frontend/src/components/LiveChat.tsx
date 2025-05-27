@@ -5,6 +5,12 @@ import { Input } from "@/components/ui/input";
 import { openChat, useChatContext } from "@/hooks/use-chat-context";
 import { Bot, Maximize2, MessageCircle, Minimize2, Send, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { VefiApi, AskRequestModel } from '@/api-client';
+
+// Initialize the API client
+const api = new VefiApi({
+    BASE: 'http://localhost:8000'
+});
 
 interface Message {
   id: string;
@@ -55,63 +61,54 @@ export const LiveChat = () => {
     scrollToBottom();
   }, [messages]);
 
+  const generateBotResponse = async (userInput: string) => {
+    try {
+        const request: AskRequestModel = {
+            question: userInput
+        };
+        
+        const response = await api.default.chat(request);
+        return response.message;
+    } catch (error) {
+        console.error('Error getting response:', error);
+        return "I apologize, but I encountered an error while processing your request. Please try again or rephrase your question.";
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!currentMessage.trim()) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
-      content: currentMessage,
-      sender: "user",
-      timestamp: new Date(),
+        id: Date.now().toString(),
+        content: currentMessage,
+        sender: "user",
+        timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setCurrentMessage("");
     setIsTyping(true);
 
-    // Simulate AI response with context awareness
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: generateBotResponse(currentMessage),
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
-      setIsTyping(false);
-    }, 1500);
-  };
-
-  const generateBotResponse = (userInput: string) => {
-    const input = userInput.toLowerCase();
-
-    // Context-aware responses if we have solution context
-    if (context?.solution) {
-      if (input.includes("step") || input.includes("how")) {
-        return `For the solution "${context.solution.title}", let me walk you through the steps. Would you like me to explain any specific step in more detail?`;
-      } else if (input.includes("why") || input.includes("explain")) {
-        return `This ${
-          context.solution.verified ? "verified" : "ai"
-        } solution works by addressing the root cause described in: ${
-          context.solution.description
-        }. What specific aspect would you like me to explain further?`;
-      } else if (input.includes("alternative") || input.includes("different")) {
-        return `If this solution doesn't work for your specific case, I can suggest alternative approaches. Can you tell me more about what's happening when you try these steps?`;
-      }
-    }
-
-    if (input.includes("plc") || input.includes("error")) {
-      return "For PLC errors, I recommend first checking the error code in your system manual. Common issues include communication faults, power supply problems, or sensor malfunctions. Would you like me to walk you through the basic troubleshooting steps?";
-    } else if (input.includes("motor") || input.includes("controller")) {
-      return "Motor controller issues can be tricky. Start by checking your power connections, communication cables, and parameter settings. Is the motor controller showing any specific error codes or LED indicators?";
-    } else if (input.includes("hydraulic") || input.includes("pressure")) {
-      return "Hydraulic pressure issues often stem from fluid levels, pump problems, or filter blockages. Have you checked the hydraulic fluid level and condition recently? I can guide you through a systematic diagnosis.";
-    } else if (input.includes("temperature") || input.includes("sensor")) {
-      return "Temperature sensor problems usually involve calibration, wiring, or environmental factors. Are you seeing consistent readings or erratic behavior? Let me help you isolate the issue.";
-    } else if (input.includes("help") || input.includes("how")) {
-      return "I'm here to help! I can assist with troubleshooting equipment issues, explaining technical procedures, interpreting error codes, or guiding you through maintenance tasks. What specific area would you like help with?";
-    } else {
-      return "I understand you're looking for assistance. Could you provide more details about the specific equipment or issue you're dealing with? The more information you share, the better I can help you troubleshoot the problem.";
+    try {
+        const botResponse = await generateBotResponse(currentMessage);
+        const botMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            content: botResponse,
+            sender: "bot",
+            timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+        console.error('Error in chat:', error);
+        const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            content: "I apologize, but I encountered an error. Please try again.",
+            sender: "bot",
+            timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+        setIsTyping(false);
     }
   };
 
