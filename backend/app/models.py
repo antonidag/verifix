@@ -67,6 +67,7 @@ class SolutionModel(BaseModel):
     description: Optional[str] = Field("", description="Description of the solution")
     solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
     confidence: Optional[str] = Field("", description="Confidence of the solution")
+    created_at: Optional[datetime] = Field(None, description="Creation date of the solution")
 
     class Config:
         orm_mode = True
