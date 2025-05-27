@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 from datetime import datetime
 
@@ -57,13 +57,16 @@ class SolutionModel(BaseModel):
     manufacturer: Optional[str] = Field("", description="Equipment manufacturer")
     model_number: Optional[str] = Field("", description="Specific model number")
     component: Optional[str] = Field("", description="Component involved")
-    resolution_type: Optional[ResolutionType] = Field(None, description="Type of resolution")
-    downtime_impact: Optional[DowntimeImpact] = Field(None, description="Impact on machine downtime")
+    resolution_type: Optional[str] = Field(None, description="Type of resolution")
+    downtime_impact: Optional[str] = Field(None, description="Impact on machine downtime")
     safety_related: Optional[bool] = Field(False, description="Whether the issue has safety implications")
     plant_name: Optional[str] = Field("", description="Name of the plant")
     department: Optional[str] = Field("", description="Department name")
     tags: Optional[str] = Field("", description="Comma-separated tags for filtering")
     title: Optional[str] = Field("", description="Title of the solution")
+    description: Optional[str] = Field("", description="Description of the solution")
+    solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
+    confidence: Optional[str] = Field("", description="Confidence of the solution")
 
     class Config:
         orm_mode = True
@@ -79,7 +82,14 @@ class SolutionModel(BaseModel):
                 "component": "Pressure Sensor",
                 "resolution_type": "Corrective",
                 "downtime_impact": "High",
-                "safety_related": True
+                "safety_related": True,
+                "description": "Issue with pressure sensor readings",
+                "solution_steps": [
+                    "1. Power down the system",
+                    "2. Remove the faulty sensor",
+                    "3. Install the new sensor",
+                    "4. Calibrate the system"
+                ]
             }
         }
 

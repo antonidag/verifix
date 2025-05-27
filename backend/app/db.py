@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine,Column, Integer, String, Boolean, ForeignKey, DateTime, ARRAY
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, DateTime, JSON
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from datetime import datetime
 
@@ -20,6 +20,9 @@ class Solution(Base):
     document_link = Column(String)
     verified = Column(Boolean, default=False)
     title = Column(String, default="")  # Adding title field
+    description = Column(String, default="")
+    solution_steps = Column(JSON, default=list)  #  # Correct way to define an array of strings
+    confidence = Column(String, default="0")
 
     # Manufacturing context fields
     error_code = Column(String, index=True)           # Machine/system error code
