@@ -14,16 +14,21 @@ def create_context_question(data: Union[SolutionRequest, AskRequestModel], prepe
     """Create a contextualized question from the input data."""
     solution: Optional[Union[SolutionModel, SolutionPartModel]] = getattr(
         data, 'solution', None)
-    
+
     # If we have parts_solution from image analysis, create or update solution
     if parts_solution:
         if not solution:
             solution = SolutionPartModel(
-                manufacturer=parts_solution.get('manufacturer') if parts_solution.get('manufacturer') != 'N/A' else None,
-                machine_type=parts_solution.get('machine_type') if parts_solution.get('machine_type') != 'N/A' else None,
-                machine_name=parts_solution.get('machine_name') if parts_solution.get('machine_name') != 'N/A' else None,
-                component=parts_solution.get('component') if parts_solution.get('component') != 'N/A' else None,
-                error_code=parts_solution.get('error_code') if parts_solution.get('error_code') != 'N/A' else None
+                manufacturer=parts_solution.get('manufacturer') if parts_solution.get(
+                    'manufacturer') != 'N/A' else None,
+                machine_type=parts_solution.get('machine_type') if parts_solution.get(
+                    'machine_type') != 'N/A' else None,
+                machine_name=parts_solution.get('machine_name') if parts_solution.get(
+                    'machine_name') != 'N/A' else None,
+                component=parts_solution.get('component') if parts_solution.get(
+                    'component') != 'N/A' else None,
+                error_code=parts_solution.get('error_code') if parts_solution.get(
+                    'error_code') != 'N/A' else None
             )
         else:
             # Update existing solution with parts_solution if fields are empty
@@ -100,11 +105,12 @@ def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
     Downtime Impact: {solution_dict.get('downtime_impact', '')}
     Verified: {solution_dict.get('verified', False)}
     """
-    
+
     confidence_score = generate_response(confidence_prompt).strip()
     try:
         confidence_score = int(confidence_score)
-        confidence_score = min(max(confidence_score, 0), 100)  # Ensure score is between 0-100
+        # Ensure score is between 0-100
+        confidence_score = min(max(confidence_score, 0), 100)
         return str(confidence_score)
     except ValueError:
         return "0"  # Default if LLM doesn't return a valid number
@@ -143,15 +149,17 @@ def create_solution_and_question(solution_data: SolutionRequest, full_question: 
              operation_id="ask")
 async def ask_question(request: AskRequestModel):
     partsSolution = None
-    preped_question = None
+    image_analysis = None
+
     if request.image_data:
+        print("Image data found")
         image_analysis = generate_response(
             "Analyze this image and describe what you see, focusing on any visible technical issues, machine parts, or error displays.",
             image_data=request.image_data
         )
         manufacturing_context = generate_response(
-            f"""Based on the following image analysis, write the manufacturing context of the machine: {image_analysis}. 
-            The output must be a raw, minified JSON object of strings like, if propty cant be determined, return N/A:
+            "Based on the following image analysis, write the manufacturing context of the machine: " + image_analysis + """
+            The output must be a raw, minified JSON object of strings like, if property can't be determined, return N/A:
             {
                 "manufacturer": "Siemens",
                 "machine_type": "CNC",
@@ -159,19 +167,25 @@ async def ask_question(request: AskRequestModel):
                 "component": "Motor",
                 "error_code": "E101"
             }
-            Do not include any other text, formatting, only the JSON array.
+            Do not include any other text, formatting, only the JSON object.
             """
         )
-        preped_question = prepare_question(f"{request.question} {image_analysis}")
         try:
             partsSolution = json.loads(manufacturing_context)
-
         except json.JSONDecodeError:
             partsSolution = None
-    else:
-        preped_question = prepare_question(request.question)
 
-    full_question = create_context_question(request, preped_question, partsSolution)
+    # Prepare the question by combining text and image analysis if available
+    question_text = request.question.strip()
+    if image_analysis:
+        preped_question = prepare_question(
+            f"Question: {question_text}\nImage Analysis: {image_analysis}"
+        )
+    else:
+        preped_question = prepare_question(question_text)
+
+    full_question = create_context_question(
+        request, preped_question, partsSolution)
     matches = find_existing_solution(full_question)
 
     if matches:
@@ -194,7 +208,8 @@ async def add_solution(data: SolutionRequest):
 
     try:
         # Create solution and question
-        solution_id, question = create_solution_and_question(data, full_question)
+        solution_id, question = create_solution_and_question(
+            data, full_question)
 
         return {
             "message": "Solution added and indexed.",
@@ -245,8 +260,44 @@ def get_all_questions():
              description="Initiate a background research task for a given question",
              operation_id="investigate")
 async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
-    preped_question = prepare_question(data.question)
-    full_question = create_context_question(data, preped_question)
+    partsSolution = None
+    image_analysis = None
+
+    if data.image_data:
+        print("Image data found in investigation")
+        image_analysis = generate_response(
+            "Analyze this image and describe what you see, focusing on any visible technical issues, machine parts, or error displays.",
+            image_data=data.image_data
+        )
+        manufacturing_context = generate_response(
+            "Based on the following image analysis, write the manufacturing context of the machine: " + image_analysis + """
+            The output must be a raw, minified JSON object of strings like, if property can't be determined, return N/A:
+            {
+                "manufacturer": "Siemens",
+                "machine_type": "CNC",
+                "machine_name": "N/A",
+                "component": "Motor",
+                "error_code": "E101"
+            }
+            Do not include any other text, formatting, only the JSON object.
+            """
+        )
+        try:
+            partsSolution = json.loads(manufacturing_context)
+        except json.JSONDecodeError:
+            partsSolution = None
+
+    # Prepare the question by combining text and image analysis if available
+    question_text = data.question.strip()
+    if image_analysis:
+        preped_question = prepare_question(
+            f"Question: {question_text}\nImage Analysis: {image_analysis}"
+        )
+    else:
+        preped_question = prepare_question(question_text)
+
+    full_question = create_context_question(
+        data, preped_question, partsSolution)
 
     report_type = "research_report"
     researcher = GPTResearcher(full_question, report_type)
@@ -264,6 +315,17 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
             'title': full_question,
             'confidence': "0"  # Initialize with 0 confidence
         }
+
+        # Add manufacturing context if available
+        if partsSolution:
+            solution_data.update({
+                'manufacturer': partsSolution.get('manufacturer'),
+                'machine_type': partsSolution.get('machine_type'),
+                'machine_name': partsSolution.get('machine_name'),
+                'component': partsSolution.get('component'),
+                'error_code': partsSolution.get('error_code')
+            })
+
         solution_id = solutions.create(solution_data)
 
         background_tasks.add_task(
@@ -377,7 +439,7 @@ Report: {report}"""
             'resolution_type': resolution_type,
             'downtime_impact': downtime_impact,
         }
-        
+
         # Generate and add confidence score
         solution_data['confidence'] = generate_confidence_score(solution_data)
 

@@ -150,9 +150,25 @@ export const ProblemSubmission = () => {
     setInvestigationId(null);
 
     try {
+      // Convert first image to base64 if available
+      let imageData = null;
+      if (uploadedImages.length > 0) {
+        const file = uploadedImages[0];
+        const reader = new FileReader();
+        imageData = await new Promise((resolve) => {
+          reader.onloadend = () => {
+            const base64String = reader.result as string;
+            // Remove data URL prefix
+            resolve(base64String.split(',')[1]);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
       const askRequest: AskRequestModel = {
         question: problem.trim(),
         solution: {} as SolutionPartModel,
+        image_data: imageData
       };
 
       const data = await api.default.ask(askRequest);
@@ -210,13 +226,29 @@ export const ProblemSubmission = () => {
   };
 
   const handleInvestigate = async () => {
-    if (!problem.trim()) return;
+    if (!problem.trim() && uploadedImages.length === 0) return;
 
     setIsInvestigating(true);
     try {
+      // Convert first image to base64 if available
+      let imageData = null;
+      if (uploadedImages.length > 0) {
+        const file = uploadedImages[0];
+        const reader = new FileReader();
+        imageData = await new Promise((resolve) => {
+          reader.onloadend = () => {
+            const base64String = reader.result as string;
+            // Remove data URL prefix
+            resolve(base64String.split(',')[1]);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
       const askRequest: AskRequestModel = {
         question: problem.trim(),
         solution: {} as SolutionPartModel,
+        image_data: imageData
       };
 
       const response = await api.default.investigate(askRequest);
