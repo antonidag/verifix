@@ -74,12 +74,49 @@ def find_existing_solution(question: str) -> Optional[Dict]:
     return questions.find_similar(embedding)
 
 
+def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
+    """Generate a confidence score for a solution using LLM."""
+    confidence_prompt = f"""
+    Based on the following solution, rate its confidence level from 0-100.
+    Consider:
+    1. Completeness of the solution
+    2. Clarity of steps
+    3. Technical accuracy
+    4. Verification status
+    5. Supporting documentation
+    
+    Return only the numeric score (0-100), no other text.
+    
+    Solution Title: {solution_dict.get('title', '')}
+    Description: {solution_dict.get('description', '')}
+    Steps: {solution_dict.get('solution_steps', [])}
+    Documentation: {solution_dict.get('document_link', '')}
+    Manufacturer: {solution_dict.get('manufacturer', '')}
+    Machine Type: {solution_dict.get('machine_type', '')}
+    Machine Name: {solution_dict.get('machine_name', '')}
+    Component: {solution_dict.get('component', '')}
+    Error Code: {solution_dict.get('error_code', '')}
+    Resolution Type: {solution_dict.get('resolution_type', '')}
+    Downtime Impact: {solution_dict.get('downtime_impact', '')}
+    Verified: {solution_dict.get('verified', False)}
+    """
+    
+    confidence_score = generate_response(confidence_prompt).strip()
+    try:
+        confidence_score = int(confidence_score)
+        confidence_score = min(max(confidence_score, 0), 100)  # Ensure score is between 0-100
+        return str(confidence_score)
+    except ValueError:
+        return "0"  # Default if LLM doesn't return a valid number
+
+
 def create_solution_and_question(solution_data: SolutionRequest, full_question: str) -> tuple[str, str]:
     """Create a new solution and associated question in Firestore."""
     try:
         # Create solution
         solution_dict = solution_data.solution.model_dump()
         solution_dict['title'] = full_question
+        solution_dict['confidence'] = generate_confidence_score(solution_dict)
         solution_id = solutions.create(solution_dict)
 
         # Create question with embedding
@@ -224,7 +261,8 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
         solution_data = {
             'text': '',  # Will be updated by background task
             'verified': False,
-            'title': full_question
+            'title': full_question,
+            'confidence': "0"  # Initialize with 0 confidence
         }
         solution_id = solutions.create(solution_data)
 
@@ -325,8 +363,8 @@ If it cannot be determined, return N/A.
 Report: {report}"""
         )
 
-        # Update the solution with all the research results
-        solutions.update(solution_id, {
+        # Prepare solution data
+        solution_data = {
             'text': report,
             'description': description,
             'solution_steps': solution_steps,
@@ -337,8 +375,14 @@ Report: {report}"""
             'error_code': error_code,
             'component': component,
             'resolution_type': resolution_type,
-            'downtime_impact': downtime_impact
-        })
+            'downtime_impact': downtime_impact,
+        }
+        
+        # Generate and add confidence score
+        solution_data['confidence'] = generate_confidence_score(solution_data)
+
+        # Update the solution with all the research results
+        solutions.update(solution_id, solution_data)
 
         # Add question to the database
         embedding = embed_text(question)
