@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type QuestionModel = {
-    id: number;
+    id: string;
     text: string;
-    solution_id?: (number | null);
+    solution_id?: (string | null);
+    created_at?: (string | null);
 };
 

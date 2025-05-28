@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { aiDisclaimer } from "@/data/solutions";
 import { toast } from "@/hooks/use-toast";
-import {  AskRequestModel, SolutionPartModel, SolutionModel } from "@/api-client";
+import { AskRequestModel, SolutionPartModel, SolutionModel } from "@/api-client";
 import {
   AlertTriangle,
   Bot,
@@ -27,6 +27,7 @@ import React, { useState } from "react";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { SolutionForm } from "./SolutionForm";
 import { api } from "@/api/apiClient";
+import { SearchSkeleton } from "./SearchSkeleton";
 
 // Helper function to add match score to the SolutionModel type
 interface SolutionWithMatch extends SolutionModel {
@@ -47,6 +48,8 @@ export const ProblemSubmission = () => {
   const [solution, setSolution] = useState<SolutionWithMatch | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [feedback, setFeedback] = useState<{ [key: string]: "helpful" | "not-helpful" | null }>({});
+  const [isInvestigating, setIsInvestigating] = useState(false);
+  const [investigationId, setInvestigationId] = useState<string | null>(null);
 
   const handleVoiceInput = () => {
     setIsListening(true);
@@ -78,6 +81,7 @@ export const ProblemSubmission = () => {
 
     setIsSearching(true);
     setSolution(null);
+    setInvestigationId(null);
 
     try {
       const askRequest: AskRequestModel = {
@@ -85,33 +89,108 @@ export const ProblemSubmission = () => {
         solution: {} as SolutionPartModel,
       };
 
-      const response = await api.default.ask(askRequest);
+      const data = await api.default.ask(askRequest);
+      if (!data) {
+        toast({
+          title: "No solution found",
+          description: "Would you like to start an AI investigation?",
+          action: (
+            <Button
+              variant="secondary"
+              onClick={() => handleInvestigate()}
+              disabled={isInvestigating}
+            >
+              {isInvestigating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Investigating...
+                </>
+              ) : (
+                <>
+                  <Bot className="mr-2 h-4 w-4" />
+                  Start Investigation
+                </>
+              )}
+            </Button>
+          ),
+        });
+        return;
+      }
 
-      if (response.match) {
+      if (data.match) {
         const solutions = await api.default.listSolutions();
-        const foundSolution = solutions.find((s) => s.id === response.match?.solution_id);
+        const foundSolution = solutions.find((s) => s.id === data.match?.solution_id);
 
         if (foundSolution) {
           setSolution({
             ...foundSolution,
-            matchScore: response.match.score?.toString() || "0", // Add match score to the solution
+            matchScore: data.match.score?.toString() || "0",
           });
         }
-      } else {
-        toast({
-          title: "No matches found",
-          description: "No matching solutions were found in our database.",
-        });
       }
     } catch (error) {
-      console.error("Error searching for solution:", error);
       toast({
         title: "Error",
-        description: "Did not find any solutions. Please try again.",
+        description: "Failed to search for solutions. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const handleInvestigate = async () => {
+    if (!problem.trim()) return;
+
+    setIsInvestigating(true);
+    try {
+      const askRequest: AskRequestModel = {
+        question: problem.trim(),
+        solution: {} as SolutionPartModel,
+      };
+
+      const response = await api.default.investigate(askRequest);
+      setInvestigationId(response.solution?.id || null);
+
+      toast({
+        title: "Investigation Started",
+        description: "We'll notify you when the results are ready.",
+      });
+
+      // Start polling for results
+      if (response.solution?.id) {
+        pollInvestigationResults(response.solution.id);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start investigation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInvestigating(false);
+    }
+  };
+
+  const pollInvestigationResults = async (solutionId: string) => {
+    try {
+      const solution = await api.default.getSolution(solutionId);
+      if (solution.text && solution.text !== "") {
+        setSolution({
+          ...solution,
+          matchScore: "1.0", // AI-generated solutions get full confidence
+        });
+        setInvestigationId(null);
+        toast({
+          title: "Investigation Complete",
+          description: "We've found a potential solution for your problem.",
+        });
+      } else {
+        // If solution is not ready, poll again in 5 seconds
+        setTimeout(() => pollInvestigationResults(solutionId), 5000);
+      }
+    } catch (error) {
+      console.error("Error polling for results:", error);
     }
   };
 
@@ -125,10 +204,7 @@ export const ProblemSubmission = () => {
     setIsDetailModalOpen(true);
   };
 
-  const handleFeedback = (
-    solutionId: number | null | undefined,
-    type: "helpful" | "not-helpful"
-  ) => {
+  const handleFeedback = (solutionId: string | null, type: "helpful" | "not-helpful") => {
     if (solutionId === null || solutionId === undefined) return;
 
     setFeedback((prev) => ({ ...prev, [solutionId.toString()]: type }));
@@ -261,9 +337,12 @@ export const ProblemSubmission = () => {
                   </Button>
                 </div>
 
+                {/* Search Loading Skeleton */}
+                {isSearching && <SearchSkeleton />}
+
                 {/* Knowledge Base Result */}
                 {solution && solution.verified && (
-                  <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                  <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200  animate-scale-in">
                     <div className="flex items-start gap-4">
                       <div className="bg-green-100 p-2 rounded-full">
                         <Database className="w-6 h-6 text-green-600" />
@@ -373,7 +452,7 @@ export const ProblemSubmission = () => {
 
                 {/* AI Solution Alternative */}
                 {solution && !solution.verified && (
-                  <div className="mt-8 p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-200">
+                  <div className="mt-8 p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-200  animate-scale-in">
                     <div className="flex items-start gap-4">
                       <div className="bg-orange-100 p-2 rounded-full">
                         <Bot className="w-6 h-6 text-orange-600" />

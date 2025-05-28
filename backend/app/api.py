@@ -77,7 +77,8 @@ def create_solution_and_question(solution_data: SolutionRequest, full_question: 
 @router.post("/ask",
              response_model=AskResponseModel,
              summary="Ask a question with manufacturing context",
-             description="Submit a question with optional manufacturing context to find matching solutions")
+             description="Submit a question with optional manufacturing context to find matching solutions",
+             operation_id="ask")
 async def ask_question(request: AskRequestModel):
     preped_question = prepare_question(request.question)
     full_question = create_context_question(request, preped_question)
@@ -87,7 +88,7 @@ async def ask_question(request: AskRequestModel):
         return {"match": result}
 
     raise HTTPException(
-        status_code=404,
+        status_code=204,
         detail="No verified solution found. Please document your fix."
     )
 
@@ -95,7 +96,8 @@ async def ask_question(request: AskRequestModel):
 @router.post("/solutions",
              response_model=SolutionResponseModel,
              summary="Add a new solution",
-             description="Add a new solution with its associated question")
+             description="Add a new solution with its associated question",
+             operation_id="createSolution")
 async def add_solution(data: SolutionRequest):
     preped_question = prepare_question(data.question)
     full_question = create_context_question(data, preped_question)
@@ -133,7 +135,8 @@ async def add_solution(data: SolutionRequest):
 @router.get("/solutions/{solution_id}",
             response_model=SolutionModel,
             summary="Get solution by ID",
-            description="Retrieve a specific solution by its ID")
+            description="Retrieve a specific solution by its ID",
+            operation_id="getSolution")
 async def get_solution(solution_id: str):
     solution = solutions.get(solution_id)
     if not solution:
@@ -144,7 +147,8 @@ async def get_solution(solution_id: str):
 @router.get("/solutions",
             response_model=List[SolutionModel],
             summary="Get all solutions",
-            description="Retrieve all solutions from the database")
+            description="Retrieve all solutions from the database",
+            operation_id="listSolutions")
 def get_all_solutions():
     return solutions.list_all()
 
@@ -152,7 +156,8 @@ def get_all_solutions():
 @router.get("/questions",
             response_model=List[QuestionModel],
             summary="Get all questions",
-            description="Retrieve all questions from the database")
+            description="Retrieve all questions from the database",
+            operation_id="listQuestions")
 def get_all_questions():
     return questions.list_all()
 
@@ -160,7 +165,8 @@ def get_all_questions():
 @router.post("/investigate",
              response_model=SolutionResponseModel,
              summary="Start an investigation",
-             description="Initiate a background research task for a given question")
+             description="Initiate a background research task for a given question",
+             operation_id="investigate")
 async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
     preped_question = prepare_question(data.question)
     full_question = create_context_question(data, preped_question)

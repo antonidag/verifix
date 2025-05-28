@@ -73,7 +73,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public getSolution(
-        solutionId: number,
+        solutionId: string,
     ): CancelablePromise<SolutionModel> {
         return this.httpRequest.request({
             method: 'GET',
@@ -84,6 +84,18 @@ export class DefaultService {
             errors: {
                 422: `Validation Error`,
             },
+        });
+    }
+    /**
+     * Get all questions
+     * Retrieve all questions from the database
+     * @returns QuestionModel Successful Response
+     * @throws ApiError
+     */
+    public listQuestions(): CancelablePromise<Array<QuestionModel>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/v1/questions',
         });
     }
     /**
@@ -104,18 +116,6 @@ export class DefaultService {
             errors: {
                 422: `Validation Error`,
             },
-        });
-    }
-    /**
-     * Get all questions
-     * Retrieve all questions and their associated solutions from the database
-     * @returns QuestionModel Successful Response
-     * @throws ApiError
-     */
-    public listQuestions(): CancelablePromise<Array<QuestionModel>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/v1/questions',
         });
     }
     /**

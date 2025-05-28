@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from enum import Enum
 from datetime import datetime
 
 class QuestionInput(BaseModel):
@@ -13,6 +12,7 @@ class SolutionPartModel(BaseModel):
     model_number: Optional[str] = Field(None, description="Specific model number of the equipment")
     component: Optional[str] = Field(None, description="Specific component involved (e.g., 'Motor', 'PLC', 'Sensor')")
     error_code: Optional[str] = Field(None, description="Machine/system error code")
+
 class AskRequestModel(BaseModel):
     question: str = Field(..., description="The main question or issue to be resolved")
     solution: Optional[SolutionPartModel] = Field(None, description="Optional solution details")
@@ -31,12 +31,11 @@ class AskRequestModel(BaseModel):
             }
         }
 
-
 class SolutionModel(BaseModel):
-    id: Optional[int] = Field(None, description="The solution id")
+    id: Optional[str] = Field(None, description="The solution id")
     text: str = Field(..., description="The solution text")
     document_link: Optional[str] = Field("", description="Link to related documentation")
-    verified: bool = Field(..., description="Whether the solution has been verified")
+    verified: bool = Field(False, description="Whether the solution has been verified")
     error_code: Optional[str] = Field("", description="Machine/system error code")
     machine_name: Optional[str] = Field("", description="Name/tag of machine")
     machine_type: Optional[str] = Field("", description="Type of machine")
@@ -48,15 +47,15 @@ class SolutionModel(BaseModel):
     safety_related: Optional[bool] = Field(False, description="Whether the issue has safety implications")
     plant_name: Optional[str] = Field("", description="Name of the plant")
     department: Optional[str] = Field("", description="Department name")
-    tags: Optional[str] = Field("", description="Comma-separated tags for filtering")
+    tags: Optional[List[str]] = Field(default_factory=list, description="Tags for filtering")
     title: Optional[str] = Field("", description="Title of the solution")
     description: Optional[str] = Field("", description="Description of the solution")
     solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
     confidence: Optional[str] = Field("", description="Confidence of the solution")
     created_at: Optional[datetime] = Field(None, description="Creation date of the solution")
+    updated_at: Optional[datetime] = Field(None, description="Last update date of the solution")
 
     class Config:
-        orm_mode = True
         schema_extra = {
             "example": {
                 "text": "Replace the pressure sensor and recalibrate the system",
@@ -80,49 +79,64 @@ class SolutionModel(BaseModel):
             }
         }
 
-
 class SolutionRequest(BaseModel):
     solution: SolutionModel
     question: str = Field(..., description="The original question this solution answers")
 
-
 class SolutionResponseModel(BaseModel):
     message: str
-    solution: dict = Field(..., example={"id": 1})
+    solution: dict = Field(..., example={"id": "abc123"})
 
     class Config:
         schema_extra = {
             "example": {
                 "message": "Solution added successfully",
                 "solution": {
-                    "id": 1
+                    "id": "abc123"
                 }
             }
         }
 
-
 class QuestionModel(BaseModel):
-    id: int
+    id: str
     text: str
-    solution_id: Optional[int] = None
+    solution_id: Optional[str] = None
+    created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
-
+        schema_extra = {
+            "example": {
+                "id": "q123",
+                "text": "How to fix error E5023?",
+                "solution_id": "abc123",
+                "created_at": "2024-05-28T10:30:00Z"
+            }
+        }
 
 class Match(BaseModel):
-    solution_id: int
+    solution_id: str
     score: float
 
     class Config:
-        orm_mode = True
-
+        schema_extra = {
+            "example": {
+                "solution_id": "abc123",
+                "score": 0.95
+            }
+        }
 
 class AskResponseModel(BaseModel):
     match: Optional[Match] = None
 
     class Config:
-        orm_mode = True 
+        schema_extra = {
+            "example": {
+                "match": {
+                    "solution_id": "abc123",
+                    "score": 0.95
+                }
+            }
+        }
 
 class ChatResponseModel(BaseModel):
     message: str
@@ -130,6 +144,6 @@ class ChatResponseModel(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "message": "Hello, world!"
+                "message": "Based on the available solutions, I recommend..."
             }
         }

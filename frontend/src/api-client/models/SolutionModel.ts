@@ -6,7 +6,7 @@ export type SolutionModel = {
     /**
      * The solution id
      */
-    id?: (number | null);
+    id?: (string | null);
     /**
      * The solution text
      */
@@ -18,7 +18,7 @@ export type SolutionModel = {
     /**
      * Whether the solution has been verified
      */
-    verified: boolean;
+    verified?: boolean;
     /**
      * Machine/system error code
      */
@@ -64,9 +64,9 @@ export type SolutionModel = {
      */
     department?: (string | null);
     /**
-     * Comma-separated tags for filtering
+     * Tags for filtering
      */
-    tags?: (string | null);
+    tags?: (Array<string> | null);
     /**
      * Title of the solution
      */
@@ -87,5 +87,9 @@ export type SolutionModel = {
      * Creation date of the solution
      */
     created_at?: (string | null);
+    /**
+     * Last update date of the solution
+     */
+    updated_at?: (string | null);
 };
 

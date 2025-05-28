@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type Match = {
-    solution_id: number;
+    solution_id: string;
     score: number;
 };
 
