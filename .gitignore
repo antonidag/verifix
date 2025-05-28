@@ -4,5 +4,6 @@ test.db
 app.db
 .DS_Store
 qdrant_data
-backend/.env
-backend/application_default_credentials.json
+
+.env
+application_default_credentials.json

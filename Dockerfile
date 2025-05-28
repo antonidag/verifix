@@ -21,15 +21,15 @@ RUN npm run build
 #  |___/___|_|_\ \_/ |___|_|_\
 
 # Build Python FastAPI backend
-FROM python:3.11-slim as production
+FROM python:3.11-slim
 WORKDIR /app
 
 # Install Python dependencies
-COPY backend/requirements.txt .
+COPY backend/.env backend/application_default_credentials.json backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend source code
-COPY backend/app ./app
+COPY backend/app/ ./app
 
 # Copy built frontend into backend's static directory
 COPY --from=build-frontend /frontend/dist ./app/static

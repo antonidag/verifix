@@ -1,15 +1,15 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from db import init_db
-from api import router
-from dotenv import load_dotenv
 import os
 from pathlib import Path
-import vertexai
-
+from dotenv import load_dotenv
 # Load environment variables from .env file in the backend directory
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from firestoredb import init
+from api import router
+import vertexai
 
 # Initialize Vertex AI with project and location
 project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
@@ -42,8 +42,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize database
-init_db()
+# Initialize Firestore database
+init()
 
 # Include the router with version prefix
 app.include_router(

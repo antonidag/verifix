@@ -5,12 +5,8 @@ import { Input } from "@/components/ui/input";
 import { openChat, useChatContext } from "@/hooks/use-chat-context";
 import { Bot, Maximize2, MessageCircle, Minimize2, Send, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { VefiApi, AskRequestModel } from '@/api-client';
-
-// Initialize the API client
-const api = new VefiApi({
-    BASE: 'http://localhost:8000'
-});
+import { AskRequestModel } from "@/api-client";
+import { api } from "@/api/apiClient";
 
 interface Message {
   id: string;
@@ -63,15 +59,15 @@ export const LiveChat = () => {
 
   const generateBotResponse = async (userInput: string) => {
     try {
-        const request: AskRequestModel = {
-            question: userInput
-        };
-        
-        const response = await api.default.chat(request);
-        return response.message;
+      const request: AskRequestModel = {
+        question: userInput,
+      };
+
+      const response = await api.default.chat(request);
+      return response.message;
     } catch (error) {
-        console.error('Error getting response:', error);
-        return "I apologize, but I encountered an error while processing your request. Please try again or rephrase your question.";
+      console.error("Error getting response:", error);
+      return "I apologize, but I encountered an error while processing your request. Please try again or rephrase your question.";
     }
   };
 
@@ -79,10 +75,10 @@ export const LiveChat = () => {
     if (!currentMessage.trim()) return;
 
     const userMessage: Message = {
-        id: Date.now().toString(),
-        content: currentMessage,
-        sender: "user",
-        timestamp: new Date(),
+      id: Date.now().toString(),
+      content: currentMessage,
+      sender: "user",
+      timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -90,25 +86,25 @@ export const LiveChat = () => {
     setIsTyping(true);
 
     try {
-        const botResponse = await generateBotResponse(currentMessage);
-        const botMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            content: botResponse,
-            sender: "bot",
-            timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, botMessage]);
+      const botResponse = await generateBotResponse(currentMessage);
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: botResponse,
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-        console.error('Error in chat:', error);
-        const errorMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            content: "I apologize, but I encountered an error. Please try again.",
-            sender: "bot",
-            timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+      console.error("Error in chat:", error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I apologize, but I encountered an error. Please try again.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
-        setIsTyping(false);
+      setIsTyping(false);
     }
   };
 

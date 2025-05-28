@@ -1,12 +1,11 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from typing import Dict, Any, Optional, Tuple, List, Union
-from db import SessionLocal, Question, Solution
+from typing import Dict, Any, Optional, List, Union
+from firestoredb import solutions, questions
 from llm_model import generate_response
 from vector_db_client import search_similar, add_to_qdrant
 from utils import embed_text
 from models import AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel, QuestionModel, SolutionResponseModel, SolutionPartModel, ChatResponseModel
 from gpt_researcher import GPTResearcher
-from sqlalchemy.exc import SQLAlchemyError
 import json
 
 router = APIRouter()
@@ -47,42 +46,28 @@ Output:
 
 
 def find_existing_solution(question: str) -> Optional[Dict]:
-    """
-    Search for an existing solution using vector similarity.
-
-    Args:
-        question: The question text to search for
-
-    Returns:
-        Optional[Dict]: Matching solution if found, None otherwise
-    """
+    """Search for an existing solution using vector similarity."""
     embedding = embed_text(question)
     return search_similar(embedding)
 
 
-def create_solution_and_question(
-    db: SessionLocal,
-    solution_data: SolutionRequest,
-    full_question: str
-) -> Tuple[int, str]:
-    """Create a new solution and associated question in the database."""
+def create_solution_and_question(solution_data: SolutionRequest, full_question: str) -> tuple[str, str]:
+    """Create a new solution and associated question in Firestore."""
     try:
-        solution = Solution(**solution_data.solution.model_dump())
-        solution.title = full_question
-        db.add(solution)
-        db.commit()
-        db.refresh(solution)
+        # Create solution
+        solution_dict = solution_data.solution.model_dump()
+        solution_dict['title'] = full_question
+        solution_id = solutions.create(solution_dict)
 
-        question = Question(
-            text=full_question,
-            solution_id=solution.id,
-        )
-        db.add(question)
-        db.commit()
+        # Create question
+        question_dict = {
+            'text': full_question,
+            'solution_id': solution_id
+        }
+        questions.create(question_dict)
 
-        return solution.id, full_question
-    except SQLAlchemyError as e:
-        db.rollback()
+        return solution_id, full_question
+    except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Database error while creating solution: {str(e)}"
@@ -92,16 +77,10 @@ def create_solution_and_question(
 @router.post("/ask",
              response_model=AskResponseModel,
              summary="Ask a question with manufacturing context",
-             description="Submit a question with optional manufacturing context to find matching solutions",
-             operation_id="ask")
+             description="Submit a question with optional manufacturing context to find matching solutions")
 async def ask_question(request: AskRequestModel):
-
-    # Clean and prepare the question
     preped_question = prepare_question(request.question)
-    # Create contextualized question
     full_question = create_context_question(request, preped_question)
-
-    # Search for existing solution
     result = find_existing_solution(full_question)
 
     if result:
@@ -116,16 +95,12 @@ async def ask_question(request: AskRequestModel):
 @router.post("/solutions",
              response_model=SolutionResponseModel,
              summary="Add a new solution",
-             description="Add a new solution with its associated question",
-             operation_id="createSolution")
+             description="Add a new solution with its associated question")
 async def add_solution(data: SolutionRequest):
-
-    # Clean and prepare the question
     preped_question = prepare_question(data.question)
-    # Create contextualized question
     full_question = create_context_question(data, preped_question)
-    # Search for existing solution using vector similarity
     result = find_existing_solution(full_question)
+
     if result:
         raise HTTPException(
             status_code=400,
@@ -135,14 +110,12 @@ async def add_solution(data: SolutionRequest):
             })
 
     try:
-        with SessionLocal() as db:
-            # Create solution and question
-            solution_id, question = create_solution_and_question(
-                db, data, full_question)
+        # Create solution and question
+        solution_id, question = create_solution_and_question(data, full_question)
 
-            # Index the question for vector search
-            embedding = embed_text(question)
-            add_to_qdrant(question, embedding, solution_id)
+        # Index the question for vector search
+        embedding = embed_text(question)
+        add_to_qdrant(question, embedding, solution_id)
 
         return {
             "message": "Solution added and indexed.",
@@ -160,35 +133,36 @@ async def add_solution(data: SolutionRequest):
 @router.get("/solutions/{solution_id}",
             response_model=SolutionModel,
             summary="Get solution by ID",
-            description="Retrieve a specific solution by its ID",
-            operation_id="getSolution")
-async def get_solution(solution_id: int):
-    try:
-        with SessionLocal() as db:
-            solution = db.query(Solution).filter(
-                Solution.id == solution_id).first()
-            if not solution:
-                raise HTTPException(
-                    status_code=404, detail="Solution not found")
+            description="Retrieve a specific solution by its ID")
+async def get_solution(solution_id: str):
+    solution = solutions.get(solution_id)
+    if not solution:
+        raise HTTPException(status_code=404, detail="Solution not found")
+    return solution
 
-            return solution
-    except SQLAlchemyError as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Database error while retrieving solution: {str(e)}"
-        )
+
+@router.get("/solutions",
+            response_model=List[SolutionModel],
+            summary="Get all solutions",
+            description="Retrieve all solutions from the database")
+def get_all_solutions():
+    return solutions.list_all()
+
+
+@router.get("/questions",
+            response_model=List[QuestionModel],
+            summary="Get all questions",
+            description="Retrieve all questions from the database")
+def get_all_questions():
+    return questions.list_all()
 
 
 @router.post("/investigate",
              response_model=SolutionResponseModel,
              summary="Start an investigation",
-             description="Initiate a background research task for a given question",
-             operation_id="investigate")
+             description="Initiate a background research task for a given question")
 async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
-
-    # Clean and prepare the question
     preped_question = prepare_question(data.question)
-    # Create contextualized question
     full_question = create_context_question(data, preped_question)
 
     report_type = "research_report"
@@ -196,44 +170,44 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
 
     if not researcher:
         raise HTTPException(
-            status_code=500, detail="Failed to initialize researcher")
+            status_code=500,
+            detail="Failed to initialize researcher"
+        )
 
     try:
-        with SessionLocal() as db:
-            solution = Solution(
-                text="",  # Placeholder, will be updated later
-                verified=False
-            )
-            db.add(solution)
-            db.commit()
-            db.refresh(solution)
-            solution_id = solution.id
+        solution_data = {
+            'text': '',  # Will be updated by background task
+            'verified': False,
+            'title': full_question
+        }
+        solution_id = solutions.create(solution_data)
 
-            # Schedule the rest of the work
-            background_tasks.add_task(process_and_save_report,
-                                      full_question, researcher, solution_id)
+        background_tasks.add_task(
+            process_and_save_report,
+            full_question,
+            researcher,
+            solution_id
+        )
 
-            return {
-                "message": f"Working on report for query: {data.question}. It will be saved once ready.",
-                "solution": {
-                    "id": solution_id
-                }
-            }
-    except SQLAlchemyError as e:
+        return {
+            "message": "Investigation started",
+            "solution": {"id": solution_id}
+        }
+    except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Database error while initializing investigation: {str(e)}"
+            detail=f"Error starting investigation: {str(e)}"
         )
 
 
-async def process_and_save_report(question: str, researcher: GPTResearcher, solution_id: int):
+async def process_and_save_report(question: str, researcher: GPTResearcher, solution_id: str):
     try:
-        # First get the research results
         research_result = await researcher.conduct_research()
         report = await researcher.write_report()
 
         description = generate_response(
             f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text.")
+
         solution_steps_raw = generate_response(
             f"""Read the report below and return a list of steps to solve the problem.
 The output must be a raw, minified JSON array of strings like: ["Step 1", "Step 2", "Step 3"].
@@ -242,24 +216,10 @@ Do not include any other text, formatting, or markdown—only the JSON array.
 Report: {report}"""
         )
 
-        # Parse to Python list
         try:
             solution_steps = json.loads(solution_steps_raw)
-            print("Parsed steps:", solution_steps)
-        except json.JSONDecodeError as e:
-            print("Failed to parse JSON:", e)
-            solution_steps = []
-        tags = generate_response(
-            f"""Extract up to 5 solution-focused tags from the following report. 
-Return only a plain, comma-separated string with the tags. 
-Do not include any explanation, markdown, or formatting. 
-
-Report: {report}"""
-        )
-        title = generate_response(
-            f"Based on the following report, write a title for the solution format based manufacturer machine_name model_number error_code: {question}: {report}. Only return the title, no other text.")
-        confidence = generate_response(
-            f"Based on the following report, write the confidence of the solution: {report}. Only return the confidence in a number between 0 and 100, no other text.")
+        except json.JSONDecodeError:
+            solution_steps = ["Could not parse solution steps"]
 
         manufacturer = generate_response(
             f"""Based on the following report, write the manufacturer of the machine.
@@ -319,96 +279,38 @@ If it cannot be determined, return N/A.
 Report: {report}"""
         )
 
-        # Then handle all database operations in a single transaction
-        try:
-            with SessionLocal() as db:
-                # Update existing solution
-                solution = db.query(Solution).get(solution_id)
-                if not solution:
-                    raise HTTPException(
-                        status_code=404,
-                        detail=f"Solution {solution_id} not found"
-                    )
+        # Update the solution with all the research results
+        solutions.update(solution_id, {
+            'text': report,
+            'description': description,
+            'solution_steps': solution_steps,
+            'verified': False,
+            'manufacturer': manufacturer,
+            'machine_name': machine_name,
+            'model_number': model_number,
+            'error_code': error_code,
+            'component': component,
+            'resolution_type': resolution_type,
+            'downtime_impact': downtime_impact
+        })
 
-                solution.text = report
-                solution.description = description
-                solution.solution_steps = solution_steps
-                solution.tags = tags
-                solution.title = title
-                solution.verified = False
-                solution.manufacturer = manufacturer
-                solution.machine_name = machine_name
-                solution.model_number = model_number
-                solution.error_code = error_code
-                solution.component = component
-                solution.resolution_type = resolution_type
-                solution.downtime_impact = downtime_impact
-                solution.confidence = confidence
-                db.commit()
-                db.refresh(solution)
+        # Add question to the database
+        question_data = {
+            'text': question,
+            'solution_id': solution_id
+        }
+        questions.create(question_data)
 
-                # Store question
-                question_record = Question(
-                    text=question,
-                    solution_id=solution_id
-                )
-                db.add(question_record)
-                db.commit()
-
-                # Embed and add to vector DB
-                embedding = embed_text(question)
-                add_to_qdrant(question, embedding, solution_id)
-
-        except SQLAlchemyError as e:
-            # Log the error since this is a background task
-            print(f"Database error in process_and_save_report: {str(e)}")
-            raise  # Re-raise to be caught by outer try block
+        # Add to vector search
+        embedding = embed_text(question)
+        add_to_qdrant(question, embedding, solution_id)
 
     except Exception as e:
-        # Log any errors (including re-raised SQLAlchemyError)
         print(f"Error in process_and_save_report: {str(e)}")
-
-
-@router.get("/questions",
-            response_model=List[QuestionModel],
-            summary="Get all questions",
-            description="Retrieve all questions and their associated solutions from the database",
-            operation_id="listQuestions")
-def get_all_questions():
-    try:
-        with SessionLocal() as db:
-            questions = (
-                db.query(Question)
-                .all()
-            )
-            return questions
-
-    except SQLAlchemyError as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Database error while retrieving questions: {str(e)}"
-        )
-
-
-@router.get("/solutions",
-            response_model=List[SolutionModel],
-            summary="Get all solutions",
-            description="Retrieve all solutions from the database",
-            operation_id="listSolutions")
-def get_all_solutions():
-    try:
-        with SessionLocal() as db:
-            solutions = (
-                db.query(Solution)
-                .all()
-            )
-            return solutions
-
-    except SQLAlchemyError as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Database error while retrieving solutions: {str(e)}"
-        )
+        solutions.update(solution_id, {
+            'text': f"Error generating report: {str(e)}",
+            'error': True
+        })
 
 
 @router.post("/chat",
@@ -417,10 +319,11 @@ def get_all_solutions():
              description="Chat with the solution",
              operation_id="chat")
 async def chat(data: AskRequestModel):
+    solution_list = solutions.list_all()
     response = generate_response(f"""
     You are a helpful assistant that can answer questions about the solutions in the database.
     The solutions are stored in the database and are indexed for vector similarity.
-    The solutions are: {get_all_solutions()}
+    The solutions are: {solution_list}
     The question is: {data.question}
     The response should be in the same language as the question.
     The response should be helpful and informative.
