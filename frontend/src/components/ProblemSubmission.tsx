@@ -40,6 +40,70 @@ const getMatchScorePercentage = (score: string): number => {
   return isNaN(parsed) ? 0 : Math.floor(parsed * 100);
 };
 
+// Helper function to get gradient colors based on match score
+const getMatchGradient = (score: string): string => {
+  const percentage = getMatchScorePercentage(score);
+  if (percentage >= 80) {
+    return 'from-green-50 to-blue-50';
+  } else if (percentage >= 60) {
+    return 'from-green-50 to-emerald-50';
+  } else if (percentage >= 40) {
+    return 'from-yellow-50 to-amber-50';
+  } else if (percentage >= 20) {
+    return 'from-orange-50 to-amber-50';
+  } else {
+    return 'from-red-50 to-orange-50';
+  }
+};
+
+// Helper function to get icon background color based on match score
+const getIconBgColor = (score: string): string => {
+  const percentage = getMatchScorePercentage(score);
+  if (percentage >= 80) {
+    return 'bg-green-100';
+  } else if (percentage >= 60) {
+    return 'bg-emerald-100';
+  } else if (percentage >= 40) {
+    return 'bg-yellow-100';
+  } else if (percentage >= 20) {
+    return 'bg-orange-100';
+  } else {
+    return 'bg-red-100';
+  }
+};
+
+// Helper function to get icon color based on match score
+const getIconColor = (score: string): string => {
+  const percentage = getMatchScorePercentage(score);
+  if (percentage >= 80) {
+    return 'text-green-600';
+  } else if (percentage >= 60) {
+    return 'text-emerald-600';
+  } else if (percentage >= 40) {
+    return 'text-yellow-600';
+  } else if (percentage >= 20) {
+    return 'text-orange-600';
+  } else {
+    return 'text-red-600';
+  }
+};
+
+// Helper function to get badge colors based on match score
+const getBadgeColors = (score: string): string => {
+  const percentage = getMatchScorePercentage(score);
+  if (percentage >= 80) {
+    return 'bg-green-100 text-green-700';
+  } else if (percentage >= 60) {
+    return 'bg-emerald-100 text-emerald-700';
+  } else if (percentage >= 40) {
+    return 'bg-yellow-100 text-yellow-700';
+  } else if (percentage >= 20) {
+    return 'bg-orange-100 text-orange-700';
+  } else {
+    return 'bg-red-100 text-red-700';
+  }
+};
+
 export const ProblemSubmission = () => {
   const [problem, setProblem] = useState("");
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
@@ -353,16 +417,20 @@ export const ProblemSubmission = () => {
                   const matchedSolution = solutionsList?.find((s) => s.id === match.solution_id);
                   if (!matchedSolution) return null;
                   
+                  const gradientClass = getMatchGradient(match.score.toString());
+                  const iconBgClass = getIconBgColor(match.score.toString());
+                  const iconColorClass = getIconColor(match.score.toString());
+                  
                   return (
-                    <div key={index} className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 animate-scale-in">
+                    <div key={index} className={`mt-8 p-6 bg-gradient-to-r ${gradientClass} rounded-lg border border-green-200 animate-scale-in`}>
                       <div className="flex items-start gap-4">
-                        <div className="bg-green-100 p-2 rounded-full">
-                          <Database className="w-6 h-6 text-green-600" />
+                        <div className={`${iconBgClass} p-2 rounded-full`}>
+                          <Database className={`w-6 h-6 ${iconColorClass}`} />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="font-semibold text-slate-800">{matchedSolution.title}</h3>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                            <Badge variant="secondary" className={getBadgeColors(match.score.toString())}>
                               {getMatchScorePercentage(match.score.toString())}% match
                             </Badge>
                             <Badge variant="secondary" className="bg-green-100 text-green-700">
