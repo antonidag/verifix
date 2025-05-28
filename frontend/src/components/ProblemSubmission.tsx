@@ -50,6 +50,8 @@ export const ProblemSubmission = () => {
   const [feedback, setFeedback] = useState<{ [key: string]: "helpful" | "not-helpful" | null }>({});
   const [isInvestigating, setIsInvestigating] = useState(false);
   const [investigationId, setInvestigationId] = useState<string | null>(null);
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const [solutionsList, setSolutionsList] = useState<SolutionModel[]>([]);
 
   const handleVoiceInput = () => {
     setIsListening(true);
@@ -90,7 +92,7 @@ export const ProblemSubmission = () => {
       };
 
       const data = await api.default.ask(askRequest);
-      if (!data) {
+      if (!data || !data.matches || data.matches.length === 0) {
         toast({
           title: "No solution found",
           description: "Would you like to start an AI investigation?",
@@ -117,15 +119,19 @@ export const ProblemSubmission = () => {
         return;
       }
 
-      if (data.match) {
-        const solutions = await api.default.listSolutions();
-        const foundSolution = solutions.find((s) => s.id === data.match?.solution_id);
-
+      const solutions = await api.default.listSolutions();
+      setSearchResults(data);
+      setSolutionsList(solutions);
+      
+      // Process all matches
+      for (const match of data.matches) {
+        const foundSolution = solutions.find((s) => s.id === match.solution_id);
         if (foundSolution) {
           setSolution({
             ...foundSolution,
-            matchScore: data.match.score?.toString() || "0",
+            matchScore: match.score.toString()
           });
+          break; // Keep existing behavior of showing first match first
         }
       }
     } catch (error) {
@@ -198,6 +204,8 @@ export const ProblemSubmission = () => {
     setProblem("");
     setUploadedImages([]);
     setSolution(null);
+    setSearchResults(null);
+    setSolutionsList([]);
   };
 
   const handleViewDetails = () => {
@@ -340,214 +348,126 @@ export const ProblemSubmission = () => {
                 {/* Search Loading Skeleton */}
                 {isSearching && <SearchSkeleton />}
 
-                {/* Knowledge Base Result */}
-                {solution && solution.verified && (
-                  <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200  animate-scale-in">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-green-100 p-2 rounded-full">
-                        <Database className="w-6 h-6 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-slate-800">{solution.title}</h3>
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                            {getMatchScorePercentage(solution.matchScore)}% match
-                          </Badge>
-                          <Badge variant="secondary" className="bg-green-100 text-green-700">
-                            {solution.confidence || "0"}% confidence
-                          </Badge>
-                          {solution.verified && (
-                            <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
-                          )}
+                {/* Knowledge Base Results */}
+                {searchResults?.matches?.map((match, index) => {
+                  const matchedSolution = solutionsList?.find((s) => s.id === match.solution_id);
+                  if (!matchedSolution) return null;
+                  
+                  return (
+                    <div key={index} className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 animate-scale-in">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-green-100 p-2 rounded-full">
+                          <Database className="w-6 h-6 text-green-600" />
                         </div>
-                        <p className="text-slate-700 mb-4">{solution.description}</p>
-
-                        {/* Solution Steps Preview */}
-                        <div className="bg-white/70 p-4 rounded-lg mb-4">
-                          <h4 className="font-medium text-slate-800 mb-2">Solution Steps:</h4>
-                          <ul className="space-y-1">
-                            {(solution.solution_steps || [])
-                              .slice(0, 3)
-                              .map((step: string, index: number) => (
-                                <li
-                                  key={index}
-                                  className="text-sm text-slate-700 flex items-start gap-2"
-                                >
-                                  <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
-                                    {index + 1}
-                                  </span>
-                                  {step}
-                                </li>
-                              ))}
-                          </ul>
-                          <div className="mt-3 flex justify-end">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleViewDetails}
-                              className="text-blue-600 hover:text-blue-700"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View Details
-                            </Button>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold text-slate-800">{matchedSolution.title}</h3>
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                              {getMatchScorePercentage(match.score.toString())}% match
+                            </Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-700">
+                              {matchedSolution.confidence || "0"}% confidence
+                            </Badge>
+                            {matchedSolution.verified && (
+                              <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
+                            )}
                           </div>
-                        </div>
+                          <p className="text-slate-700 mb-4">{matchedSolution.description}</p>
 
-                        {/* Document Link */}
-                        {solution.document_link && (
+                          {/* Solution Steps Preview */}
                           <div className="bg-white/70 p-4 rounded-lg mb-4">
-                            <h4 className="font-medium text-slate-800 mb-2">Related Documents:</h4>
-                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                              <FileText className="w-4 h-4" />
-                              <a
-                                href={solution.document_link}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <h4 className="font-medium text-slate-800 mb-2">Solution Steps:</h4>
+                            <ul className="space-y-1">
+                              {(matchedSolution.solution_steps || [])
+                                .slice(0, 3)
+                                .map((step: string, stepIndex: number) => (
+                                  <li
+                                    key={stepIndex}
+                                    className="text-sm text-slate-700 flex items-start gap-2"
+                                  >
+                                    <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                                      {stepIndex + 1}
+                                    </span>
+                                    {step}
+                                  </li>
+                                ))}
+                            </ul>
+                            <div className="mt-3 flex justify-end">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSolution({
+                                    ...matchedSolution,
+                                    matchScore: match.score.toString()
+                                  });
+                                  handleViewDetails();
+                                }}
                                 className="text-blue-600 hover:text-blue-700"
                               >
-                                View Documentation
-                              </a>
+                                <Eye className="w-4 h-4 mr-1" />
+                                View Details
+                              </Button>
                             </div>
                           </div>
-                        )}
 
-                        {/* Feedback Section */}
-                        <div className="mt-4 flex items-center gap-4">
-                          <span className="text-sm text-slate-600">Was this solution helpful?</span>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className={`border-slate-200 ${
-                                solution.id !== null &&
-                                feedback[solution.id.toString()] === "helpful"
-                                  ? "bg-green-50 text-green-600"
-                                  : ""
-                              }`}
-                              onClick={() => handleFeedback(solution.id, "helpful")}
-                            >
-                              <ThumbsUp className="w-4 h-4 mr-1" />
-                              Yes
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className={`border-slate-200 ${
-                                solution.id !== null &&
-                                feedback[solution.id.toString()] === "not-helpful"
-                                  ? "bg-red-50 text-red-600"
-                                  : ""
-                              }`}
-                              onClick={() => handleFeedback(solution.id, "not-helpful")}
-                            >
-                              <ThumbsDown className="w-4 h-4 mr-1" />
-                              No
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* AI Solution Alternative */}
-                {solution && !solution.verified && (
-                  <div className="mt-8 p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-200  animate-scale-in">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-orange-100 p-2 rounded-full">
-                        <Bot className="w-6 h-6 text-orange-600" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-slate-800">{solution.title}</h3>
-                          <Badge variant="outline" className="text-blue-600 border-blue-300">
-                            Question {getMatchScorePercentage(solution.matchScore)}% match
-                          </Badge>
-                          <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                            AI Generated
-                          </Badge>
-                          <Badge variant="outline" className="text-orange-600 border-orange-300">
-                            {solution.confidence || "0"}% confidence
-                          </Badge>
-                        </div>
-                        <p className="text-slate-700 mb-4">{solution.description}</p>
-
-                        {/* AI Solution Steps Preview */}
-                        <div className="bg-white/70 p-4 rounded-lg mb-4">
-                          <h4 className="font-medium text-slate-800 mb-2">
-                            Troubleshooting Steps:
-                          </h4>
-                          <ul className="space-y-1">
-                            {(solution.solution_steps || [])
-                              .slice(0, 3)
-                              .map((step: string, index: number) => (
-                                <li
-                                  key={index}
-                                  className="text-sm text-slate-700 flex items-start gap-2"
+                          {/* Document Link */}
+                          {matchedSolution.document_link && (
+                            <div className="bg-white/70 p-4 rounded-lg mb-4">
+                              <h4 className="font-medium text-slate-800 mb-2">Related Documents:</h4>
+                              <div className="flex items-center gap-2 text-sm text-slate-600">
+                                <FileText className="w-4 h-4" />
+                                <a
+                                  href={matchedSolution.document_link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-700"
                                 >
-                                  <span className="bg-orange-100 text-orange-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
-                                    {index + 1}
-                                  </span>
-                                  {step}
-                                </li>
-                              ))}
-                          </ul>
-                          <div className="mt-3 flex justify-end">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleViewDetails}
-                              className="text-orange-600 hover:text-orange-700"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View Details
-                            </Button>
-                          </div>
-                        </div>
+                                  View Documentation
+                                </a>
+                              </div>
+                            </div>
+                          )}
 
-                        <div className="flex items-start gap-2 p-3 bg-orange-100/50 rounded-lg flex-1 mr-3">
-                          <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                          <p className="text-xs text-orange-700">
-                            <strong>AI Disclaimer:</strong> {aiDisclaimer}
-                          </p>
-                        </div>
-
-                        {/* Feedback Section for AI Solutions */}
-                        <div className="flex items-center gap-3 pt-3 border-t border-orange-200">
-                          <span className="text-sm text-slate-600">Was this solution helpful?</span>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleFeedback(solution.id, "helpful")}
-                              className={`${
-                                solution.id !== null &&
-                                feedback[solution.id.toString()] === "helpful"
-                                  ? "bg-green-100 text-green-700"
-                                  : "text-slate-500 hover:text-green-600"
-                              }`}
-                            >
-                              <ThumbsUp className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleFeedback(solution.id, "not-helpful")}
-                              className={`${
-                                solution.id !== null &&
-                                feedback[solution.id.toString()] === "not-helpful"
-                                  ? "bg-red-100 text-red-700"
-                                  : "text-slate-500 hover:text-red-600"
-                              }`}
-                            >
-                              <ThumbsDown className="w-4 h-4" />
-                            </Button>
+                          {/* Feedback Section */}
+                          <div className="mt-4 flex items-center gap-4">
+                            <span className="text-sm text-slate-600">Was this solution helpful?</span>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className={`border-slate-200 ${
+                                  matchedSolution.id !== null &&
+                                  feedback[matchedSolution.id.toString()] === "helpful"
+                                    ? "bg-green-50 text-green-600"
+                                    : ""
+                                }`}
+                                onClick={() => handleFeedback(matchedSolution.id, "helpful")}
+                              >
+                                <ThumbsUp className="w-4 h-4 mr-1" />
+                                Yes
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className={`border-slate-200 ${
+                                  matchedSolution.id !== null &&
+                                  feedback[matchedSolution.id.toString()] === "not-helpful"
+                                    ? "bg-red-50 text-red-600"
+                                    : ""
+                                }`}
+                                onClick={() => handleFeedback(matchedSolution.id, "not-helpful")}
+                              >
+                                <ThumbsDown className="w-4 h-4 mr-1" />
+                                No
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })}
 
                 <div className="text-center">
                   {solution && (

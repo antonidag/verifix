@@ -7,5 +7,6 @@ export type QuestionModel = {
     text: string;
     solution_id?: (string | null);
     created_at?: (string | null);
+    embedding?: (Array<number> | null);
 };
 

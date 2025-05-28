@@ -12,3 +12,4 @@ sentence-transformers
 sqlalchemy
 uvicorn
 vertexai
+google.cloud

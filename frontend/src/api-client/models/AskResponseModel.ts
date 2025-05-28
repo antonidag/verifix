@@ -4,6 +4,6 @@
 /* eslint-disable */
 import type { Match } from './Match';
 export type AskResponseModel = {
-    match?: (Match | null);
+    matches: Array<Match>;
 };
 

@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 from typing import Optional, Dict, List, Any
 import json
+import numpy as np
 
 db = None
 
@@ -20,6 +21,14 @@ def init():
 class FirestoreSolution:
     def __init__(self):
         self.collection = get_db().collection('solutions')
+
+    def _serialize_datetime(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert Firestore datetime objects to ISO format strings"""
+        result = data.copy()
+        for key, value in result.items():
+            if hasattr(value, 'isoformat'):  # Check if it's any datetime-like object
+                result[key] = value.isoformat()
+        return result
 
     def create(self, solution_data: Dict[str, Any]) -> str:
         """Create a new solution document"""
@@ -51,7 +60,7 @@ class FirestoreSolution:
                 data['solution_steps'] = json.loads(data['solution_steps'])
             if 'tags' in data and isinstance(data['tags'], str):
                 data['tags'] = json.loads(data['tags'])
-            return data
+            return self._serialize_datetime(data)
         return None
 
     def list_all(self) -> List[Dict[str, Any]]:
@@ -59,7 +68,6 @@ class FirestoreSolution:
         docs = self.collection.stream()
         solutions = []
         for doc in docs:
-            # print
             print(f"Processing document: {doc.id}")
             data = doc.to_dict()
             data['id'] = doc.id
@@ -68,7 +76,7 @@ class FirestoreSolution:
                 data['solution_steps'] = json.loads(data['solution_steps'])
             if 'tags' in data and isinstance(data['tags'], str):
                 data['tags'] = json.loads(data['tags'])
-            solutions.append(data)
+            solutions.append(self._serialize_datetime(data))
         return solutions
 
     def update(self, solution_id: str, solution_data: Dict[str, Any]) -> bool:
@@ -90,10 +98,23 @@ class FirestoreSolution:
 class FirestoreQuestion:
     def __init__(self):
         self.collection = get_db().collection('questions')
+        self.THRESHOLD = 0.8  # Similarity threshold
+
+    def _serialize_datetime(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert Firestore datetime objects to ISO format strings"""
+        result = data.copy()
+        for key, value in result.items():
+            if hasattr(value, 'isoformat'):  # Check if it's any datetime-like object
+                result[key] = value.isoformat()
+        return result
 
     def create(self, question_data: Dict[str, Any]) -> str:
-        """Create a new question document"""
+        """Create a new question document with embedding"""
         doc_ref = self.collection.document()
+        # Convert embedding to list if it's a numpy array
+        if 'embedding' in question_data and hasattr(question_data['embedding'], 'tolist'):
+            question_data['embedding'] = question_data['embedding'].tolist()
+        
         doc_ref.set({
             **question_data,
             'created_at': datetime.utcnow()
@@ -107,13 +128,61 @@ class FirestoreQuestion:
         if doc.exists:
             data = doc.to_dict()
             data['id'] = doc.id
-            return data
+            return self._serialize_datetime(data)
         return None
 
     def list_all(self) -> List[Dict[str, Any]]:
         """Get all questions"""
         docs = self.collection.stream()
-        return [{**doc.to_dict(), 'id': doc.id} for doc in docs]
+        return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
+
+    def find_similar(self, embedding, limit: int = 5, min_score: float = 0.5) -> List[Dict[str, Any]]:
+        """Find most similar questions using cosine similarity.
+        
+        Args:
+            embedding: The query embedding to compare against
+            limit: Maximum number of results to return (default: 5)
+            min_score: Minimum similarity score to include in results (default: 0.5)
+        
+        Returns:
+            List of matches sorted by similarity score (highest first)
+        """
+        # Convert input embedding to numpy array if it isn't already
+        query_embedding = np.array(embedding)
+        
+        # Store all matches above threshold
+        matches = []
+        
+        # Stream all documents
+        for doc in self.collection.stream():
+            doc_data = doc.to_dict()
+            if 'embedding' not in doc_data:
+                continue
+                
+            # Convert document embedding to numpy array
+            doc_embedding = np.array(doc_data['embedding'])
+            
+            # Calculate cosine similarity
+            similarity = np.dot(query_embedding, doc_embedding) / (
+                np.linalg.norm(query_embedding) * np.linalg.norm(doc_embedding)
+            )
+            
+            if similarity >= min_score:
+                match_data = {
+                    **doc_data,
+                    'id': doc.id,
+                    'score': float(similarity)
+                }
+                # Ensure solution_id is a string
+                if 'solution_id' in match_data:
+                    match_data['solution_id'] = str(match_data['solution_id'])
+                matches.append(self._serialize_datetime(match_data))
+        
+        # Sort matches by score in descending order
+        matches.sort(key=lambda x: x['score'], reverse=True)
+        
+        # Return top N matches
+        return matches[:limit]
 
 # Create instances for global use
 solutions = FirestoreSolution()

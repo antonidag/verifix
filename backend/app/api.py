@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import Dict, Any, Optional, List, Union
 from firestoredb import solutions, questions
 from llm_model import generate_response
-from vector_db_client import search_similar, add_to_qdrant
 from utils import embed_text
 from models import AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel, QuestionModel, SolutionResponseModel, SolutionPartModel, ChatResponseModel
 from gpt_researcher import GPTResearcher
@@ -11,10 +10,34 @@ import json
 router = APIRouter()
 
 
-def create_context_question(data: Union[SolutionRequest, AskRequestModel], preped_question: str) -> str:
+def create_context_question(data: Union[SolutionRequest, AskRequestModel], preped_question: str, parts_solution: Optional[dict] = None) -> str:
     """Create a contextualized question from the input data."""
     solution: Optional[Union[SolutionModel, SolutionPartModel]] = getattr(
         data, 'solution', None)
+    
+    # If we have parts_solution from image analysis, create or update solution
+    if parts_solution:
+        if not solution:
+            solution = SolutionPartModel(
+                manufacturer=parts_solution.get('manufacturer') if parts_solution.get('manufacturer') != 'N/A' else None,
+                machine_type=parts_solution.get('machine_type') if parts_solution.get('machine_type') != 'N/A' else None,
+                machine_name=parts_solution.get('machine_name') if parts_solution.get('machine_name') != 'N/A' else None,
+                component=parts_solution.get('component') if parts_solution.get('component') != 'N/A' else None,
+                error_code=parts_solution.get('error_code') if parts_solution.get('error_code') != 'N/A' else None
+            )
+        else:
+            # Update existing solution with parts_solution if fields are empty
+            if not solution.manufacturer and parts_solution.get('manufacturer') != 'N/A':
+                solution.manufacturer = parts_solution['manufacturer']
+            if not solution.machine_type and parts_solution.get('machine_type') != 'N/A':
+                solution.machine_type = parts_solution['machine_type']
+            if not solution.machine_name and parts_solution.get('machine_name') != 'N/A':
+                solution.machine_name = parts_solution['machine_name']
+            if not solution.component and parts_solution.get('component') != 'N/A':
+                solution.component = parts_solution['component']
+            if not solution.error_code and parts_solution.get('error_code') != 'N/A':
+                solution.error_code = parts_solution['error_code']
+
     if not solution:
         return preped_question
 
@@ -48,7 +71,7 @@ Output:
 def find_existing_solution(question: str) -> Optional[Dict]:
     """Search for an existing solution using vector similarity."""
     embedding = embed_text(question)
-    return search_similar(embedding)
+    return questions.find_similar(embedding)
 
 
 def create_solution_and_question(solution_data: SolutionRequest, full_question: str) -> tuple[str, str]:
@@ -59,10 +82,12 @@ def create_solution_and_question(solution_data: SolutionRequest, full_question: 
         solution_dict['title'] = full_question
         solution_id = solutions.create(solution_dict)
 
-        # Create question
+        # Create question with embedding
+        embedding = embed_text(full_question)
         question_dict = {
             'text': full_question,
-            'solution_id': solution_id
+            'solution_id': solution_id,
+            'embedding': embedding
         }
         questions.create(question_dict)
 
@@ -80,16 +105,44 @@ def create_solution_and_question(solution_data: SolutionRequest, full_question: 
              description="Submit a question with optional manufacturing context to find matching solutions",
              operation_id="ask")
 async def ask_question(request: AskRequestModel):
-    preped_question = prepare_question(request.question)
-    full_question = create_context_question(request, preped_question)
-    result = find_existing_solution(full_question)
+    partsSolution = None
+    preped_question = None
+    if request.image_data:
+        image_analysis = generate_response(
+            "Analyze this image and describe what you see, focusing on any visible technical issues, machine parts, or error displays.",
+            image_data=request.image_data
+        )
+        manufacturing_context = generate_response(
+            f"""Based on the following image analysis, write the manufacturing context of the machine: {image_analysis}. 
+            The output must be a raw, minified JSON object of strings like, if propty cant be determined, return N/A:
+            {
+                "manufacturer": "Siemens",
+                "machine_type": "CNC",
+                "machine_name": "N/A",
+                "component": "Motor",
+                "error_code": "E101"
+            }
+            Do not include any other text, formatting, only the JSON array.
+            """
+        )
+        preped_question = prepare_question(f"{request.question} {image_analysis}")
+        try:
+            partsSolution = json.loads(manufacturing_context)
 
-    if result:
-        return {"match": result}
+        except json.JSONDecodeError:
+            partsSolution = None
+    else:
+        preped_question = prepare_question(request.question)
+
+    full_question = create_context_question(request, preped_question, partsSolution)
+    matches = find_existing_solution(full_question)
+
+    if matches:
+        return {"matches": matches}
 
     raise HTTPException(
         status_code=204,
-        detail="No verified solution found. Please document your fix."
+        detail="No verified solutions found. Please document your fix."
     )
 
 
@@ -101,23 +154,10 @@ async def ask_question(request: AskRequestModel):
 async def add_solution(data: SolutionRequest):
     preped_question = prepare_question(data.question)
     full_question = create_context_question(data, preped_question)
-    result = find_existing_solution(full_question)
-
-    if result:
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "message": "A similar question already has a solution.",
-                "match": result
-            })
 
     try:
         # Create solution and question
         solution_id, question = create_solution_and_question(data, full_question)
-
-        # Index the question for vector search
-        embedding = embed_text(question)
-        add_to_qdrant(question, embedding, solution_id)
 
         return {
             "message": "Solution added and indexed.",
@@ -301,15 +341,13 @@ Report: {report}"""
         })
 
         # Add question to the database
-        question_data = {
-            'text': question,
-            'solution_id': solution_id
-        }
-        questions.create(question_data)
-
-        # Add to vector search
         embedding = embed_text(question)
-        add_to_qdrant(question, embedding, solution_id)
+        question_dict = {
+            'text': question,
+            'solution_id': solution_id,
+            'embedding': embedding
+        }
+        questions.create(question_dict)
 
     except Exception as e:
         print(f"Error in process_and_save_report: {str(e)}")

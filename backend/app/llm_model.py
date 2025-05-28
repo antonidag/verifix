@@ -3,7 +3,7 @@ from google.genai import types
 import base64
 
 
-def generate_response(query: str):
+def generate_response(query: str, image_data: str = None):
     client = genai.Client(
         vertexai=True,
         project="even-hull-461009-j8",
@@ -11,13 +11,19 @@ def generate_response(query: str):
     )
 
     model = "gemini-2.5-flash-preview-05-20"
+    
+    parts = [types.Part(text=query)]
+    if image_data:
+        # Assuming image_data is a base64 encoded string
+        parts.append(types.Part(inline_data=types.Blob(
+            mime_type="image/jpeg",
+            data=base64.b64decode(image_data)
+        )))
+
     contents = [
         types.Content(
             role="user",
-            parts=[
-                types.Part(text=query)
-            ]
-
+            parts=parts
         )
     ]
 

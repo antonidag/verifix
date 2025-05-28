@@ -12,5 +12,9 @@ export type AskRequestModel = {
      * Optional solution details
      */
     solution?: (SolutionPartModel | null);
+    /**
+     * Optional base64 encoded image data
+     */
+    image_data?: (string | null);
 };
 

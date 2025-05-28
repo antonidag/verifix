@@ -16,6 +16,7 @@ class SolutionPartModel(BaseModel):
 class AskRequestModel(BaseModel):
     question: str = Field(..., description="The main question or issue to be resolved")
     solution: Optional[SolutionPartModel] = Field(None, description="Optional solution details")
+    image_data: Optional[str] = Field(None, description="Optional base64 encoded image data")
 
     class Config:
         schema_extra = {
@@ -102,6 +103,7 @@ class QuestionModel(BaseModel):
     text: str
     solution_id: Optional[str] = None
     created_at: Optional[datetime] = None
+    embedding: Optional[List[float]] = None
 
     class Config:
         schema_extra = {
@@ -126,15 +128,21 @@ class Match(BaseModel):
         }
 
 class AskResponseModel(BaseModel):
-    match: Optional[Match] = None
+    matches: List[Match]
 
     class Config:
         schema_extra = {
             "example": {
-                "match": {
-                    "solution_id": "abc123",
-                    "score": 0.95
-                }
+                "matches": [
+                    {
+                        "solution_id": "abc123",
+                        "score": 0.95,
+                    },
+                    {
+                        "solution_id": "def456",
+                        "score": 0.85,
+                    }
+                ]
             }
         }
 
