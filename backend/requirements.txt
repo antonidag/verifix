@@ -5,8 +5,9 @@ sqlalchemy
 gpt-researcher
 qdrant_client
 langgraph
-ollama
 langchain_google_vertexai
 python-dotenv
 vertexai
 google-genai
+google-cloud-aiplatform
+google.generativeai
