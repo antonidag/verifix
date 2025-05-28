@@ -1,11 +1,5 @@
-import axios from 'axios';
+import { VefiApi } from "@/api-client";
 
-// Create a configuration instance
-const config = axios.create({
-    baseURL: 'http://localhost:8000',
-    headers: {
-        'Content-Type': 'application/json',
-    },
+export const api = new VefiApi({
+  BASE: "",
 });
-
-export { config }; 

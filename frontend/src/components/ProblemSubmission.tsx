@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { aiDisclaimer } from "@/data/solutions";
 import { toast } from "@/hooks/use-toast";
-import { VefiApi, AskRequestModel, SolutionPartModel, SolutionModel } from '@/api-client';
+import {  AskRequestModel, SolutionPartModel, SolutionModel } from "@/api-client";
 import {
   AlertTriangle,
   Bot,
@@ -26,11 +26,7 @@ import {
 import React, { useState } from "react";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { SolutionForm } from "./SolutionForm";
-
-// Initialize the API client
-const api = new VefiApi({
-    BASE: 'http://localhost:8000'
-});
+import { api } from "@/api/apiClient";
 
 // Helper function to add match score to the SolutionModel type
 interface SolutionWithMatch extends SolutionModel {
@@ -86,19 +82,19 @@ export const ProblemSubmission = () => {
     try {
       const askRequest: AskRequestModel = {
         question: problem.trim(),
-        solution: {} as SolutionPartModel
+        solution: {} as SolutionPartModel,
       };
 
       const response = await api.default.ask(askRequest);
 
       if (response.match) {
         const solutions = await api.default.listSolutions();
-        const foundSolution = solutions.find(s => s.id === response.match?.solution_id);
-        
+        const foundSolution = solutions.find((s) => s.id === response.match?.solution_id);
+
         if (foundSolution) {
           setSolution({
             ...foundSolution,
-            matchScore: response.match.score?.toString() || "0" // Add match score to the solution
+            matchScore: response.match.score?.toString() || "0", // Add match score to the solution
           });
         }
       } else {
@@ -108,7 +104,7 @@ export const ProblemSubmission = () => {
         });
       }
     } catch (error) {
-      console.error('Error searching for solution:', error);
+      console.error("Error searching for solution:", error);
       toast({
         title: "Error",
         description: "Did not find any solutions. Please try again.",
@@ -129,9 +125,12 @@ export const ProblemSubmission = () => {
     setIsDetailModalOpen(true);
   };
 
-  const handleFeedback = (solutionId: number | null | undefined, type: "helpful" | "not-helpful") => {
+  const handleFeedback = (
+    solutionId: number | null | undefined,
+    type: "helpful" | "not-helpful"
+  ) => {
     if (solutionId === null || solutionId === undefined) return;
-    
+
     setFeedback((prev) => ({ ...prev, [solutionId.toString()]: type }));
     toast({
       title: "Feedback submitted",
@@ -271,7 +270,7 @@ export const ProblemSubmission = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-slate-800">{solution.title }</h3>
+                          <h3 className="font-semibold text-slate-800">{solution.title}</h3>
                           <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                             {getMatchScorePercentage(solution.matchScore)}% match
                           </Badge>
@@ -288,17 +287,19 @@ export const ProblemSubmission = () => {
                         <div className="bg-white/70 p-4 rounded-lg mb-4">
                           <h4 className="font-medium text-slate-800 mb-2">Solution Steps:</h4>
                           <ul className="space-y-1">
-                            {(solution.solution_steps || []).slice(0, 3).map((step: string, index: number) => (
-                              <li
-                                key={index}
-                                className="text-sm text-slate-700 flex items-start gap-2"
-                              >
-                                <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
-                                  {index + 1}
-                                </span>
-                                {step}
-                              </li>
-                            ))}
+                            {(solution.solution_steps || [])
+                              .slice(0, 3)
+                              .map((step: string, index: number) => (
+                                <li
+                                  key={index}
+                                  className="text-sm text-slate-700 flex items-start gap-2"
+                                >
+                                  <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                                    {index + 1}
+                                  </span>
+                                  {step}
+                                </li>
+                              ))}
                           </ul>
                           <div className="mt-3 flex justify-end">
                             <Button
@@ -316,14 +317,12 @@ export const ProblemSubmission = () => {
                         {/* Document Link */}
                         {solution.document_link && (
                           <div className="bg-white/70 p-4 rounded-lg mb-4">
-                            <h4 className="font-medium text-slate-800 mb-2">
-                              Related Documents:
-                            </h4>
+                            <h4 className="font-medium text-slate-800 mb-2">Related Documents:</h4>
                             <div className="flex items-center gap-2 text-sm text-slate-600">
                               <FileText className="w-4 h-4" />
-                              <a 
-                                href={solution.document_link} 
-                                target="_blank" 
+                              <a
+                                href={solution.document_link}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 hover:text-blue-700"
                               >
@@ -335,15 +334,14 @@ export const ProblemSubmission = () => {
 
                         {/* Feedback Section */}
                         <div className="mt-4 flex items-center gap-4">
-                          <span className="text-sm text-slate-600">
-                            Was this solution helpful?
-                          </span>
+                          <span className="text-sm text-slate-600">Was this solution helpful?</span>
                           <div className="flex gap-2">
                             <Button
                               variant="outline"
                               size="sm"
                               className={`border-slate-200 ${
-                                solution.id !== null && feedback[solution.id.toString()] === "helpful"
+                                solution.id !== null &&
+                                feedback[solution.id.toString()] === "helpful"
                                   ? "bg-green-50 text-green-600"
                                   : ""
                               }`}
@@ -356,7 +354,8 @@ export const ProblemSubmission = () => {
                               variant="outline"
                               size="sm"
                               className={`border-slate-200 ${
-                                solution.id !== null && feedback[solution.id.toString()] === "not-helpful"
+                                solution.id !== null &&
+                                feedback[solution.id.toString()] === "not-helpful"
                                   ? "bg-red-50 text-red-600"
                                   : ""
                               }`}
@@ -387,10 +386,10 @@ export const ProblemSubmission = () => {
                           </Badge>
                           <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                             AI Generated
-                          </Badge>                        
+                          </Badge>
                           <Badge variant="outline" className="text-orange-600 border-orange-300">
                             {solution.confidence || "0"}% confidence
-                          </Badge>                        
+                          </Badge>
                         </div>
                         <p className="text-slate-700 mb-4">{solution.description}</p>
 
@@ -400,17 +399,19 @@ export const ProblemSubmission = () => {
                             Troubleshooting Steps:
                           </h4>
                           <ul className="space-y-1">
-                            {(solution.solution_steps || []).slice(0, 3).map((step: string, index: number) => (
-                              <li
-                                key={index}
-                                className="text-sm text-slate-700 flex items-start gap-2"
-                              >
-                                <span className="bg-orange-100 text-orange-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
-                                  {index + 1}
-                                </span>
-                                {step}
-                              </li>
-                            ))}
+                            {(solution.solution_steps || [])
+                              .slice(0, 3)
+                              .map((step: string, index: number) => (
+                                <li
+                                  key={index}
+                                  className="text-sm text-slate-700 flex items-start gap-2"
+                                >
+                                  <span className="bg-orange-100 text-orange-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                                    {index + 1}
+                                  </span>
+                                  {step}
+                                </li>
+                              ))}
                           </ul>
                           <div className="mt-3 flex justify-end">
                             <Button
@@ -441,7 +442,8 @@ export const ProblemSubmission = () => {
                               size="sm"
                               onClick={() => handleFeedback(solution.id, "helpful")}
                               className={`${
-                                solution.id !== null && feedback[solution.id.toString()] === "helpful"
+                                solution.id !== null &&
+                                feedback[solution.id.toString()] === "helpful"
                                   ? "bg-green-100 text-green-700"
                                   : "text-slate-500 hover:text-green-600"
                               }`}
@@ -453,7 +455,8 @@ export const ProblemSubmission = () => {
                               size="sm"
                               onClick={() => handleFeedback(solution.id, "not-helpful")}
                               className={`${
-                                solution.id !== null && feedback[solution.id.toString()] === "not-helpful"
+                                solution.id !== null &&
+                                feedback[solution.id.toString()] === "not-helpful"
                                   ? "bg-red-100 text-red-700"
                                   : "text-slate-500 hover:text-red-600"
                               }`}

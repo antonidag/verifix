@@ -4,13 +4,8 @@ import { AlertCircle, CheckCircle, Clock, Database, TrendingUp } from "lucide-re
 import { useEffect, useState } from "react";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { Button } from "./ui/button";
-import { VefiApi, SolutionModel } from '@/api-client';
-
-// Initialize the API client
-const api = new VefiApi({
-    BASE: 'http://localhost:8000'
-});
-
+import { SolutionModel } from "@/api-client";
+import { api } from "@/api/apiClient";
 
 export const KnowledgeBase = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -24,7 +19,7 @@ export const KnowledgeBase = () => {
         const apiSolutions = await api.default.listSolutions();
         setSolutions(apiSolutions);
       } catch (error) {
-        console.error('Error fetching solutions:', error);
+        console.error("Error fetching solutions:", error);
       } finally {
         setIsLoading(false);
       }
@@ -75,11 +70,13 @@ export const KnowledgeBase = () => {
                         )}
                       </div>
                       <Badge variant="outline" className="text-xs">
-                        {solution.id || 'New'}
+                        {solution.id || "New"}
                       </Badge>
                     </div>
 
-                    <p className="text-sm text-slate-600 mb-3">{solution.description.slice(0, 100)}...</p>
+                    <p className="text-sm text-slate-600 mb-3">
+                      {solution.description.slice(0, 100)}...
+                    </p>
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 text-xs text-slate-500">
@@ -124,19 +121,24 @@ export const KnowledgeBase = () => {
               <div className="text-center">
                 <div className="text-3xl font-bold text-green-600">
                   {solutions.length > 0
-                    ? Math.round((solutions.filter(s => s.verified).length / solutions.length) * 100)
-                    : 0}%
+                    ? Math.round(
+                        (solutions.filter((s) => s.verified).length / solutions.length) * 100
+                      )
+                    : 0}
+                  %
                 </div>
                 <div className="text-sm text-green-700">Verified Solutions</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600">
-                  {solutions.filter(s => {
-                    if (!s.created_at) return false;
-                    const created = new Date(s.created_at);
-                    const today = new Date();
-                    return created.toDateString() === today.toDateString();
-                  }).length}
+                  {
+                    solutions.filter((s) => {
+                      if (!s.created_at) return false;
+                      const created = new Date(s.created_at);
+                      const today = new Date();
+                      return created.toDateString() === today.toDateString();
+                    }).length
+                  }
                 </div>
                 <div className="text-sm text-purple-700">Solutions Added Today</div>
               </div>

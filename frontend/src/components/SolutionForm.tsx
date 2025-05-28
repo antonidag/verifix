@@ -4,7 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, Loader2, CheckCircle, Link as LinkIcon, Upload, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Plus,
+  X,
+  Loader2,
+  CheckCircle,
+  Link as LinkIcon,
+  Upload,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import {
   Select,
@@ -15,12 +24,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { VefiApi, SolutionRequest, SolutionModel } from '@/api-client';
-
-// Initialize the API client
-const api = new VefiApi({
-    BASE: 'http://localhost:8000'
-});
+import { SolutionRequest, SolutionModel } from "@/api-client";
+import { api } from "@/api/apiClient";
 
 // Enums for form fields
 enum MachineType {
@@ -29,7 +34,7 @@ enum MachineType {
   PLC = "PLC",
   PACKAGING = "Packaging Machine",
   PALLETIZER = "Palletizer",
-  OTHER = "Other"
+  OTHER = "Other",
 }
 
 enum Manufacturer {
@@ -39,13 +44,13 @@ enum Manufacturer {
   ROCKWELL = "Rockwell",
   OMRON = "Omron",
   SCHNEIDER = "Schneider",
-  OTHER = "Other"
+  OTHER = "Other",
 }
 
 enum DowntimeImpact {
   HIGH = "High",
   MEDIUM = "Medium",
-  LOW = "Low"
+  LOW = "Low",
 }
 
 interface Link {
@@ -117,49 +122,49 @@ export const SolutionForm = () => {
 
   const addSolutionStep = () => {
     if (!currentStep.trim()) return;
-    
-    setSolutionSteps(steps => [
+
+    setSolutionSteps((steps) => [
       ...steps,
       {
         id: Math.random().toString(36).substr(2, 9),
         content: currentStep.trim(),
-        order: steps.length + 1
-      }
+        order: steps.length + 1,
+      },
     ]);
     setCurrentStep("");
   };
 
   const removeSolutionStep = (stepId: string) => {
-    setSolutionSteps(steps => {
-      const filteredSteps = steps.filter(step => step.id !== stepId);
+    setSolutionSteps((steps) => {
+      const filteredSteps = steps.filter((step) => step.id !== stepId);
       // Reorder remaining steps
       return filteredSteps.map((step, index) => ({
         ...step,
-        order: index + 1
+        order: index + 1,
       }));
     });
   };
 
-  const moveStep = (stepId: string, direction: 'up' | 'down') => {
-    setSolutionSteps(steps => {
-      const stepIndex = steps.findIndex(step => step.id === stepId);
+  const moveStep = (stepId: string, direction: "up" | "down") => {
+    setSolutionSteps((steps) => {
+      const stepIndex = steps.findIndex((step) => step.id === stepId);
       if (
-        (direction === 'up' && stepIndex === 0) ||
-        (direction === 'down' && stepIndex === steps.length - 1)
+        (direction === "up" && stepIndex === 0) ||
+        (direction === "down" && stepIndex === steps.length - 1)
       ) {
         return steps;
       }
 
       const newSteps = [...steps];
-      const swapIndex = direction === 'up' ? stepIndex - 1 : stepIndex + 1;
-      
+      const swapIndex = direction === "up" ? stepIndex - 1 : stepIndex + 1;
+
       // Swap the steps
       [newSteps[stepIndex], newSteps[swapIndex]] = [newSteps[swapIndex], newSteps[stepIndex]];
-      
+
       // Update order numbers
       return newSteps.map((step, index) => ({
         ...step,
-        order: index + 1
+        order: index + 1,
       }));
     });
   };
@@ -174,7 +179,7 @@ export const SolutionForm = () => {
       const solution: SolutionModel = {
         text: problem.trim(),
         description: problem.trim(),
-        solution_steps: solutionSteps.map(step => step.content),
+        solution_steps: solutionSteps.map((step) => step.content),
         tags: tags.join(","),
         error_code: errorCode || null,
         machine_name: machineName || null,
@@ -185,12 +190,12 @@ export const SolutionForm = () => {
         plant_name: plantName || null,
         department: department || null,
         document_link: links.length > 0 ? links[0].url : null,
-        verified: true
+        verified: true,
       };
 
       const solutionRequest: SolutionRequest = {
         solution,
-        question: question.trim()
+        question: question.trim(),
       };
 
       const response = await api.default.createSolution(solutionRequest);
@@ -205,7 +210,7 @@ export const SolutionForm = () => {
         description: "Your solution has been added to the knowledge base",
       });
     } catch (error) {
-      console.error('Error submitting solution:', error);
+      console.error("Error submitting solution:", error);
       toast({
         title: "Error submitting solution",
         description: "There was a problem submitting your solution. Please try again.",
@@ -242,12 +247,8 @@ export const SolutionForm = () => {
       <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
         <CardContent className="p-8 text-center">
           <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-green-800 mb-2">
-            Solution Submitted!
-          </h3>
-          <p className="text-green-700 mb-6">
-            Thank you for contributing to our knowledge base.
-          </p>
+          <h3 className="text-xl font-semibold text-green-800 mb-2">Solution Submitted!</h3>
+          <p className="text-green-700 mb-6">Thank you for contributing to our knowledge base.</p>
           <Button
             onClick={resetForm}
             variant="outline"
@@ -272,7 +273,7 @@ export const SolutionForm = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Required Fields Section */}
           <div className="space-y-6">
-            <h3 className="font-semibold text-slate-800">Required Information</h3>      
+            <h3 className="font-semibold text-slate-800">Required Information</h3>
             <div>
               <label htmlFor="question" className="block text-sm font-medium text-slate-700 mb-2">
                 Question *
@@ -305,7 +306,10 @@ export const SolutionForm = () => {
             </div>
 
             <div>
-              <label htmlFor="solution-steps" className="block text-sm font-medium text-slate-700 mb-2">
+              <label
+                htmlFor="solution-steps"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
                 Solution Steps *
               </label>
               <div className="space-y-4">
@@ -345,7 +349,7 @@ export const SolutionForm = () => {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => moveStep(step.id, 'up')}
+                          onClick={() => moveStep(step.id, "up")}
                           disabled={index === 0}
                           className="h-8 w-8 p-0"
                         >
@@ -355,7 +359,7 @@ export const SolutionForm = () => {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => moveStep(step.id, 'down')}
+                          onClick={() => moveStep(step.id, "down")}
                           disabled={index === solutionSteps.length - 1}
                           className="h-8 w-8 p-0"
                         >
@@ -376,9 +380,7 @@ export const SolutionForm = () => {
                 </div>
 
                 {solutionSteps.length === 0 && (
-                  <p className="text-sm text-slate-500 italic">
-                    Add at least one solution step
-                  </p>
+                  <p className="text-sm text-slate-500 italic">Add at least one solution step</p>
                 )}
               </div>
             </div>
@@ -390,7 +392,10 @@ export const SolutionForm = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="errorCode" className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="errorCode"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Error Code
                 </label>
                 <Input
@@ -403,7 +408,10 @@ export const SolutionForm = () => {
               </div>
 
               <div>
-                <label htmlFor="machineName" className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="machineName"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Machine Name
                 </label>
                 <Input
@@ -416,10 +424,16 @@ export const SolutionForm = () => {
               </div>
 
               <div>
-                <label htmlFor="machineType" className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="machineType"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Machine Type
                 </label>
-                <Select value={machineType} onValueChange={(value) => setMachineType(value as MachineType)}>
+                <Select
+                  value={machineType}
+                  onValueChange={(value) => setMachineType(value as MachineType)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select machine type" />
                   </SelectTrigger>
@@ -434,10 +448,16 @@ export const SolutionForm = () => {
               </div>
 
               <div>
-                <label htmlFor="manufacturer" className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="manufacturer"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Manufacturer
                 </label>
-                <Select value={manufacturer} onValueChange={(value) => setManufacturer(value as Manufacturer)}>
+                <Select
+                  value={manufacturer}
+                  onValueChange={(value) => setManufacturer(value as Manufacturer)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select manufacturer" />
                   </SelectTrigger>
@@ -452,10 +472,16 @@ export const SolutionForm = () => {
               </div>
 
               <div>
-                <label htmlFor="downtimeImpact" className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="downtimeImpact"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Downtime Impact
                 </label>
-                <Select value={downtimeImpact} onValueChange={(value) => setDowntimeImpact(value as DowntimeImpact)}>
+                <Select
+                  value={downtimeImpact}
+                  onValueChange={(value) => setDowntimeImpact(value as DowntimeImpact)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select impact level" />
                   </SelectTrigger>
@@ -470,7 +496,10 @@ export const SolutionForm = () => {
               </div>
 
               <div>
-                <label htmlFor="plantName" className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="plantName"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Plant Name
                 </label>
                 <Input
@@ -483,7 +512,10 @@ export const SolutionForm = () => {
               </div>
 
               <div>
-                <label htmlFor="department" className="block text-sm font-medium text-slate-700 mb-2">
+                <label
+                  htmlFor="department"
+                  className="block text-sm font-medium text-slate-700 mb-2"
+                >
                   Department
                 </label>
                 <Input
@@ -507,9 +539,7 @@ export const SolutionForm = () => {
 
             {/* Links Section */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Helpful Links
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Helpful Links</label>
               <div className="flex gap-2 mb-2">
                 <Input
                   value={currentLink.title}
@@ -582,9 +612,7 @@ export const SolutionForm = () => {
 
             {/* Images Section */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Images
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Images</label>
               <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
                 <Input
                   type="file"
@@ -629,7 +657,9 @@ export const SolutionForm = () => {
 
           <Button
             type="submit"
-            disabled={!problem.trim() || !question.trim() || solutionSteps.length === 0 || isSubmitting}
+            disabled={
+              !problem.trim() || !question.trim() || solutionSteps.length === 0 || isSubmitting
+            }
             className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
           >
             {isSubmitting ? (
