@@ -7,7 +7,7 @@ load_dotenv(dotenv_path=env_path)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from firestoredb import init
+from db import init
 from api import router
 import vertexai
 

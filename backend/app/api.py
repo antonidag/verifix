@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import Dict, Any, Optional, List, Union
-from firestoredb import solutions, questions
 from llm_model import generate_response
 from utils import embed_text
 from models import AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel, QuestionModel, SolutionResponseModel, SolutionPartModel, ChatResponseModel
 from gpt_researcher import GPTResearcher
 import json
+
+from db import solutions, questions
 
 router = APIRouter()
 
@@ -89,9 +90,9 @@ def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
     3. Technical accuracy
     4. Verification status
     5. Supporting documentation
-    
+
     Return only the numeric score (0-100), no other text.
-    
+
     Solution Title: {solution_dict.get('title', '')}
     Description: {solution_dict.get('description', '')}
     Steps: {solution_dict.get('solution_steps', [])}
@@ -377,16 +378,16 @@ Report: {report}"""
         )
 
         machine_name = generate_response(
-            f"""Extract the machine name from the following report. 
-Return only the machine name, and nothing else. 
+            f"""Extract the machine name from the following report.
+Return only the machine name, and nothing else.
 If it cannot be determined, return N/A.
 
 Report: {report}"""
         )
 
         model_number = generate_response(
-            f"""Extract the model number of the machine from the following report. 
-Return only the model number, and nothing else. 
+            f"""Extract the model number of the machine from the following report.
+Return only the model number, and nothing else.
 If it cannot be determined, return N/A.
 
 Report: {report}"""

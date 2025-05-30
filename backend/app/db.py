@@ -1,59 +1,189 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, DateTime, JSON
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from google.cloud import firestore
 from datetime import datetime
+import os
+from typing import Optional, Dict, List, Any
+import json
+import numpy as np
 
-# If you're using SQLite locally for testing:
-SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}  # Only for SQLite
-)
+db = None
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def get_db():
+    global db
+    if db is None:
+        project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+        db = firestore.Client(project=project_id, database="verifixdb")
+    return db
 
-Base = declarative_base()
+def init():
+    """Initialize Firestore connection"""
+    get_db()
 
-class Solution(Base):
-    __tablename__ = "solutions"
+class FirestoreSolution:
+    def __init__(self):
+        self.collection = get_db().collection('solutions')
 
-    id = Column(Integer, primary_key=True, index=True)
-    text = Column(String)
-    document_link = Column(String)
-    verified = Column(Boolean, default=False)
-    title = Column(String, default="")  # Adding title field
-    description = Column(String, default="")
-    solution_steps = Column(JSON, default=list)  #  # Correct way to define an array of strings
-    confidence = Column(String, default="0")
+    def _serialize_datetime(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert Firestore datetime objects to ISO format strings"""
+        result = data.copy()
+        for key, value in result.items():
+            if hasattr(value, 'isoformat'):  # Check if it's any datetime-like object
+                result[key] = value.isoformat()
+        return result
 
-    # Manufacturing context fields
-    error_code = Column(String, index=True)           # Machine/system error code
-    machine_name = Column(String, index=True)         # Name/tag of machine (e.g., "Press #3")
-    machine_type = Column(String, index=True)         # "Press", "Conveyor", "Robot Arm"
-    manufacturer = Column(String, index=True)         # e.g., "Siemens", "ABB", "KUKA"
-    model_number = Column(String, index=True)         # Specific model
-    component = Column(String, index=True)            # "Motor", "PLC", "Sensor"
-    
-    resolution_type = Column(String, index=True)      # "Preventive", "Corrective", "Calibration", "Software Fix"
-    downtime_impact = Column(String, index=True)      # "High", "Medium", "Low" – helps prioritize
-    safety_related = Column(Boolean, default=False)   # Flag if the issue has safety implications
-    
-    plant_name = Column(String, index=True)           # e.g., "Plant A", "Line 2"
-    department = Column(String, index=True)           # e.g., "Welding", "Assembly", "Packaging"
+    def create(self, solution_data: Dict[str, Any]) -> str:
+        """Create a new solution document"""
+        # Add timestamps
+        solution_data['created_at'] = datetime.utcnow()
+        solution_data['updated_at'] = datetime.utcnow()
+        
+        # Convert any None values to empty strings for Firestore
+        for key, value in solution_data.items():
+            if value is None:
+                solution_data[key] = ""
+            elif isinstance(value, list):
+                solution_data[key] = json.dumps(value)
+        
+        # Add the document to Firestore
+        doc_ref = self.collection.document()
+        doc_ref.set(solution_data)
+        return doc_ref.id
 
-    tags = Column(String)                      # Flexible filter e.g. ["overheat", "sensor fault"]
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    def get(self, solution_id: str) -> Optional[Dict[str, Any]]:
+        """Get a solution by ID"""
+        doc_ref = self.collection.document(solution_id)
+        doc = doc_ref.get()
+        if doc.exists:
+            data = doc.to_dict()
+            data['id'] = doc.id
+            # Convert stored JSON strings back to lists
+            if 'solution_steps' in data and isinstance(data['solution_steps'], str):
+                data['solution_steps'] = json.loads(data['solution_steps'])
+            if 'tags' in data and isinstance(data['tags'], str):
+                data['tags'] = json.loads(data['tags'])
+            return self._serialize_datetime(data)
+        return None
 
-    def get_title(self) -> str:
-        """Return a human-readable title for this solution."""
-        return f"{self.manufacturer} {self.machine_name} {self.model_number}: {self.error_code}"
+    def list_all(self) -> List[Dict[str, Any]]:
+        """Get all solutions"""
+        docs = self.collection.stream()
+        solutions = []
+        for doc in docs:
+            print(f"Processing document: {doc.id}")
+            data = doc.to_dict()
+            data['id'] = doc.id
+            # Convert stored JSON strings back to lists
+            if 'solution_steps' in data and isinstance(data['solution_steps'], str):
+                data['solution_steps'] = json.loads(data['solution_steps'])
+            if 'tags' in data and isinstance(data['tags'], str):
+                data['tags'] = json.loads(data['tags'])
+            solutions.append(self._serialize_datetime(data))
+        return solutions
 
-class Question(Base):
-    __tablename__ = "questions"
-    id = Column(Integer, primary_key=True, index=True)
-    text = Column(String)
-    solution_id = Column(Integer, ForeignKey("solutions.id"))
-    solution = relationship("Solution")
+    def update(self, solution_id: str, solution_data: Dict[str, Any]) -> bool:
+        """Update a solution"""
+        solution_data['updated_at'] = datetime.utcnow()
+        
+        # Convert lists to JSON strings for storage
+        if 'solution_steps' in solution_data and isinstance(solution_data['solution_steps'], list):
+            solution_data['solution_steps'] = json.dumps(solution_data['solution_steps'])
+        if 'tags' in solution_data and isinstance(solution_data['tags'], list):
+            solution_data['tags'] = json.dumps(solution_data['tags'])
+            
+        doc_ref = self.collection.document(solution_id)
+        if doc_ref.get().exists:
+            doc_ref.update(solution_data)
+            return True
+        return False
 
-# Optional: For initializing tables
-def init_db():
-    Base.metadata.create_all(bind=engine)
+class FirestoreQuestion:
+    def __init__(self):
+        self.collection = get_db().collection('questions')
+        self.THRESHOLD = 0.8  # Similarity threshold
+
+    def _serialize_datetime(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert Firestore datetime objects to ISO format strings"""
+        result = data.copy()
+        for key, value in result.items():
+            if hasattr(value, 'isoformat'):  # Check if it's any datetime-like object
+                result[key] = value.isoformat()
+        return result
+
+    def create(self, question_data: Dict[str, Any]) -> str:
+        """Create a new question document with embedding"""
+        doc_ref = self.collection.document()
+        # Convert embedding to list if it's a numpy array
+        if 'embedding' in question_data and hasattr(question_data['embedding'], 'tolist'):
+            question_data['embedding'] = question_data['embedding'].tolist()
+        
+        doc_ref.set({
+            **question_data,
+            'created_at': datetime.utcnow()
+        })
+        return doc_ref.id
+
+    def get(self, question_id: str) -> Optional[Dict[str, Any]]:
+        """Get a question by ID"""
+        doc_ref = self.collection.document(question_id)
+        doc = doc_ref.get()
+        if doc.exists:
+            data = doc.to_dict()
+            data['id'] = doc.id
+            return self._serialize_datetime(data)
+        return None
+
+    def list_all(self) -> List[Dict[str, Any]]:
+        """Get all questions"""
+        docs = self.collection.stream()
+        return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
+
+    def find_similar(self, embedding, limit: int = 5, min_score: float = 0.5) -> List[Dict[str, Any]]:
+        """Find most similar questions using cosine similarity.
+        
+        Args:
+            embedding: The query embedding to compare against
+            limit: Maximum number of results to return (default: 5)
+            min_score: Minimum similarity score to include in results (default: 0.5)
+        
+        Returns:
+            List of matches sorted by similarity score (highest first)
+        """
+        # Convert input embedding to numpy array if it isn't already
+        query_embedding = np.array(embedding)
+        
+        # Store all matches above threshold
+        matches = []
+        
+        # Stream all documents
+        for doc in self.collection.stream():
+            doc_data = doc.to_dict()
+            if 'embedding' not in doc_data:
+                continue
+                
+            # Convert document embedding to numpy array
+            doc_embedding = np.array(doc_data['embedding'])
+            
+            # Calculate cosine similarity
+            similarity = np.dot(query_embedding, doc_embedding) / (
+                np.linalg.norm(query_embedding) * np.linalg.norm(doc_embedding)
+            )
+            
+            if similarity >= min_score:
+                match_data = {
+                    **doc_data,
+                    'id': doc.id,
+                    'score': float(similarity)
+                }
+                # Ensure solution_id is a string
+                if 'solution_id' in match_data:
+                    match_data['solution_id'] = str(match_data['solution_id'])
+                matches.append(self._serialize_datetime(match_data))
+        
+        # Sort matches by score in descending order
+        matches.sort(key=lambda x: x['score'], reverse=True)
+        
+        # Return top N matches
+        return matches[:limit]
+
+# Create instances for global use
+solutions = FirestoreSolution()
+questions = FirestoreQuestion()

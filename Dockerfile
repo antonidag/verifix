@@ -4,7 +4,7 @@
 #   \___|____|___|___|_|\_| |_|
 
 # Build React frontend
-FROM node:20-alpine as build-frontend
+FROM node:20-alpine AS build-frontend
 
 WORKDIR /frontend
 
@@ -22,10 +22,13 @@ RUN npm run build
 
 # Build Python FastAPI backend
 FROM python:3.11-slim
-WORKDIR /app
+WORKDIR /backend
 
 # Install Python dependencies
-COPY backend/.env backend/application_default_credentials.json backend/requirements.txt ./
+COPY backend/.env ./
+COPY backend/application_default_credentials.json ./
+COPY backend/requirements.txt ./
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend source code
@@ -34,8 +37,17 @@ COPY backend/app/ ./app
 # Copy built frontend into backend's static directory
 COPY --from=build-frontend /frontend/dist ./app/static
 
+# Set environment variables
+ENV FAST_LLM=google_vertexai:gemini-2.5-flash-preview-05-20 \
+    SMART_LLM=google_vertexai:gemini-2.5-pro-preview-05-06 \
+    STRATEGIC_LLM=google_vertexai:gemini-2.5-pro-preview-05-06 \
+    EMBEDDING=google_vertexai:text-embedding-004 \
+    GOOGLE_APPLICATION_CREDENTIALS=/backend/application_default_credentials.json
+
 # Expose port
 EXPOSE 8000
 
+WORKDIR /backend/app
+
 # Start FastAPI with Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
