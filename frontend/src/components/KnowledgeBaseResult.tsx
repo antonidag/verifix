@@ -1,11 +1,13 @@
 import {
   AlertTriangle,
   Bot,
+  CalendarDays,
   Database,
   Eye,
   FileText,
   ThumbsDown,
   ThumbsUp,
+  Wrench,
 } from "lucide-react";
 import Markdown from "react-markdown";
 
@@ -13,31 +15,22 @@ import { SolutionModel } from "@/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { aiDisclaimer } from "@/data/solutions";
-import { SolutionWithMatch } from "@/hooks/use-solution-search";
 import {
   getBadgeColors,
   getMatchScorePercentage,
 } from "@/utils/matchScoreUtils";
+import { SolutionWithMatch } from "@/hooks/use-solution-search";
 
 interface KnowledgeBaseResultProps {
-  matchedSolution: SolutionWithMatch;
-  feedback: {
-    [key: string]: "helpful" | "not-helpful" | null;
-  };
-  onFeedback: (
-    solutionId: string | null,
-    type: "helpful" | "not-helpful"
-  ) => void;
+  solution: SolutionWithMatch;
   onViewDetails: (solution: SolutionModel & { matchScore: string }) => void;
 }
 
 export const KnowledgeBaseResult = ({
-  matchedSolution,
-  feedback,
-  onFeedback,
+  solution,
   onViewDetails,
 }: KnowledgeBaseResultProps) => {
-  const isAiGenerated = !matchedSolution.verified;
+  const isAiGenerated = !solution.verified;
 
   const containerClasses = `mt-8 p-6 bg-gradient-to-r ${
     isAiGenerated
@@ -60,26 +53,24 @@ export const KnowledgeBaseResult = ({
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="font-semibold text-slate-800">
-              {matchedSolution.title}
-            </h3>
+            <h3 className="font-semibold text-slate-800">{solution.title}</h3>
             <Badge
               variant="secondary"
-              className={getBadgeColors(matchedSolution.matchScore)}
+              className={getBadgeColors(solution.matchScore)}
             >
-              {getMatchScorePercentage(matchedSolution.matchScore)}% match
+              {getMatchScorePercentage(solution.matchScore)}% match
             </Badge>
             <Badge
               variant="secondary"
               className={
-                matchedSolution.verified
+                solution.verified
                   ? "bg-blue-100 text-blue-700"
                   : "bg-orange-100 text-orange-700"
               }
             >
-              {matchedSolution.confidence || "0"}% confidence
+              {solution.confidence || "0"}% confidence
             </Badge>
-            {matchedSolution.verified ? (
+            {solution.verified ? (
               <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
             ) : (
               <>
@@ -89,44 +80,132 @@ export const KnowledgeBaseResult = ({
                 >
                   AI
                 </Badge>
-                {matchedSolution.model_name && (
+                {solution.model_name && (
                   <Badge
                     variant="secondary"
                     className="bg-orange-100 text-orange-700"
                   >
-                    {matchedSolution.model_name} {matchedSolution.model_version}
+                    {solution.model_name} {solution.model_version}
                   </Badge>
                 )}
               </>
             )}
           </div>
           {/* Add model details if available */}
-          {!matchedSolution.verified && matchedSolution.model_metadata && (
+          {!solution.verified && solution.model_metadata && (
             <div className="text-xs text-slate-500 mb-2 flex gap-2">
-              {matchedSolution.model_metadata.usage_type && (
-                <span>Type: {matchedSolution.model_metadata.usage_type}</span>
+              {solution.model_metadata.usage_type && (
+                <span>Type: {solution.model_metadata.usage_type}</span>
               )}
-              {matchedSolution.model_parameters?.temperature && (
+              {solution.model_parameters?.temperature && (
                 <span>
-                  Temperature: {matchedSolution.model_parameters.temperature}
+                  Temperature: {solution.model_parameters.temperature}
                 </span>
               )}
-              {matchedSolution.model_metadata.total_tokens && (
-                <span>
-                  Tokens: {matchedSolution.model_metadata.total_tokens}
-                </span>
+              {solution.model_metadata.total_tokens && (
+                <span>Tokens: {solution.model_metadata.total_tokens}</span>
+              )}
+            </div>
+          )}{" "}
+          {/* Add inventory details if available */}
+          {solution.inventory && (
+            <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-slate-800">
+                  Component Details:
+                </h4>
+                {solution.inventory.manufacturer && (
+                  <Badge variant="outline" className="bg-slate-100">
+                    {solution.inventory.manufacturer}
+                  </Badge>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {solution.inventory.component_type && (
+                  <div>
+                    <span className="text-slate-500">Component Type:</span>
+                    <p className="text-slate-800">
+                      {solution.inventory.component_type}
+                    </p>
+                  </div>
+                )}
+                {solution.inventory.model_name && (
+                  <div>
+                    <span className="text-slate-500">Model:</span>
+                    <p className="text-slate-800">
+                      {solution.inventory.model_name}
+                    </p>
+                  </div>
+                )}
+                {solution.inventory.firmware_version && (
+                  <div>
+                    <span className="text-slate-500">Firmware Version:</span>
+                    <p className="text-slate-800">
+                      {solution.inventory.firmware_version}
+                    </p>
+                  </div>
+                )}
+                {solution.inventory.metadata?.machine_type && (
+                  <div>
+                    <span className="text-slate-500">Machine Type:</span>
+                    <p className="text-slate-800">
+                      {solution.inventory.metadata.machine_type}
+                    </p>
+                  </div>
+                )}
+                {solution.inventory.metadata?.error_code && (
+                  <div>
+                    <span className="text-slate-500">Error Code:</span>
+                    <p className="text-slate-800">
+                      {solution.inventory.metadata.error_code}
+                    </p>
+                  </div>
+                )}
+                {Object.entries(solution.inventory.specifications || {}).map(
+                  ([key, value]) => (
+                    <div key={key}>
+                      <span className="text-slate-500">{key}:</span>
+                      <p className="text-slate-800">{value}</p>
+                    </div>
+                  )
+                )}
+              </div>
+              {solution.inventory.metadata && (
+                <div className="mt-3 text-xs flex items-center gap-3 text-slate-500">
+                  {solution.inventory.metadata.installation_date && (
+                    <div className="flex items-center gap-1">
+                      <CalendarDays className="w-3 h-3" />
+                      <span>
+                        Installed:{" "}
+                        {new Date(
+                          solution.inventory.metadata.installation_date
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  {solution.inventory.metadata.last_service && (
+                    <div className="flex items-center gap-1">
+                      <Wrench className="w-3 h-3" />
+                      <span>
+                        Last Service:{" "}
+                        {new Date(
+                          solution.inventory.metadata.last_service
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           )}
           <p className="text-slate-700 mb-4">
-            <Markdown>{matchedSolution.description}</Markdown>
+            <Markdown>{solution.description}</Markdown>
           </p>
-
           {/* Solution Steps Preview */}
           <div className="bg-white/70 p-4 rounded-lg mb-4">
             <h4 className="font-medium text-slate-800 mb-2">Solution Steps:</h4>
             <ul className="space-y-1">
-              {(matchedSolution.solution_steps || [])
+              {(solution.solution_steps || [])
                 .slice(0, 3)
                 .map((step, stepIndex) => (
                   <li
@@ -150,7 +229,7 @@ export const KnowledgeBaseResult = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onViewDetails(matchedSolution)}
+                onClick={() => onViewDetails(solution)}
                 className={
                   isAiGenerated
                     ? "text-orange-600 hover:text-orange-700"
@@ -162,7 +241,6 @@ export const KnowledgeBaseResult = ({
               </Button>
             </div>
           </div>
-
           {/* AI Disclaimer */}
           {isAiGenerated && (
             <div className="flex items-start gap-2 p-3 bg-orange-100/50 rounded-lg flex-1 mb-4">
@@ -172,9 +250,8 @@ export const KnowledgeBaseResult = ({
               </p>
             </div>
           )}
-
           {/* Document Link */}
-          {matchedSolution.document_link && (
+          {solution.document_link && (
             <div className="bg-white/70 p-4 rounded-lg mb-4">
               <h4 className="font-medium text-slate-800 mb-2">
                 Related Documents:
@@ -182,7 +259,7 @@ export const KnowledgeBaseResult = ({
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <FileText className="w-4 h-4" />
                 <a
-                  href={matchedSolution.document_link}
+                  href={solution.document_link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-700"
@@ -192,43 +269,6 @@ export const KnowledgeBaseResult = ({
               </div>
             </div>
           )}
-
-          {/* Feedback Section */}
-          <div className="mt-4 flex items-center gap-4">
-            <span className="text-sm text-slate-600">
-              Was this solution helpful?
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className={`border-slate-200 ${
-                  matchedSolution.id !== null &&
-                  feedback[matchedSolution.id.toString()] === "helpful"
-                    ? "bg-green-50 text-green-600"
-                    : ""
-                }`}
-                onClick={() => onFeedback(matchedSolution.id, "helpful")}
-              >
-                <ThumbsUp className="w-4 h-4 mr-1" />
-                Yes
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className={`border-slate-200 ${
-                  matchedSolution.id !== null &&
-                  feedback[matchedSolution.id.toString()] === "not-helpful"
-                    ? "bg-red-50 text-red-600"
-                    : ""
-                }`}
-                onClick={() => onFeedback(matchedSolution.id, "not-helpful")}
-              >
-                <ThumbsDown className="w-4 h-4 mr-1" />
-                No
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

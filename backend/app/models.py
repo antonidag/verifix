@@ -164,6 +164,8 @@ class InventoryBase(BaseModel):
     firmware_version: Optional[str] = Field(None, description="Firmware/software version if applicable")
     specifications: Optional[dict] = Field(default_factory=dict, description="Technical specifications")
     metadata: Optional[dict] = Field(default_factory=dict, description="Additional metadata like installation date, service history")
+    created_at: Optional[datetime] = Field(None, description="Creation date of the solution")
+    updated_at: Optional[datetime] = Field(None, description="Last update date of the solution")
 
     class Config:
         json_schema_extra = {

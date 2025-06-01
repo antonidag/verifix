@@ -20,9 +20,6 @@ export const ProblemSubmission = () => {
   const [problem, setProblem] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [detailSolution, setDetailSolution] = useState<SolutionWithMatch>(null);
-  const [feedback, setFeedback] = useState<{
-    [key: string]: "helpful" | "not-helpful" | null;
-  }>({});
 
   const {
     uploadedImages,
@@ -32,7 +29,7 @@ export const ProblemSubmission = () => {
     clearImages,
   } = useImageUpload();
 
-  const { isSearching, solutions, searchResults, handleSearch, clearSearch } =
+  const { isSearching, solutions, handleSearch, clearSearch } =
     useSolutionSearch();
 
   const handleSubmit = async () => {
@@ -40,14 +37,6 @@ export const ProblemSubmission = () => {
     clearSearch();
     const imageData = await convertFirstImageToBase64();
     handleSearch(problem, imageData);
-  };
-
-  const handleFeedback = (
-    solutionId: string | null,
-    type: "helpful" | "not-helpful"
-  ) => {
-    if (solutionId === null || solutionId === undefined) return;
-    setFeedback((prev) => ({ ...prev, [solutionId.toString()]: type }));
   };
 
   const clearForm = () => {
@@ -128,9 +117,7 @@ export const ProblemSubmission = () => {
               return (
                 <KnowledgeBaseResult
                   key={solution.id}
-                  matchedSolution={solution}
-                  feedback={feedback}
-                  onFeedback={handleFeedback}
+                  solution={solution}
                   onViewDetails={(solution) => {
                     setIsDetailModalOpen(true);
                     setDetailSolution(solution);

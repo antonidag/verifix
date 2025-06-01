@@ -14,6 +14,7 @@ export type { AskRequestModel } from './models/AskRequestModel';
 export type { AskResponseModel } from './models/AskResponseModel';
 export type { ChatResponseModel } from './models/ChatResponseModel';
 export type { HTTPValidationError } from './models/HTTPValidationError';
+export type { InventoryBase } from './models/InventoryBase';
 export type { Match } from './models/Match';
 export type { QuestionModel } from './models/QuestionModel';
 export type { SolutionModel } from './models/SolutionModel';

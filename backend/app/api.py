@@ -537,3 +537,15 @@ async def extract_component_info(text: str) -> Dict[str, Any]:
     except (json.JSONDecodeError, Exception) as e:
         print(f"Error extracting component info: {e}")
         return {}
+
+@router.get("/solutions/{solution_id}/inventory",
+            response_model=InventoryBase,
+            summary="Get inventory information for a solution",
+            description="Retrieve inventory data associated with a specific solution",
+            operation_id="getSolutionInventory")
+async def get_solution_inventory(solution_id: str):
+    """Get inventory information for a solution."""
+    inventory_data = inventory.get_by_solution_id(solution_id)
+    if not inventory_data or len(inventory_data) == 0:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+    return inventory_data

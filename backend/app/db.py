@@ -222,10 +222,13 @@ class FirestoreInventory:
         docs = self.collection.stream()
         return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
 
-    def get_by_solution_id(self, solution_id: str) -> List[Dict[str, Any]]:
-        """Get all inventory items associated with a solution"""
-        docs = self.collection.where('solution_id', '==', solution_id).stream()
-        return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
+    def get_by_solution_id(self, solution_id: str) -> Optional[Dict[str, Any]]:
+        """Get the inventory item associated with a solution"""
+        docs = self.collection.where('solution_id', '==', solution_id).limit(1).stream()
+        first_doc = next(docs, None)
+        if first_doc:
+            return self._serialize_datetime({**first_doc.to_dict(), 'id': first_doc.id})
+        return None
 
 # Create instances for global use
 solutions = FirestoreSolution()

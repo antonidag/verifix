@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   AskRequestModel,
   AskResponseModel,
+  InventoryBase,
   SolutionModel,
   SolutionPartModel,
 } from "@/api-client";
@@ -13,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 
 export interface SolutionWithMatch extends SolutionModel {
   matchScore: string;
+  inventory?: InventoryBase;
 }
 
 export const useSolutionSearch = () => {
@@ -59,9 +61,23 @@ export const useSolutionSearch = () => {
             match.solution_id
           );
           if (foundSolution) {
+            // Fetch inventory data for the solution
+            let inventory = null;
+            try {
+              inventory = await api.default.getSolutionInventory(
+                match.solution_id
+              );
+            } catch (error) {
+              console.log(
+                "No inventory data found for solution:",
+                match.solution_id
+              );
+            }
+
             return {
               ...foundSolution,
               matchScore: match.score.toString(),
+              inventory: inventory,
             };
           }
           return null;
@@ -116,10 +132,19 @@ export const useSolutionSearch = () => {
     try {
       const solution = await api.default.getSolution(solutionId);
       if (solution.text && solution.text !== "") {
+        // Fetch inventory data for the solution
+        let inventory = null;
+        try {
+          inventory = await api.default.getSolutionInventory(solutionId);
+        } catch (error) {
+          console.log("No inventory data found for solution:", solutionId);
+        }
+
         setSolutions([
           {
             ...solution,
             matchScore: "1.0", // AI-generated solutions get full confidence
+            inventory: inventory,
           },
         ]);
         toast({
