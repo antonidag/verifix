@@ -1,4 +1,12 @@
-import { Database, Eye, FileText, ThumbsDown, ThumbsUp } from "lucide-react";
+import {
+  AlertTriangle,
+  Bot,
+  Database,
+  Eye,
+  FileText,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
 import Markdown from "react-markdown";
 
 import { SolutionModel } from "@/api-client";
@@ -11,6 +19,7 @@ import {
   getBadgeColors,
   getMatchScorePercentage,
 } from "@/utils/matchScoreUtils";
+import { aiDisclaimer } from "@/data/solutions";
 
 interface KnowledgeBaseResultProps {
   match: {
@@ -35,17 +44,26 @@ export const KnowledgeBaseResult = ({
   onFeedback,
   onViewDetails,
 }: KnowledgeBaseResultProps) => {
-  const gradientClass = getMatchGradient(match.score.toString());
-  const iconBgClass = getIconBgColor(match.score.toString());
-  const iconColorClass = getIconColor(match.score.toString());
+  const isAiGenerated = !matchedSolution.verified;
+
+  const containerClasses = `mt-8 p-6 bg-gradient-to-r ${
+    isAiGenerated
+      ? "from-orange-50 to-yellow-50 border-orange-200"
+      : "from-blue-50 to-green-50 border-green-200"
+  } rounded-lg border animate-scale-in`;
+
+  const iconBgClass = isAiGenerated ? "bg-orange-100" : "bg-blue-100";
+  const iconColorClass = isAiGenerated ? "text-orange-600" : "text-blue-600";
 
   return (
-    <div
-      className={`mt-8 p-6 bg-gradient-to-r ${gradientClass} rounded-lg border border-green-200 animate-scale-in`}
-    >
+    <div className={containerClasses}>
       <div className="flex items-start gap-4">
         <div className={`${iconBgClass} p-2 rounded-full`}>
-          <Database className={`w-6 h-6 ${iconColorClass}`} />
+          {isAiGenerated ? (
+            <Bot className={`w-6 h-6 ${iconColorClass}`} />
+          ) : (
+            <Database className={`w-6 h-6 ${iconColorClass}`} />
+          )}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -58,11 +76,25 @@ export const KnowledgeBaseResult = ({
             >
               {getMatchScorePercentage(match.score.toString())}% match
             </Badge>
-            <Badge variant="secondary" className="bg-green-100 text-green-700">
+            <Badge
+              variant="secondary"
+              className={
+                matchedSolution.verified
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-orange-100 text-orange-700"
+              }
+            >
               {matchedSolution.confidence || "0"}% confidence
             </Badge>
-            {matchedSolution.verified && (
+            {matchedSolution.verified ? (
               <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
+            ) : (
+              <Badge
+                variant="secondary"
+                className="bg-orange-100 text-orange-700"
+              >
+                AI
+              </Badge>
             )}
           </div>
           <p className="text-slate-700 mb-4">
@@ -80,7 +112,13 @@ export const KnowledgeBaseResult = ({
                     key={stepIndex}
                     className="text-sm text-slate-700 flex items-start gap-2"
                   >
-                    <span className="bg-blue-100 text-blue-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                    <span
+                      className={`${
+                        isAiGenerated
+                          ? "bg-orange-100 text-orange-700"
+                          : "bg-blue-100 text-blue-700"
+                      } rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5`}
+                    >
                       {stepIndex + 1}
                     </span>
                     {step}
@@ -97,13 +135,27 @@ export const KnowledgeBaseResult = ({
                     matchScore: match.score.toString(),
                   })
                 }
-                className="text-blue-600 hover:text-blue-700"
+                className={
+                  isAiGenerated
+                    ? "text-orange-600 hover:text-orange-700"
+                    : "text-blue-600 hover:text-blue-700"
+                }
               >
                 <Eye className="w-4 h-4 mr-1" />
                 View Details
               </Button>
             </div>
           </div>
+
+          {/* AI Disclaimer */}
+          {isAiGenerated && (
+            <div className="flex items-start gap-2 p-3 bg-orange-100/50 rounded-lg flex-1 mb-4">
+              <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-orange-700">
+                <strong>AI Disclaimer:</strong> {aiDisclaimer}
+              </p>
+            </div>
+          )}
 
           {/* Document Link */}
           {matchedSolution.document_link && (
