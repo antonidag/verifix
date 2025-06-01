@@ -45,9 +45,9 @@ ENV FAST_LLM=google_vertexai:gemini-2.5-flash-preview-05-20 \
     GOOGLE_APPLICATION_CREDENTIALS=/backend/application_default_credentials.json
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8080
 
 WORKDIR /backend/app
 
 # Start FastAPI with Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
