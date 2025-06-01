@@ -1,12 +1,23 @@
-from sentence_transformers import SentenceTransformer
+import vertexai
+from vertexai.language_models import TextEmbeddingModel
+from datetime import datetime
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+
+def initialize_vertex_ai():
+    vertexai.init()
+    return TextEmbeddingModel.from_pretrained("text-embedding-005")
+
+
+# Initialize the model
+model = initialize_vertex_ai()
+
 
 def embed_text(text):
-    return model.encode(text).tolist()
+    embeddings = model.get_embeddings([text])
+    if embeddings and len(embeddings) > 0:
+        return embeddings[0].values
+    return []
 
-
-from datetime import datetime
 
 def solution_to_dict(obj):
     result = {}

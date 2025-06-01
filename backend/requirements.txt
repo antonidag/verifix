@@ -8,7 +8,6 @@ langchain_google_vertexai
 langgraph
 python-dotenv
 qdrant_client
-sentence-transformers
 sqlalchemy
 uvicorn
 vertexai
