@@ -42,7 +42,8 @@ ENV FAST_LLM=google_vertexai:gemini-2.5-flash-preview-05-20 \
     SMART_LLM=google_vertexai:gemini-2.5-pro-preview-05-06 \
     STRATEGIC_LLM=google_vertexai:gemini-2.5-pro-preview-05-06 \
     EMBEDDING=google_vertexai:text-embedding-004 \
-    GOOGLE_APPLICATION_CREDENTIALS=/backend/application_default_credentials.json
+    GOOGLE_APPLICATION_CREDENTIALS=/backend/application_default_credentials.json \
+    PORT=8080
 
 # Expose port
 EXPOSE 8080
