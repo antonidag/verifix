@@ -2,7 +2,6 @@ from google import genai
 from google.genai import types
 import base64
 
-
 async def generate_response(query: str, image_data: str = None):
     client = genai.Client(
         vertexai=True,

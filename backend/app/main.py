@@ -8,6 +8,7 @@ load_dotenv(dotenv_path=env_path)
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from db import init
 from api import router
 import vertexai
