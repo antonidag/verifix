@@ -4,6 +4,9 @@ import asyncio
 import json
 from llm_model import generate_response
 from utils import embed_text
+from services.question_service import prepare_question, create_context_question, find_existing_solution
+from services.solution_service import generate_confidence_score, process_solution_report
+from services.inventory_service import store_model_info
 from models import (
     AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel,
     QuestionModel, SolutionResponseModel, SolutionPartModel, ChatResponseModel,
@@ -12,114 +15,6 @@ from gpt_researcher import GPTResearcher
 from db import solutions, questions, inventory
 
 router = APIRouter()
-
-
-def create_context_question(data: Union[SolutionRequest, AskRequestModel], preped_question: str, parts_solution: Optional[dict] = None) -> str:
-    """Create a contextualized question from the input data."""
-    solution: Optional[Union[SolutionModel, SolutionPartModel]] = getattr(
-        data, 'solution', None)
-
-    # If we have parts_solution from image analysis, create or update solution
-    if parts_solution:
-        if not solution:
-            solution = SolutionPartModel(
-                manufacturer=parts_solution.get('manufacturer') if parts_solution.get(
-                    'manufacturer') != 'N/A' else None,
-                machine_type=parts_solution.get('machine_type') if parts_solution.get(
-                    'machine_type') != 'N/A' else None,
-                machine_name=parts_solution.get('machine_name') if parts_solution.get(
-                    'machine_name') != 'N/A' else None,
-                component=parts_solution.get('component') if parts_solution.get(
-                    'component') != 'N/A' else None,
-                error_code=parts_solution.get('error_code') if parts_solution.get(
-                    'error_code') != 'N/A' else None
-            )
-        else:
-            # Update existing solution with parts_solution if fields are empty
-            if not solution.manufacturer and parts_solution.get('manufacturer') != 'N/A':
-                solution.manufacturer = parts_solution['manufacturer']
-            if not solution.machine_type and parts_solution.get('machine_type') != 'N/A':
-                solution.machine_type = parts_solution['machine_type']
-            if not solution.machine_name and parts_solution.get('machine_name') != 'N/A':
-                solution.machine_name = parts_solution['machine_name']
-            if not solution.component and parts_solution.get('component') != 'N/A':
-                solution.component = parts_solution['component']
-            if not solution.error_code and parts_solution.get('error_code') != 'N/A':
-                solution.error_code = parts_solution['error_code']
-
-    if not solution:
-        return preped_question
-
-    context_fields = [
-        solution.manufacturer,
-        solution.machine_type,
-        solution.machine_name,
-        solution.component,
-        solution.error_code
-    ]
-
-    context_str = " ".join(field for field in context_fields if field)
-    return f"{context_str}: {preped_question}" if context_str else preped_question
-
-
-async def prepare_question(question: str) -> str:
-    """Clean and prepare the question using LLM."""
-    return await generate_response(f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
-
-Correct any spelling or grammar issues, remove informal language or excessive punctuation, and rephrase the input into a neutral tone while preserving all technical context.
-
-Only return the cleaned-up description. Do not explain your reasoning.
-
-Input:
-{question}
-
-Output:
-""")
-
-
-def find_existing_solution(question: str) -> Optional[Dict]:
-    """Search for an existing solution using vector similarity."""
-    embedding = embed_text(question)
-    return questions.find_similar(embedding)
-
-
-async def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
-    """Generate a confidence score for a solution using LLM."""
-    confidence_prompt = f"""
-    Based on the following solution, rate its confidence level from 0-100.
-    Consider:
-    1. Completeness of the solution
-    2. Clarity of steps
-    3. Technical accuracy
-    4. Verification status
-    5. Supporting documentation
-
-    Return only the numeric score (0-100), no other text.
-
-    Solution Title: {solution_dict.get('title', '')}
-    Description: {solution_dict.get('description', '')}
-    Steps: {solution_dict.get('solution_steps', [])}
-    Documentation: {solution_dict.get('document_link', '')}
-    Manufacturer: {solution_dict.get('manufacturer', '')}
-    Machine Type: {solution_dict.get('machine_type', '')}
-    Machine Name: {solution_dict.get('machine_name', '')}
-    Component: {solution_dict.get('component', '')}
-    Error Code: {solution_dict.get('error_code', '')}
-    Resolution Type: {solution_dict.get('resolution_type', '')}
-    Downtime Impact: {solution_dict.get('downtime_impact', '')}
-    Verified: {solution_dict.get('verified', False)}
-    """
-
-    confidence_score = await generate_response(confidence_prompt)
-    confidence_score = confidence_score.strip()
-    try:
-        confidence_score = int(confidence_score)
-        # Ensure score is between 0-100
-        confidence_score = min(max(confidence_score, 0), 100)
-        return str(confidence_score)
-    except ValueError:
-        return "0"  # Default if LLM doesn't return a valid number
-
 
 async def create_solution_and_question(solution_data: SolutionRequest, full_question: str) -> tuple[str, str]:
     """Create a new solution and associated question in Firestore."""
@@ -149,7 +44,6 @@ async def create_solution_and_question(solution_data: SolutionRequest, full_ques
             status_code=500,
             detail=f"Database error while creating solution: {str(e)}"
         )
-
 
 @router.post("/ask",
              response_model=AskResponseModel,
@@ -205,7 +99,6 @@ async def ask_question(request: AskRequestModel):
         detail="No verified solutions found. Please document your fix."
     )
 
-
 @router.post("/solutions",
              response_model=SolutionResponseModel,
              summary="Add a new solution",
@@ -232,7 +125,6 @@ async def add_solution(data: SolutionRequest):
             detail=f"Error adding solution: {str(e)}"
         )
 
-
 @router.get("/solutions/{solution_id}",
             response_model=SolutionModel,
             summary="Get solution by ID",
@@ -244,7 +136,6 @@ async def get_solution(solution_id: str):
         raise HTTPException(status_code=404, detail="Solution not found")
     return solution
 
-
 @router.get("/solutions",
             response_model=List[SolutionModel],
             summary="Get all solutions",
@@ -253,7 +144,6 @@ async def get_solution(solution_id: str):
 def get_all_solutions():
     return solutions.list_all()
 
-
 @router.get("/questions",
             response_model=List[QuestionModel],
             summary="Get all questions",
@@ -261,7 +151,6 @@ def get_all_solutions():
             operation_id="listQuestions")
 def get_all_questions():
     return questions.list_all()
-
 
 @router.post("/investigate",
              response_model=SolutionResponseModel,
@@ -354,7 +243,6 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
             detail=f"Error starting investigation: {str(e)}"
         )
 
-
 async def process_and_save_report(question: str, researcher: GPTResearcher, solution_id: str):
     try:
         # Run research and report generation in parallel
@@ -363,96 +251,25 @@ async def process_and_save_report(question: str, researcher: GPTResearcher, solu
             researcher.write_report()
         )
 
-        # Batch together all the extractive queries
-        prompts_list = [
-            ("description", f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text."),
-            ("solution_steps", f"""Read the report below and return a list of steps to solve the problem.
-The output must be a raw, minified JSON array of strings like: ["Step 1", "Step 2", "Step 3"].
-Do not include any other text, formatting, or markdown—only the JSON array.
-
-Report: {report}"""),
-            ("manufacturer", f"""Based on the following report, write the manufacturer of the machine.
-Only return the manufacturer name as a string (e.g., "Siemens").
-If the manufacturer cannot be confidently determined, return "N/A".
-Do not include any other text, explanation, or formatting.
-
-Report: {report}"""),
-            ("machine_name", f"""Extract the machine name from the following report.
-Return only the machine name, and nothing else.
-If it cannot be determined, return N/A.
-
-Report: {report}"""),
-            ("model_number", f"""Extract the model number of the machine from the following report.
-Return only the model number, and nothing else.
-If it cannot be determined, return N/A.
-
-Report: {report}"""),
-            ("error_code", f"""Based on the following report, write the error code of the machine.
-Only return the error code as a string (e.g., "E101").
-If you cannot confidently determine the error code from the report, return "N/A".
-Do not include any other text, explanation, or formatting.
-
-Report: {report}"""),
-            ("component", f"""Extract the component of the machine from the following report.
-Return only the component name, and nothing else.
-If it cannot be determined, return N/A.
-
-Report: {report}"""),
-            ("resolution_type", f"""Extract the resolution type from the following report.
-Return only the resolution type, and nothing else.
-If it cannot be determined, return N/A.
-
-Report: {report}"""),
-            ("downtime_impact", f"""Extract the downtime impact of the machine from the following report.
-Return only the downtime impact (e.g. High, Medium, Low), and nothing else.
-If it cannot be determined, return N/A.
-
-Report: {report}""")
-        ]
-
-        # Create list of coroutines for parallel execution
-        coroutines = [generate_response(prompt) for _, prompt in prompts_list]
-
-        # Run all extractive queries in parallel
-        results = await asyncio.gather(*coroutines)
-
-        # Map results back using the keys from prompts_list
-        extracted_data = {key: result for (key, _), result in zip(prompts_list, results)}
-
-        try:
-            solution_steps = json.loads(extracted_data['solution_steps'])
-        except json.JSONDecodeError:
-            solution_steps = ["Could not parse solution steps"]
-
-        # Prepare solution data
-        solution_data = {
-            'text': report,
-            'description': extracted_data['description'],
-            'solution_steps': solution_steps,
-            'verified': False,
-            'manufacturer': extracted_data['manufacturer'],
-            'machine_name': extracted_data['machine_name'],
-            'model_number': extracted_data['model_number'],
-            'error_code': extracted_data['error_code'],
-            'component': extracted_data['component'],
-            'resolution_type': extracted_data['resolution_type'],
-            'downtime_impact': extracted_data['downtime_impact'],
-        }
+        # Process report and extract data
+        solution_data = await process_solution_report(report)
+        solution_data['text'] = report
+        solution_data['verified'] = False
 
         # Generate confidence score
         solution_data['confidence'] = await generate_confidence_score(solution_data)
 
         # Run database operations in parallel
         embedding = embed_text(question)
-        solutions.update(solution_id, solution_data),
-        questions.create({
-            'text': question,
-            'solution_id': solution_id,
-            'embedding': embedding
-        })
-
-        # Store component/machine information
-        await store_model_info(solution_id, solution_data)
+        await asyncio.gather(
+            solutions.update(solution_id, solution_data),
+            questions.create({
+                'text': question,
+                'solution_id': solution_id,
+                'embedding': embedding
+            }),
+            store_model_info(solution_id, solution_data)
+        )
 
     except Exception as e:
         print(f"Error in process_and_save_report: {str(e)}")
@@ -460,7 +277,6 @@ Report: {report}""")
             'text': f"Error generating report: {str(e)}",
             'error': True
         })
-
 
 @router.post("/chat",
              response_model=ChatResponseModel,
@@ -479,65 +295,6 @@ async def chat(data: AskRequestModel):
     """)
     return {"message": response}
 
-
-async def store_model_info(solution_id: str, solution_data: Dict[str, Any]) -> str:
-    """Store component/machine model information in the inventory collection.
-
-    Args:
-        solution_id: The ID of the solution this inventory is associated with
-        solution_data: Dictionary containing the solution data with component info
-
-    Returns:
-        The ID of the created inventory record
-    """
-    component_info = await extract_component_info(solution_data.get('text', ''))
-
-    inventory_data = {
-        'solution_id': solution_id,
-        'manufacturer': solution_data.get('manufacturer', component_info.get('manufacturer', 'Unknown')),
-        'model_name': component_info.get('model_name', 'Unknown'),
-        'component_type': solution_data.get('component', component_info.get('component_type', 'Unknown')),
-        'firmware_version': component_info.get('firmware_version'),
-        'specifications': component_info.get('specifications', {}),
-        'metadata': {
-            'machine_type': solution_data.get('machine_type'),
-            'error_code': solution_data.get('error_code'),
-            'installation_date': component_info.get('installation_date'),
-            'last_service': component_info.get('last_service')
-        }
-    }
-    return inventory.create(inventory_data)
-
-async def extract_component_info(text: str) -> Dict[str, Any]:
-    """Extract detailed component information from solution text using LLM.
-
-    Args:
-        text: The solution text to analyze
-
-    Returns:
-        Dictionary with extracted component information
-    """
-    prompt = f"""Extract detailed component/machine information from this text. Return a JSON object with these fields:
-    - manufacturer: The equipment manufacturer
-    - model_name: The specific model name/number
-    - component_type: The type of component (PLC, Robot, Drive, etc.)
-    - firmware_version: Any mentioned firmware/software version
-    - specifications: Technical specifications as key-value pairs
-    - installation_date: Installation date if mentioned
-    - last_service: Last service date if mentioned
-
-    Only include fields if they are mentioned in the text. Format dates as YYYY-MM-DD.
-    Text: {text}
-
-    Return only the JSON object, no other text."""
-
-    try:
-        response = await generate_response(prompt)
-        return json.loads(response)
-    except (json.JSONDecodeError, Exception) as e:
-        print(f"Error extracting component info: {e}")
-        return {}
-
 @router.get("/solutions/{solution_id}/inventory",
             response_model=InventoryBase,
             summary="Get inventory information for a solution",
@@ -546,6 +303,6 @@ async def extract_component_info(text: str) -> Dict[str, Any]:
 async def get_solution_inventory(solution_id: str):
     """Get inventory information for a solution."""
     inventory_data = inventory.get_by_solution_id(solution_id)
-    if not inventory_data or len(inventory_data) == 0:
+    if not inventory_data:
         raise HTTPException(status_code=404, detail="Inventory not found")
     return inventory_data
