@@ -6,6 +6,7 @@ env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from db import init
 from api import router
@@ -33,10 +34,16 @@ app = FastAPI(
     },
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # React's default port
+    allow_origins=["*"],  # Allow all origins in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,3 +57,15 @@ app.include_router(
     router,
     prefix="/api/v1",
 )
+
+# Serve frontend
+frontend_path = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
+# Fallback route for SPA (e.g., /, /about, /dashboard)
+@app.get("/{full_path:path}")
+async def spa_fallback(full_path: str):
+    index_file = frontend_path / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {"error": "index.html not found"}
