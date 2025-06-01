@@ -6,6 +6,7 @@ import path from "path";
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   return {
+    base: process.env.VITE_BASE_URL || "/",
     server: {
       host: "::",
       port: 8080,

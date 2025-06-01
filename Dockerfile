@@ -13,6 +13,7 @@ RUN npm ci
 
 COPY frontend/ .
 
+ENV VITE_BASE_URL=/static/
 RUN npm run build
 
 #   ___ ___ _____   _____ ___
