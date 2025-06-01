@@ -83,23 +83,11 @@ export const KnowledgeDialog = ({
                 </Badge>
               </>
             )}
-            {solution.tags &&
-              (Array.isArray(solution.tags)
-                ? solution.tags.map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))
-                : typeof solution.tags === "string"
-                ? solution.tags
-                    .split(",")
-                    .filter(Boolean)
-                    .map((tag: string) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        {tag.trim()}
-                      </Badge>
-                    ))
-                : null)}
+            {solution.tags?.map((tag: string) => (
+              <Badge key={tag} variant="outline" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
           </div>
 
           {/* Description */}
