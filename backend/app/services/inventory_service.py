@@ -46,7 +46,7 @@ async def store_model_info(solution_id: str, solution_data: Dict[str, Any]) -> s
     component_info = await extract_component_info(solution_data.get('text', ''))
 
     inventory_data = {
-        'solution_id': solution_id,
+        'solution_id': solution_id, # TODO: Remove this field
         'manufacturer': solution_data.get('manufacturer', component_info.get('manufacturer', 'Unknown')),
         'model_name': component_info.get('model_name', 'Unknown'),
         'component_type': solution_data.get('component', component_info.get('component_type', 'Unknown')),
@@ -59,4 +59,5 @@ async def store_model_info(solution_id: str, solution_data: Dict[str, Any]) -> s
             'last_service': component_info.get('last_service')
         }
     }
-    return inventory.create(inventory_data)
+    inventory.create(inventory_data)
+    return

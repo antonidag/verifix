@@ -52,61 +52,39 @@ export const KnowledgeBaseResult = ({
           )}
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="font-semibold text-slate-800">{solution.title}</h3>
-            <Badge
-              variant="secondary"
-              className={getBadgeColors(solution.matchScore)}
-            >
-              {getMatchScorePercentage(solution.matchScore)}% match
-            </Badge>
-            <Badge
-              variant="secondary"
-              className={
-                solution.verified
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-orange-100 text-orange-700"
-              }
-            >
-              {solution.confidence || "0"}% confidence
-            </Badge>
-            {solution.verified ? (
-              <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
-            ) : (
-              <>
+          <div className="flex items-center gap-2 mb-2 flex-wrap md:flex-nowrap overflow-x-auto">
+            <h3 className="font-semibold text-slate-800 min-w-0 truncate flex-shrink">
+              {solution.title}
+            </h3>
+            <div className="flex items-center gap-2 flex-nowrap flex-shrink-0">
+              <Badge
+                variant="secondary"
+                className={getBadgeColors(solution.matchScore)}
+              >
+                {getMatchScorePercentage(solution.matchScore)}% match
+              </Badge>
+              <Badge
+                variant="secondary"
+                className={
+                  solution.verified
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-orange-100 text-orange-700"
+                }
+              >
+                {solution.confidence || "0"}% confidence
+              </Badge>
+              {solution.verified ? (
+                <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
+              ) : (
                 <Badge
                   variant="secondary"
                   className="bg-orange-100 text-orange-700"
                 >
                   AI
                 </Badge>
-                {solution.model_name && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-orange-100 text-orange-700"
-                  >
-                    {solution.model_name} {solution.model_version}
-                  </Badge>
-                )}
-              </>
-            )}
-          </div>
-          {/* Add model details if available */}
-          {!solution.verified && solution.model_metadata && (
-            <div className="text-xs text-slate-500 mb-2 flex gap-2">
-              {solution.model_metadata.usage_type && (
-                <span>Type: {solution.model_metadata.usage_type}</span>
-              )}
-              {solution.model_parameters?.temperature && (
-                <span>
-                  Temperature: {solution.model_parameters.temperature}
-                </span>
-              )}
-              {solution.model_metadata.total_tokens && (
-                <span>Tokens: {solution.model_metadata.total_tokens}</span>
               )}
             </div>
-          )}{" "}
+          </div>
           {/* Add inventory details if available */}
           {solution.inventory && (
             <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
@@ -224,6 +202,11 @@ export const KnowledgeBaseResult = ({
                     {step}
                   </li>
                 ))}
+              {solution.solution_steps.length > 3 && (
+                <li className="text-sm text-slate-500">
+                  ... and {solution.solution_steps.length - 3} more steps
+                </li>
+              )}
             </ul>
             <div className="mt-3 flex justify-end">
               <Button
