@@ -25,8 +25,8 @@ FROM python:3.11-slim
 WORKDIR /backend
 
 # Install Python dependencies
-COPY backend/.env ./
-COPY backend/application_default_credentials.json ./
+# COPY backend/.env ./
+# COPY backend/application_default_credentials.json ./
 COPY backend/requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
