@@ -18,7 +18,9 @@ export const SearchSkeleton = () => {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Database className="w-4 h-4 text-blue-600 animate-pulse" />
-          <span className="text-sm text-slate-600">Searching knowledge base...</span>
+          <span className="text-sm text-slate-600">
+            Searching knowledge base...
+          </span>
         </div>
 
         <div className="bg-white/70 p-4 rounded-lg">
@@ -37,11 +39,6 @@ export const SearchSkeleton = () => {
               <Skeleton className="h-3 w-3/4" />
             </div>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Bot className="w-4 h-4 text-orange-600 animate-pulse" />
-          <span className="text-sm text-slate-600">Generating AI assistance...</span>
         </div>
 
         <div className="flex justify-between items-center">

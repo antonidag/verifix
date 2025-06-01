@@ -12,21 +12,15 @@ import Markdown from "react-markdown";
 import { SolutionModel } from "@/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { aiDisclaimer } from "@/data/solutions";
+import { SolutionWithMatch } from "@/hooks/use-solution-search";
 import {
-  getMatchGradient,
-  getIconBgColor,
-  getIconColor,
   getBadgeColors,
   getMatchScorePercentage,
 } from "@/utils/matchScoreUtils";
-import { aiDisclaimer } from "@/data/solutions";
 
 interface KnowledgeBaseResultProps {
-  match: {
-    score: number;
-    solution_id: string;
-  };
-  matchedSolution: SolutionModel;
+  matchedSolution: SolutionWithMatch;
   feedback: {
     [key: string]: "helpful" | "not-helpful" | null;
   };
@@ -38,7 +32,6 @@ interface KnowledgeBaseResultProps {
 }
 
 export const KnowledgeBaseResult = ({
-  match,
   matchedSolution,
   feedback,
   onFeedback,
@@ -72,9 +65,9 @@ export const KnowledgeBaseResult = ({
             </h3>
             <Badge
               variant="secondary"
-              className={getBadgeColors(match.score.toString())}
+              className={getBadgeColors(matchedSolution.matchScore)}
             >
-              {getMatchScorePercentage(match.score.toString())}% match
+              {getMatchScorePercentage(matchedSolution.matchScore)}% match
             </Badge>
             <Badge
               variant="secondary"
@@ -89,14 +82,42 @@ export const KnowledgeBaseResult = ({
             {matchedSolution.verified ? (
               <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
             ) : (
-              <Badge
-                variant="secondary"
-                className="bg-orange-100 text-orange-700"
-              >
-                AI
-              </Badge>
+              <>
+                <Badge
+                  variant="secondary"
+                  className="bg-orange-100 text-orange-700"
+                >
+                  AI
+                </Badge>
+                {matchedSolution.model_name && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-orange-100 text-orange-700"
+                  >
+                    {matchedSolution.model_name} {matchedSolution.model_version}
+                  </Badge>
+                )}
+              </>
             )}
           </div>
+          {/* Add model details if available */}
+          {!matchedSolution.verified && matchedSolution.model_metadata && (
+            <div className="text-xs text-slate-500 mb-2 flex gap-2">
+              {matchedSolution.model_metadata.usage_type && (
+                <span>Type: {matchedSolution.model_metadata.usage_type}</span>
+              )}
+              {matchedSolution.model_parameters?.temperature && (
+                <span>
+                  Temperature: {matchedSolution.model_parameters.temperature}
+                </span>
+              )}
+              {matchedSolution.model_metadata.total_tokens && (
+                <span>
+                  Tokens: {matchedSolution.model_metadata.total_tokens}
+                </span>
+              )}
+            </div>
+          )}
           <p className="text-slate-700 mb-4">
             <Markdown>{matchedSolution.description}</Markdown>
           </p>
@@ -129,12 +150,7 @@ export const KnowledgeBaseResult = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() =>
-                  onViewDetails({
-                    ...matchedSolution,
-                    matchScore: match.score.toString(),
-                  })
-                }
+                onClick={() => onViewDetails(matchedSolution)}
                 className={
                   isAiGenerated
                     ? "text-orange-600 hover:text-orange-700"

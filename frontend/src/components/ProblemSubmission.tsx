@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useImageUpload } from "@/hooks/use-image-upload";
-import { useSolutionSearch } from "@/hooks/use-solution-search";
+import {
+  SolutionWithMatch,
+  useSolutionSearch,
+} from "@/hooks/use-solution-search";
 
 import { ImageUploadSection } from "./ImageUploadSection";
 import { KnowledgeBaseResult } from "./KnowledgeBaseResult";
@@ -16,6 +19,7 @@ import { VoiceInput } from "./VoiceInput";
 export const ProblemSubmission = () => {
   const [problem, setProblem] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailSolution, setDetailSolution] = useState<SolutionWithMatch>(null);
   const [feedback, setFeedback] = useState<{
     [key: string]: "helpful" | "not-helpful" | null;
   }>({});
@@ -28,17 +32,12 @@ export const ProblemSubmission = () => {
     clearImages,
   } = useImageUpload();
 
-  const {
-    isSearching,
-    solution,
-    searchResults,
-    solutionsList,
-    handleSearch,
-    clearSearch,
-  } = useSolutionSearch();
+  const { isSearching, solutions, searchResults, handleSearch, clearSearch } =
+    useSolutionSearch();
 
   const handleSubmit = async () => {
     if (!problem.trim() && uploadedImages.length === 0) return;
+    clearSearch();
     const imageData = await convertFirstImageToBase64();
     handleSearch(problem, imageData);
   };
@@ -125,39 +124,34 @@ export const ProblemSubmission = () => {
 
             {isSearching && <SearchSkeleton />}
 
-            {searchResults?.matches?.map((match, index) => {
-              const matchedSolution = solutionsList?.find(
-                (s) => s.id === match.solution_id
-              );
-              if (!matchedSolution) return null;
-
+            {solutions.map((solution) => {
               return (
                 <KnowledgeBaseResult
-                  key={index}
-                  match={match}
-                  matchedSolution={matchedSolution}
+                  key={solution.id}
+                  matchedSolution={solution}
                   feedback={feedback}
                   onFeedback={handleFeedback}
                   onViewDetails={(solution) => {
                     setIsDetailModalOpen(true);
+                    setDetailSolution(solution);
                   }}
                 />
               );
             })}
 
-            <div className="text-center">
-              {solution && (
-                <>
-                  <div className="text-3xl font-bold text-blue-600">1</div>
-                  <div className="text-sm text-blue-700">Match Found</div>
-                </>
-              )}
-            </div>
+            {solutions.length > 0 && (
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600">
+                  {solutions.length}
+                </div>
+                <div className="text-sm text-blue-700">Match Found</div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <KnowledgeDialog
-          solution={solution}
+          solution={detailSolution}
           open={isDetailModalOpen}
           onOpenChange={setIsDetailModalOpen}
         />

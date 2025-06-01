@@ -3,7 +3,7 @@ from google.genai import types
 import base64
 
 
-def generate_response(query: str, image_data: str = None):
+async def generate_response(query: str, image_data: str = None):
     client = genai.Client(
         vertexai=True,
         project="even-hull-461009-j8",
@@ -11,7 +11,7 @@ def generate_response(query: str, image_data: str = None):
     )
 
     model = "gemini-2.5-flash-preview-05-20"
-    
+
     parts = [types.Part(text=query)]
     if image_data:
         # Assuming image_data is a base64 encoded string
@@ -47,7 +47,7 @@ def generate_response(query: str, image_data: str = None):
         )],
     )
 
-    response = client.models.generate_content(
+    response = await client.aio.models.generate_content(
         model=model,
         contents=contents,
         config=generate_content_config,

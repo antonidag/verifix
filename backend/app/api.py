@@ -1,12 +1,15 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import Dict, Any, Optional, List, Union
+import asyncio
+import json
 from llm_model import generate_response
 from utils import embed_text
-from models import AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel, QuestionModel, SolutionResponseModel, SolutionPartModel, ChatResponseModel
+from models import (
+    AskResponseModel, AskRequestModel, SolutionRequest, SolutionModel,
+    QuestionModel, SolutionResponseModel, SolutionPartModel, ChatResponseModel,
+    InventoryBase)
 from gpt_researcher import GPTResearcher
-import json
-
-from db import solutions, questions
+from db import solutions, questions, inventory
 
 router = APIRouter()
 
@@ -59,9 +62,9 @@ def create_context_question(data: Union[SolutionRequest, AskRequestModel], prepe
     return f"{context_str}: {preped_question}" if context_str else preped_question
 
 
-def prepare_question(question: str) -> str:
+async def prepare_question(question: str) -> str:
     """Clean and prepare the question using LLM."""
-    return generate_response(f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
+    return await generate_response(f"""You are a helpful assistant that rewrites technician input into clear, professional, and concise problem descriptions suitable for logging into a maintenance or troubleshooting system.
 
 Correct any spelling or grammar issues, remove informal language or excessive punctuation, and rephrase the input into a neutral tone while preserving all technical context.
 
@@ -80,7 +83,7 @@ def find_existing_solution(question: str) -> Optional[Dict]:
     return questions.find_similar(embedding)
 
 
-def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
+async def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
     """Generate a confidence score for a solution using LLM."""
     confidence_prompt = f"""
     Based on the following solution, rate its confidence level from 0-100.
@@ -107,7 +110,8 @@ def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
     Verified: {solution_dict.get('verified', False)}
     """
 
-    confidence_score = generate_response(confidence_prompt).strip()
+    confidence_score = await generate_response(confidence_prompt)
+    confidence_score = confidence_score.strip()
     try:
         confidence_score = int(confidence_score)
         # Ensure score is between 0-100
@@ -117,23 +121,27 @@ def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
         return "0"  # Default if LLM doesn't return a valid number
 
 
-def create_solution_and_question(solution_data: SolutionRequest, full_question: str) -> tuple[str, str]:
+async def create_solution_and_question(solution_data: SolutionRequest, full_question: str) -> tuple[str, str]:
     """Create a new solution and associated question in Firestore."""
     try:
         # Create solution
         solution_dict = solution_data.solution.model_dump()
         solution_dict['title'] = full_question
-        solution_dict['confidence'] = generate_confidence_score(solution_dict)
+        solution_dict['confidence'] = await generate_confidence_score(solution_dict)
         solution_id = solutions.create(solution_dict)
 
-        # Create question with embedding
+        # Create question with embedding in parallel with storing model info
         embedding = embed_text(full_question)
         question_dict = {
             'text': full_question,
             'solution_id': solution_id,
             'embedding': embedding
         }
-        questions.create(question_dict)
+
+        await asyncio.gather(
+            questions.create(question_dict),
+            store_model_info(solution_id, solution_dict)
+        )
 
         return solution_id, full_question
     except Exception as e:
@@ -154,11 +162,11 @@ async def ask_question(request: AskRequestModel):
 
     if request.image_data:
         print("Image data found")
-        image_analysis = generate_response(
+        image_analysis = await generate_response(
             "Analyze this image and describe what you see, focusing on any visible technical issues, machine parts, or error displays.",
             image_data=request.image_data
         )
-        manufacturing_context = generate_response(
+        manufacturing_context = await generate_response(
             "Based on the following image analysis, write the manufacturing context of the machine: " + image_analysis + """
             The output must be a raw, minified JSON object of strings like, if property can't be determined, return N/A:
             {
@@ -179,11 +187,11 @@ async def ask_question(request: AskRequestModel):
     # Prepare the question by combining text and image analysis if available
     question_text = request.question.strip()
     if image_analysis:
-        preped_question = prepare_question(
+        preped_question = await prepare_question(
             f"Question: {question_text}\nImage Analysis: {image_analysis}"
         )
     else:
-        preped_question = prepare_question(question_text)
+        preped_question = await prepare_question(question_text)
 
     full_question = create_context_question(
         request, preped_question, partsSolution)
@@ -204,12 +212,12 @@ async def ask_question(request: AskRequestModel):
              description="Add a new solution with its associated question",
              operation_id="createSolution")
 async def add_solution(data: SolutionRequest):
-    preped_question = prepare_question(data.question)
+    preped_question = await prepare_question(data.question)
     full_question = create_context_question(data, preped_question)
 
     try:
         # Create solution and question
-        solution_id, question = create_solution_and_question(
+        solution_id, question = await create_solution_and_question(
             data, full_question)
 
         return {
@@ -266,11 +274,11 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
 
     if data.image_data:
         print("Image data found in investigation")
-        image_analysis = generate_response(
+        image_analysis = await generate_response(
             "Analyze this image and describe what you see, focusing on any visible technical issues, machine parts, or error displays.",
             image_data=data.image_data
         )
-        manufacturing_context = generate_response(
+        manufacturing_context = await generate_response(
             "Based on the following image analysis, write the manufacturing context of the machine: " + image_analysis + """
             The output must be a raw, minified JSON object of strings like, if property can't be determined, return N/A:
             {
@@ -291,11 +299,11 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
     # Prepare the question by combining text and image analysis if available
     question_text = data.question.strip()
     if image_analysis:
-        preped_question = prepare_question(
+        preped_question = await prepare_question(
             f"Question: {question_text}\nImage Analysis: {image_analysis}"
         )
     else:
-        preped_question = prepare_question(question_text)
+        preped_question = await prepare_question(question_text)
 
     full_question = create_context_question(
         data, preped_question, partsSolution)
@@ -349,112 +357,102 @@ async def get_report(data: AskRequestModel, background_tasks: BackgroundTasks):
 
 async def process_and_save_report(question: str, researcher: GPTResearcher, solution_id: str):
     try:
-        research_result = await researcher.conduct_research()
-        report = await researcher.write_report()
+        # Run research and report generation in parallel
+        research_result, report = await asyncio.gather(
+            researcher.conduct_research(),
+            researcher.write_report()
+        )
 
-        description = generate_response(
-            f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text.")
-
-        solution_steps_raw = generate_response(
-            f"""Read the report below and return a list of steps to solve the problem.
+        # Batch together all the extractive queries
+        prompts_list = [
+            ("description", f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text."),
+            ("solution_steps", f"""Read the report below and return a list of steps to solve the problem.
 The output must be a raw, minified JSON array of strings like: ["Step 1", "Step 2", "Step 3"].
 Do not include any other text, formatting, or markdown—only the JSON array.
 
-Report: {report}"""
-        )
-
-        try:
-            solution_steps = json.loads(solution_steps_raw)
-        except json.JSONDecodeError:
-            solution_steps = ["Could not parse solution steps"]
-
-        manufacturer = generate_response(
-            f"""Based on the following report, write the manufacturer of the machine.
+Report: {report}"""),
+            ("manufacturer", f"""Based on the following report, write the manufacturer of the machine.
 Only return the manufacturer name as a string (e.g., "Siemens").
 If the manufacturer cannot be confidently determined, return "N/A".
 Do not include any other text, explanation, or formatting.
 
-Report: {report}"""
-        )
-
-        machine_name = generate_response(
-            f"""Extract the machine name from the following report.
+Report: {report}"""),
+            ("machine_name", f"""Extract the machine name from the following report.
 Return only the machine name, and nothing else.
 If it cannot be determined, return N/A.
 
-Report: {report}"""
-        )
-
-        model_number = generate_response(
-            f"""Extract the model number of the machine from the following report.
+Report: {report}"""),
+            ("model_number", f"""Extract the model number of the machine from the following report.
 Return only the model number, and nothing else.
 If it cannot be determined, return N/A.
 
-Report: {report}"""
-        )
-
-        error_code = generate_response(
-            f"""Based on the following report, write the error code of the machine.
+Report: {report}"""),
+            ("error_code", f"""Based on the following report, write the error code of the machine.
 Only return the error code as a string (e.g., "E101").
 If you cannot confidently determine the error code from the report, return "N/A".
 Do not include any other text, explanation, or formatting.
 
-Report: {report}"""
-        )
-
-        component = generate_response(
-            f"""Extract the component of the machine from the following report.
+Report: {report}"""),
+            ("component", f"""Extract the component of the machine from the following report.
 Return only the component name, and nothing else.
 If it cannot be determined, return N/A.
 
-Report: {report}"""
-        )
-
-        resolution_type = generate_response(
-            f"""Extract the resolution type from the following report.
+Report: {report}"""),
+            ("resolution_type", f"""Extract the resolution type from the following report.
 Return only the resolution type, and nothing else.
 If it cannot be determined, return N/A.
 
-Report: {report}"""
-        )
-
-        downtime_impact = generate_response(
-            f"""Extract the downtime impact of the machine from the following report.
+Report: {report}"""),
+            ("downtime_impact", f"""Extract the downtime impact of the machine from the following report.
 Return only the downtime impact (e.g. High, Medium, Low), and nothing else.
 If it cannot be determined, return N/A.
 
-Report: {report}"""
-        )
+Report: {report}""")
+        ]
+
+        # Create list of coroutines for parallel execution
+        coroutines = [generate_response(prompt) for _, prompt in prompts_list]
+
+        # Run all extractive queries in parallel
+        results = await asyncio.gather(*coroutines)
+
+        # Map results back using the keys from prompts_list
+        extracted_data = {key: result for (key, _), result in zip(prompts_list, results)}
+
+        try:
+            solution_steps = json.loads(extracted_data['solution_steps'])
+        except json.JSONDecodeError:
+            solution_steps = ["Could not parse solution steps"]
 
         # Prepare solution data
         solution_data = {
             'text': report,
-            'description': description,
+            'description': extracted_data['description'],
             'solution_steps': solution_steps,
             'verified': False,
-            'manufacturer': manufacturer,
-            'machine_name': machine_name,
-            'model_number': model_number,
-            'error_code': error_code,
-            'component': component,
-            'resolution_type': resolution_type,
-            'downtime_impact': downtime_impact,
+            'manufacturer': extracted_data['manufacturer'],
+            'machine_name': extracted_data['machine_name'],
+            'model_number': extracted_data['model_number'],
+            'error_code': extracted_data['error_code'],
+            'component': extracted_data['component'],
+            'resolution_type': extracted_data['resolution_type'],
+            'downtime_impact': extracted_data['downtime_impact'],
         }
 
-        # Generate and add confidence score
-        solution_data['confidence'] = generate_confidence_score(solution_data)
+        # Generate confidence score
+        solution_data['confidence'] = await generate_confidence_score(solution_data)
 
-        # Update the solution with all the research results
-        solutions.update(solution_id, solution_data)
-
-        # Add question to the database
+        # Run database operations in parallel
         embedding = embed_text(question)
-        question_dict = {
+        solutions.update(solution_id, solution_data),
+        questions.create({
             'text': question,
             'solution_id': solution_id,
             'embedding': embedding
-        }
-        questions.create(question_dict)
+        })
+
+        # Store component/machine information
+        await store_model_info(solution_id, solution_data)
 
     except Exception as e:
         print(f"Error in process_and_save_report: {str(e)}")
@@ -471,7 +469,7 @@ Report: {report}"""
              operation_id="chat")
 async def chat(data: AskRequestModel):
     solution_list = solutions.list_all()
-    response = generate_response(f"""
+    response = await generate_response(f"""
     You are a helpful assistant that can answer questions about the solutions in the database.
     The solutions are stored in the database and are indexed for vector similarity.
     The solutions are: {solution_list}
@@ -480,3 +478,62 @@ async def chat(data: AskRequestModel):
     The response should be helpful and informative.
     """)
     return {"message": response}
+
+
+async def store_model_info(solution_id: str, solution_data: Dict[str, Any]) -> str:
+    """Store component/machine model information in the inventory collection.
+
+    Args:
+        solution_id: The ID of the solution this inventory is associated with
+        solution_data: Dictionary containing the solution data with component info
+
+    Returns:
+        The ID of the created inventory record
+    """
+    component_info = await extract_component_info(solution_data.get('text', ''))
+
+    inventory_data = {
+        'solution_id': solution_id,
+        'manufacturer': solution_data.get('manufacturer', component_info.get('manufacturer', 'Unknown')),
+        'model_name': component_info.get('model_name', 'Unknown'),
+        'component_type': solution_data.get('component', component_info.get('component_type', 'Unknown')),
+        'firmware_version': component_info.get('firmware_version'),
+        'specifications': component_info.get('specifications', {}),
+        'metadata': {
+            'machine_type': solution_data.get('machine_type'),
+            'error_code': solution_data.get('error_code'),
+            'installation_date': component_info.get('installation_date'),
+            'last_service': component_info.get('last_service')
+        }
+    }
+    return inventory.create(inventory_data)
+
+async def extract_component_info(text: str) -> Dict[str, Any]:
+    """Extract detailed component information from solution text using LLM.
+
+    Args:
+        text: The solution text to analyze
+
+    Returns:
+        Dictionary with extracted component information
+    """
+    prompt = f"""Extract detailed component/machine information from this text. Return a JSON object with these fields:
+    - manufacturer: The equipment manufacturer
+    - model_name: The specific model name/number
+    - component_type: The type of component (PLC, Robot, Drive, etc.)
+    - firmware_version: Any mentioned firmware/software version
+    - specifications: Technical specifications as key-value pairs
+    - installation_date: Installation date if mentioned
+    - last_service: Last service date if mentioned
+
+    Only include fields if they are mentioned in the text. Format dates as YYYY-MM-DD.
+    Text: {text}
+
+    Return only the JSON object, no other text."""
+
+    try:
+        response = await generate_response(prompt)
+        return json.loads(response)
+    except (json.JSONDecodeError, Exception) as e:
+        print(f"Error extracting component info: {e}")
+        return {}

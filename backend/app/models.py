@@ -19,7 +19,7 @@ class AskRequestModel(BaseModel):
     image_data: Optional[str] = Field(None, description="Optional base64 encoded image data")
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "question": "Machine keeps stopping unexpectedly",
                 "solution": {
@@ -57,7 +57,7 @@ class SolutionModel(BaseModel):
     updated_at: Optional[datetime] = Field(None, description="Last update date of the solution")
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "text": "Replace the pressure sensor and recalibrate the system",
                 "document_link": "https://docs.example.com/solutions/5023",
@@ -89,7 +89,7 @@ class SolutionResponseModel(BaseModel):
     solution: dict = Field(..., example={"id": "abc123"})
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "message": "Solution added successfully",
                 "solution": {
@@ -106,7 +106,7 @@ class QuestionModel(BaseModel):
     embedding: Optional[List[float]] = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "id": "q123",
                 "text": "How to fix error E5023?",
@@ -120,7 +120,7 @@ class Match(BaseModel):
     score: float
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "solution_id": "abc123",
                 "score": 0.95
@@ -131,7 +131,7 @@ class AskResponseModel(BaseModel):
     matches: List[Match]
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "matches": [
                     {
@@ -150,8 +150,46 @@ class ChatResponseModel(BaseModel):
     message: str
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "message": "Based on the available solutions, I recommend..."
             }
         }
+
+class InventoryBase(BaseModel):
+    solution_id: str = Field(..., description="ID of the associated solution")
+    manufacturer: str = Field(..., description="Equipment manufacturer (e.g., 'Siemens', 'ABB')")
+    model_name: str = Field(..., description="Model name/number of the equipment")
+    component_type: str = Field(..., description="Type of component (e.g., 'PLC', 'Robot', 'Drive')")
+    firmware_version: Optional[str] = Field(None, description="Firmware/software version if applicable")
+    specifications: Optional[dict] = Field(default_factory=dict, description="Technical specifications")
+    metadata: Optional[dict] = Field(default_factory=dict, description="Additional metadata like installation date, service history")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "solution_id": "abc123",
+                "manufacturer": "Siemens",
+                "model_name": "SIMATIC S7-1500",
+                "component_type": "PLC",
+                "firmware_version": "V2.9.2",
+                "specifications": {
+                    "cpu_type": "1516-3 PN/DP",
+                    "memory": "5MB work, 32MB load",
+                    "interfaces": ["PROFINET", "PROFIBUS"]
+                },
+                "metadata": {
+                    "installation_date": "2024-01-15",
+                    "last_service": "2025-05-01",
+                    "service_contract": "SLA-12345"
+                }
+            }
+        }
+
+class InventoryCreate(InventoryBase):
+    pass
+
+class Inventory(InventoryBase):
+    id: str = Field(..., description="Unique identifier for the inventory item")
+    created_at: datetime = Field(..., description="Creation timestamp")
+    updated_at: datetime = Field(..., description="Last update timestamp")

@@ -3,93 +3,117 @@
 /* tslint:disable */
 /* eslint-disable */
 export type SolutionModel = {
-    /**
-     * The solution id
-     */
-    id?: (string | null);
-    /**
-     * The solution text
-     */
-    text: string;
-    /**
-     * Link to related documentation
-     */
-    document_link?: (string | null);
-    /**
-     * Whether the solution has been verified
-     */
-    verified?: boolean;
-    /**
-     * Machine/system error code
-     */
-    error_code?: (string | null);
-    /**
-     * Name/tag of machine
-     */
-    machine_name?: (string | null);
-    /**
-     * Type of machine
-     */
-    machine_type?: (string | null);
-    /**
-     * Equipment manufacturer
-     */
-    manufacturer?: (string | null);
-    /**
-     * Specific model number
-     */
-    model_number?: (string | null);
-    /**
-     * Component involved
-     */
-    component?: (string | null);
-    /**
-     * Type of resolution
-     */
-    resolution_type?: (string | null);
-    /**
-     * Impact on machine downtime
-     */
-    downtime_impact?: (string | null);
-    /**
-     * Whether the issue has safety implications
-     */
-    safety_related?: (boolean | null);
-    /**
-     * Name of the plant
-     */
-    plant_name?: (string | null);
-    /**
-     * Department name
-     */
-    department?: (string | null);
-    /**
-     * Tags for filtering
-     */
-    tags?: (Array<string> | null);
-    /**
-     * Title of the solution
-     */
-    title?: (string | null);
-    /**
-     * Description of the solution
-     */
-    description?: (string | null);
-    /**
-     * List of solution steps
-     */
-    solution_steps?: (Array<string> | null);
-    /**
-     * Confidence of the solution
-     */
-    confidence?: (string | null);
-    /**
-     * Creation date of the solution
-     */
-    created_at?: (string | null);
-    /**
-     * Last update date of the solution
-     */
-    updated_at?: (string | null);
+  /**
+   * The solution id
+   */
+  id?: string | null;
+  /**
+   * The solution text
+   */
+  text: string;
+  /**
+   * Link to related documentation
+   */
+  document_link?: string | null;
+  /**
+   * Whether the solution has been verified
+   */
+  verified?: boolean;
+  /**
+   * Machine/system error code
+   */
+  error_code?: string | null;
+  /**
+   * Name/tag of machine
+   */
+  machine_name?: string | null;
+  /**
+   * Type of machine
+   */
+  machine_type?: string | null;
+  /**
+   * Equipment manufacturer
+   */
+  manufacturer?: string | null;
+  /**
+   * Specific model number
+   */
+  model_number?: string | null;
+  /**
+   * Component involved
+   */
+  component?: string | null;
+  /**
+   * Type of resolution
+   */
+  resolution_type?: string | null;
+  /**
+   * Impact on machine downtime
+   */
+  downtime_impact?: string | null;
+  /**
+   * Whether the issue has safety implications
+   */
+  safety_related?: boolean | null;
+  /**
+   * Name of the plant
+   */
+  plant_name?: string | null;
+  /**
+   * Department name
+   */
+  department?: string | null;
+  /**
+   * Tags for filtering
+   */
+  tags?: Array<string> | null;
+  /**
+   * Title of the solution
+   */
+  title?: string | null;
+  /**
+   * Description of the solution
+   */
+  description?: string | null;
+  /**
+   * List of solution steps
+   */
+  solution_steps?: Array<string> | null;
+  /**
+   * Confidence of the solution
+   */
+  confidence?: string | null;
+  /**
+   * Creation date of the solution
+   */
+  created_at?: string | null;
+  /**
+   * Last update date of the solution
+   */
+  updated_at?: string | null;
+  /**
+   * Model used to generate the solution
+   */
+  model_name?: string | null;
+  /**
+   * Version of the model
+   */
+  model_version?: string | null;
+  /**
+   * Model parameters used
+   */
+  model_parameters?: {
+    temperature?: number;
+    max_tokens?: number;
+    top_p?: number;
+  } | null;
+  /**
+   * Model usage metadata
+   */
+  model_metadata?: {
+    usage_type?: string;
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  } | null;
 };
-
