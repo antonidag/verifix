@@ -1,5 +1,5 @@
-import { Loader2, Search } from "lucide-react";
-import { useState } from "react";
+import { Bot, Loader2, Search } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,12 +14,17 @@ import { ImageUploadSection } from "./ImageUploadSection";
 import { KnowledgeBaseResult } from "./KnowledgeBaseResult";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { SearchSkeleton } from "./SearchSkeleton";
+import { InvestigationProgress } from "./InvestigationProgress";
 import { VoiceInput } from "./VoiceInput";
 
 export const ProblemSubmission = () => {
   const [problem, setProblem] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [detailSolution, setDetailSolution] = useState<SolutionWithMatch>(null);
+  const [isInvestigating, setIsInvestigating] = useState(false);
+  const [shouldStartInvestigation, setShouldStartInvestigation] = useState(false);
+  const [lastSearchedProblem, setLastSearchedProblem] = useState("");
+  const [lastSearchedImage, setLastSearchedImage] = useState<string | null>(null);
 
   const {
     uploadedImages,
@@ -29,20 +34,51 @@ export const ProblemSubmission = () => {
     clearImages,
   } = useImageUpload();
 
-  const { isSearching, solutions, handleSearch, clearSearch } =
+  const { isSearching, solutions, handleSearch, handleInvestigate, clearSearch } =
     useSolutionSearch();
+
+  // Watch for changes in solutions and start investigation if needed
+  useEffect(() => {
+    const startInvestigation = async () => {
+      if (shouldStartInvestigation && !isSearching && solutions.length === 0) {
+        setIsInvestigating(true);
+        setShouldStartInvestigation(false);
+        await handleInvestigate(lastSearchedProblem, lastSearchedImage);
+      }
+    };
+
+    startInvestigation();
+  }, [solutions, isSearching, shouldStartInvestigation, lastSearchedProblem, lastSearchedImage, handleInvestigate]);
+
+  // Turn off investigation state when solutions are found
+  useEffect(() => {
+    if (solutions.length > 0) {
+      setIsInvestigating(false);
+      setShouldStartInvestigation(false);
+    }
+  }, [solutions]);
 
   const handleSubmit = async () => {
     if (!problem.trim() && uploadedImages.length === 0) return;
     clearSearch();
     const imageData = await convertFirstImageToBase64();
-    handleSearch(problem, imageData);
+    
+    setIsInvestigating(false);
+    setShouldStartInvestigation(true);
+    setLastSearchedProblem(problem);
+    setLastSearchedImage(imageData);
+    
+    await handleSearch(problem, imageData);
   };
 
   const clearForm = () => {
     setProblem("");
     clearImages();
     clearSearch();
+    setIsInvestigating(false);
+    setShouldStartInvestigation(false);
+    setLastSearchedProblem("");
+    setLastSearchedImage(null);
   };
 
   return (
@@ -86,7 +122,8 @@ export const ProblemSubmission = () => {
                 onClick={handleSubmit}
                 disabled={
                   (!problem.trim() && uploadedImages.length === 0) ||
-                  isSearching
+                  isSearching ||
+                  isInvestigating
                 }
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
               >
@@ -94,6 +131,11 @@ export const ProblemSubmission = () => {
                   <>
                     <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                     Searching...
+                  </>
+                ) : isInvestigating ? (
+                  <>
+                    <Bot className="mr-2 w-4 h-4 animate-pulse" />
+                    Investigating...
                   </>
                 ) : (
                   <>
@@ -112,6 +154,7 @@ export const ProblemSubmission = () => {
             </div>
 
             {isSearching && <SearchSkeleton />}
+            {isInvestigating && <InvestigationProgress />}
 
             {solutions.map((solution) => {
               return (
