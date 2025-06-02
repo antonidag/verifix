@@ -43,9 +43,11 @@ async def process_solution_report(report: str) -> Dict[str, Any]:
     """Process a solution report and extract relevant data."""
     prompts_list = [
         ("description", f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text."),
-        ("solution_steps", f"""Read the report below and return a list of steps to solve the problem.
-The output must be a raw, minified JSON array of strings like: ["Step 1", "Step 2", "Step 3"].
-Do not include any other text, formatting, or markdown—only the JSON array.
+        ("solution_steps", f"""Extract solution steps from the report below. Return a raw JSON array.
+Format the output as a minified JSON array of strings without any spaces, like this:
+["Step 1","Step 2","Step 3"]
+Do not include any markdown formatting, backticks, newlines, or other text - ONLY the raw JSON array.
+If no steps are found, return only: []
 
 Report: {report}"""),
         ("manufacturer", f"""Based on the following report, write the manufacturer of the machine.
