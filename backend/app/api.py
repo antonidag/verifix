@@ -48,6 +48,14 @@ async def ask_question(request: AskRequestModel):
         detail="No verified solutions found. Please document your fix."
     )
 
+@router.get("/solutions/recent",
+            response_model=List[SolutionModel],
+            summary="Get recent solutions",
+            description="Retrieve the 5 most recent solutions from the database",
+            operation_id="listRecentSolutions")
+def get_recent_solutions():
+    return solutions.list_recent()
+
 @router.get("/solutions/{solution_id}",
             response_model=SolutionModel,
             summary="Get solution by ID",
@@ -56,7 +64,7 @@ async def ask_question(request: AskRequestModel):
 async def get_solution(solution_id: str):
     solution = solutions.get(solution_id)
     if not solution:
-        raise HTTPException(status_code=404, detail="Solution not found")
+        raise HTTPException(status_code=404, detail=f"Solution id: {solution_id} not found")
     return solution
 
 @router.get("/solutions",
@@ -160,7 +168,7 @@ async def get_solution_inventory(solution_id: str):
     """Get inventory information for a solution."""
     solution = solutions.get(solution_id)
     if not solution:
-        raise HTTPException(status_code=404, detail="Solution not found")
+        raise HTTPException(status_code=404, detail=f"Solution id: {solution_id} inventory not found")
 
     if not solution.get('inventory_id'):
         return None
@@ -203,11 +211,3 @@ async def solution_status(solution_id: str):
             await asyncio.sleep(2)  # Check every 2 seconds
 
     return EventSourceResponse(event_generator())
-
-@router.get("/solutions/recent",
-            response_model=List[SolutionModel],
-            summary="Get recent solutions",
-            description="Retrieve the 5 most recent solutions from the database",
-            operation_id="listRecentSolutions")
-def get_recent_solutions():
-    return solutions.list_recent()
