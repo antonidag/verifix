@@ -27,7 +27,7 @@ class SolutionModel(BaseModel):
     title: Optional[str] = Field("", description="Title of the solution")
     description: Optional[str] = Field("", description="Description of the solution")
     solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
-    status: Optional[str] = Field("analyzing", description="Current status of the investigation: analyzing, processing, identifying, validating, storing, complete, or error")
+    status: Optional[str] = Field("", description="Current status of the investigation: analyzing, processing, identifying, validating, storing, complete, or error")
     verified: bool = Field(False, description="Whether the solution has been verified")
     error_code: Optional[str] = Field("", description="Machine/system error code")
     machine_name: Optional[str] = Field("", description="Name/tag of machine")

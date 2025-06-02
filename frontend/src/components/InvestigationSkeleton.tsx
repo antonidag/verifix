@@ -19,10 +19,15 @@ interface StatusInfo {
 }
 
 const statusConfig: Record<SolutionStatus, StatusInfo> = {
+  initializing: {
+    icon: Bot,
+    message:
+      "AI Investigation initialized. Preparing to analyze problem and gather data.",
+  },
   analyzing: {
     icon: Search,
     message:
-      "GPTResearcher model is conducting comprehensive research on your problem. Using advanced LLMs to gather and analyze technical documentation and solutions.",
+      "GPTResearcher agent is conducting comprehensive research on your problem. Using advanced LLMs to gather and analyze technical documentation and solutions.",
   },
   processing: {
     icon: BookOpen,
@@ -57,10 +62,10 @@ const statusConfig: Record<SolutionStatus, StatusInfo> = {
 };
 
 interface Props {
-  status?: SolutionStatus | null;
+  status: SolutionStatus;
 }
 
-export const InvestigationSkeleton = ({ status = "analyzing" }: Props) => {
+export const InvestigationSkeleton = ({ status }: Props) => {
   const steps: SolutionStatus[] = [
     "analyzing",
     "processing",
@@ -68,13 +73,13 @@ export const InvestigationSkeleton = ({ status = "analyzing" }: Props) => {
     "validating",
     "storing",
   ];
-  const currentStepIndex = steps.indexOf(status as SolutionStatus);
+  const currentStepIndex = steps.indexOf(status);
   const progress =
-    status === "complete"
-      ? 100
-      : status === "error"
+    status === "initializing" || status === "error"
       ? 0
-      : Math.round(((currentStepIndex + 1) / (steps.length + 1)) * 100);
+      : status === "complete"
+      ? 100
+      : Math.round(((currentStepIndex + 0.5) / steps.length) * 100);
 
   return (
     <div className="mt-8 p-6 bg-gradient-to-r from-slate-50 to-orange-50 rounded-lg border border-slate-200 animate-fade-in">
@@ -110,9 +115,7 @@ export const InvestigationSkeleton = ({ status = "analyzing" }: Props) => {
                 })()}
               </div>
             )}
-            <span className="flex-1">
-              {statusConfig[status]?.message || "Starting investigation..."}
-            </span>
+            <span className="flex-1">{statusConfig[status].message}</span>
           </div>
         </div>
       </div>
@@ -133,7 +136,9 @@ export const InvestigationSkeleton = ({ status = "analyzing" }: Props) => {
               <div
                 key={step}
                 className={`flex-1 flex flex-col items-center ${
-                  currentStepIndex >= index ? "text-orange-600 font-medium" : "text-slate-500"
+                  currentStepIndex >= index
+                    ? "text-orange-600 font-medium"
+                    : "text-slate-500"
                 }`}
               >
                 <div
@@ -145,7 +150,9 @@ export const InvestigationSkeleton = ({ status = "analyzing" }: Props) => {
                       : "bg-slate-300"
                   }`}
                 />
-                <span className="text-xs text-center capitalize whitespace-nowrap">{step}</span>
+                <span className="text-xs text-center capitalize whitespace-nowrap">
+                  {step}
+                </span>
               </div>
             ))}
           </div>

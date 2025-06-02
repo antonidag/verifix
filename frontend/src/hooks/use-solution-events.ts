@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+
 import { SolutionModel, InventoryBase } from "@/api-client";
-import { api } from "@/api/apiClient";
 import { toast } from "@/hooks/use-toast";
 
 export type SolutionStatus =
+  | "initializing"
   | "analyzing"
   | "processing"
   | "identifying"
@@ -21,10 +22,13 @@ export const useSolutionEvents = (
   solutionId: string,
   onSolutionReady: SolutionEventCallback
 ) => {
-  const [status, setStatus] = useState<SolutionStatus>("analyzing");
+  const [status, setStatus] = useState<SolutionStatus>("initializing");
 
   useEffect(() => {
-    if (!solutionId) return;
+    if (!solutionId) {
+      setStatus("initializing");
+      return;
+    }
 
     const eventSource = new EventSource(
       `/api/v1/solutions/${solutionId}/status`
@@ -81,9 +85,5 @@ export const useSolutionEvents = (
     };
   }, [solutionId, onSolutionReady]);
 
-  return {
-    status,
-    isComplete: status === "complete",
-    isError: status === "error",
-  };
+  return { status };
 };
