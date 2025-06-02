@@ -154,14 +154,19 @@ async def chat(data: AskRequestModel):
 @router.get("/solutions/{solution_id}/inventory",
             response_model=InventoryBase,
             summary="Get inventory information for a solution",
-            description="Retrieve inventory data associated with a specific solution",
+            description="Retrieve inventory data associated with a solution",
             operation_id="getSolutionInventory")
 async def get_solution_inventory(solution_id: str):
     """Get inventory information for a solution."""
-    inventory_data = inventory.get_by_solution_id(solution_id)
-    if not inventory_data:
-        raise HTTPException(status_code=404, detail="Inventory not found")
-    return inventory_data
+    solution = solutions.get(solution_id)
+    if not solution:
+        raise HTTPException(status_code=404, detail="Solution not found")
+
+    if not solution.get('inventory_id'):
+        return None
+
+    inventory_item = inventory.get(solution['inventory_id'])
+    return inventory_item
 
 @router.get("/solutions/{solution_id}/status")
 async def solution_status(solution_id: str):
@@ -170,13 +175,19 @@ async def solution_status(solution_id: str):
         while True:
             solution = solutions.get(solution_id)
             if solution and solution.get('description'):
+                # Fetch inventory data if available
+                inventory_data = None
+                if solution.get('inventory_id'):
+                    inventory_data = inventory.get(solution['inventory_id'])
+
                 # Solution is ready
                 yield {
                     "event": "solution_ready",
                     "data": json.dumps({
                         "id": solution_id,
                         "status": "ready",
-                        "solution": solution
+                        "solution": solution,
+                        "inventory": inventory_data
                     })
                 }
                 break

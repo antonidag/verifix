@@ -88,7 +88,7 @@ export const KnowledgeBaseResult = ({
             <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium text-slate-800">
-                  Component Details:
+                  Component Details
                 </h4>
                 {solution.inventory.manufacturer && (
                   <Badge variant="outline" className="bg-slate-100">
@@ -141,7 +141,7 @@ export const KnowledgeBaseResult = ({
                   ([key, value]) => (
                     <div key={key}>
                       <span className="text-slate-500">{key}:</span>
-                      <p className="text-slate-800">{value}</p>
+                      <p className="text-slate-800">{String(value)}</p>
                     </div>
                   )
                 )}
@@ -174,6 +174,7 @@ export const KnowledgeBaseResult = ({
               )}
             </div>
           )}
+
           <p className="text-slate-700 mb-4">
             <Markdown>{solution.description}</Markdown>
           </p>

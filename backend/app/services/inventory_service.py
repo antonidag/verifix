@@ -59,5 +59,4 @@ async def store_model_info(solution_id: str, solution_data: Dict[str, Any]) -> s
             'last_service': component_info.get('last_service')
         }
     }
-    inventory.create(inventory_data)
-    return
+    return inventory.create(inventory_data)

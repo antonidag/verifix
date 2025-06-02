@@ -19,11 +19,14 @@ async def process_research_report(question: str, researcher: GPTResearcher, solu
         # Generate confidence score
         solution_data['confidence'] = await generate_confidence_score(solution_data)
 
-        await store_model_info(solution_id, solution_data)
+        inventory_id = await store_model_info(solution_id, solution_data)
+        solution_data['inventory_id'] = inventory_id
+
         embedding = embed_text(question)
         questions.create({
             'text': question,
             'solution_id': solution_id,
+            'inventory_id': inventory_id,
             'embedding': embedding
         })
         solutions.update(solution_id, solution_data)

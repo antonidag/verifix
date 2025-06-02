@@ -117,7 +117,8 @@ class FirestoreQuestion:
 
         doc_ref.set({
             **question_data,
-            'created_at': datetime.utcnow()
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow(),
         })
         return doc_ref.id
 
@@ -136,13 +137,13 @@ class FirestoreQuestion:
         docs = self.collection.stream()
         return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
 
-    def find_similar(self, embedding, limit: int = 5, min_score: float = 0.5) -> List[Dict[str, Any]]:
+    def find_similar(self, embedding, limit: int = 5, min_score: float = 0.75) -> List[Dict[str, Any]]:
         """Find most similar questions using cosine similarity.
 
         Args:
             embedding: The query embedding to compare against
             limit: Maximum number of results to return (default: 5)
-            min_score: Minimum similarity score to include in results (default: 0.5)
+            min_score: Minimum similarity score to include in results (default: 0.75)
 
         Returns:
             List of matches sorted by similarity score (highest first)
@@ -222,13 +223,14 @@ class FirestoreInventory:
         docs = self.collection.stream()
         return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
 
-    def get_by_solution_id(self, solution_id: str) -> Optional[Dict[str, Any]]:
-        """Get the inventory item associated with a solution"""
-        docs = self.collection.where('solution_id', '==', solution_id).limit(1).stream()
-        first_doc = next(docs, None)
-        if first_doc:
-            return self._serialize_datetime({**first_doc.to_dict(), 'id': first_doc.id})
-        return None
+    def get_multiple(self, inventory_ids: List[str]) -> List[Dict[str, Any]]:
+        """Get multiple inventory items by their IDs"""
+        results = []
+        for inventory_id in inventory_ids:
+            inventory_item = self.get(inventory_id)
+            if inventory_item:
+                results.append(inventory_item)
+        return results
 
 # Create instances for global use
 solutions = FirestoreSolution()

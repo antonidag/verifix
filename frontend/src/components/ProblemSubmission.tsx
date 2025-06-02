@@ -11,6 +11,7 @@ import {
 } from "@/hooks/use-solution-search";
 
 import { ImageUploadSection } from "./ImageUploadSection";
+import { InvestigationSkeleton } from "./InvestigationSkeleton";
 import { KnowledgeBaseResult } from "./KnowledgeBaseResult";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { SearchSkeleton } from "./SearchSkeleton";
@@ -29,14 +30,25 @@ export const ProblemSubmission = () => {
     clearImages,
   } = useImageUpload();
 
-  const { isSearching, solutions, handleSearch, clearSearch } =
-    useSolutionSearch();
+  const {
+    isSearching,
+    isInvestigating,
+    solutions,
+    handleSearch,
+    clearSearch,
+    handleInvestigate,
+  } = useSolutionSearch();
 
   const handleSubmit = async () => {
     if (!problem.trim() && uploadedImages.length === 0) return;
     clearSearch();
     const imageData = await convertFirstImageToBase64();
     handleSearch(problem, imageData);
+  };
+
+  const handleInvestigationStart = async () => {
+    const imageData = await convertFirstImageToBase64();
+    handleInvestigate(problem, imageData);
   };
 
   const clearForm = () => {
@@ -86,7 +98,8 @@ export const ProblemSubmission = () => {
                 onClick={handleSubmit}
                 disabled={
                   (!problem.trim() && uploadedImages.length === 0) ||
-                  isSearching
+                  isSearching ||
+                  isInvestigating
                 }
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
               >
@@ -94,6 +107,11 @@ export const ProblemSubmission = () => {
                   <>
                     <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                     Searching...
+                  </>
+                ) : isInvestigating ? (
+                  <>
+                    <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                    Investigating...
                   </>
                 ) : (
                   <>
@@ -113,25 +131,31 @@ export const ProblemSubmission = () => {
 
             {isSearching && <SearchSkeleton />}
 
-            {solutions.map((solution) => {
-              return (
-                <KnowledgeBaseResult
-                  key={solution.id}
-                  solution={solution}
-                  onViewDetails={(solution) => {
-                    setIsDetailModalOpen(true);
-                    setDetailSolution(solution);
-                  }}
-                />
-              );
-            })}
+            {isInvestigating && <InvestigationSkeleton />}
 
             {solutions.length > 0 && (
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600">
-                  {solutions.length}
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-semibold">Search Results</h2>
+                  <button
+                    onClick={handleInvestigationStart}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Start AI Investigation
+                  </button>
                 </div>
-                <div className="text-sm text-blue-700">Match Found</div>
+                {solutions.map((solution) => {
+                  return (
+                    <KnowledgeBaseResult
+                      key={solution.id}
+                      solution={solution}
+                      onViewDetails={(solution) => {
+                        setIsDetailModalOpen(true);
+                        setDetailSolution(solution);
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
           </CardContent>
