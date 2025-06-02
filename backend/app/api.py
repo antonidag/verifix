@@ -8,7 +8,7 @@ from gpt_researcher import GPTResearcher
 from services.question_service import prepare_question, find_existing_solution
 from services.research_service import (process_research_report)
 from models import (
-    AskResponseModel, AskRequestModel, SolutionRequest, SolutionResponseModel,
+    AskResponseModel, AskRequestModel, SolutionResponseModel,
     SolutionModel, QuestionModel, ChatResponseModel, InventoryBase
 )
 from db import solutions, questions, inventory

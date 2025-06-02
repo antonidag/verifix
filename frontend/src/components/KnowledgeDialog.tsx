@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   Bot,
+  CheckCircle,
   Copy,
   Database,
   ExternalLink,
@@ -88,6 +89,104 @@ export const KnowledgeDialog = ({
                 {tag}
               </Badge>
             ))}
+          </div>
+
+          {/* Technical Details */}
+          <div>
+            <h3 className="font-semibold text-slate-800 mb-3">
+              Technical Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {solution.error_code && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Error Code</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.error_code}
+                  </div>
+                </div>
+              )}
+              {solution.machine_name && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Machine Name</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.machine_name}
+                  </div>
+                </div>
+              )}
+              {solution.machine_type && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Machine Type</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.machine_type}
+                  </div>
+                </div>
+              )}
+              {solution.manufacturer && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Manufacturer</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.manufacturer}
+                  </div>
+                </div>
+              )}
+              {solution.model_number && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Model Number</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.model_number}
+                  </div>
+                </div>
+              )}
+              {solution.component && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Component</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.component}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Operational Details */}
+          <div>
+            <h3 className="font-semibold text-slate-800 mb-3">
+              Operational Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {solution.resolution_type && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Resolution Type</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.resolution_type}
+                  </div>
+                </div>
+              )}
+              {solution.downtime_impact && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Downtime Impact</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.downtime_impact}
+                  </div>
+                </div>
+              )}
+              {solution.created_at && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Created At</div>
+                  <div className="font-medium text-slate-800">
+                    {new Date(solution.created_at).toLocaleString()}
+                  </div>
+                </div>
+              )}
+              {solution.updated_at && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Last Updated</div>
+                  <div className="font-medium text-slate-800">
+                    {new Date(solution.updated_at).toLocaleString()}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Description */}

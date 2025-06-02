@@ -13,6 +13,22 @@ export type SolutionModel = {
      */
     text: string;
     /**
+     * Confidence of the solution
+     */
+    confidence?: (string | null);
+    /**
+     * Title of the solution
+     */
+    title?: (string | null);
+    /**
+     * Description of the solution
+     */
+    description?: (string | null);
+    /**
+     * List of solution steps
+     */
+    solution_steps?: (Array<string> | null);
+    /**
      * Whether the solution has been verified
      */
     verified?: boolean;
@@ -49,41 +65,13 @@ export type SolutionModel = {
      */
     downtime_impact?: (string | null);
     /**
-     * Whether the issue has safety implications
-     */
-    safety_related?: (boolean | null);
-    /**
-     * Name of the plant
-     */
-    plant_name?: (string | null);
-    /**
-     * Department name
-     */
-    department?: (string | null);
-    /**
      * Tags for filtering
      */
     tags?: (Array<string> | null);
     /**
-     * Title of the solution
-     */
-    title?: (string | null);
-    /**
-     * Description of the solution
-     */
-    description?: (string | null);
-    /**
-     * List of solution steps
-     */
-    solution_steps?: (Array<string> | null);
-    /**
      * Links to related documentation and resources
      */
     links?: (Array<LinkModel> | null);
-    /**
-     * Confidence of the solution
-     */
-    confidence?: (string | null);
     /**
      * Creation date of the solution
      */

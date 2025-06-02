@@ -23,6 +23,10 @@ class AskRequestModel(BaseModel):
 class SolutionModel(BaseModel):
     id: Optional[str] = Field(None, description="The solution id")
     text: str = Field(..., description="The solution text")
+    confidence: Optional[str] = Field("", description="Confidence of the solution")
+    title: Optional[str] = Field("", description="Title of the solution")
+    description: Optional[str] = Field("", description="Description of the solution")
+    solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
     verified: bool = Field(False, description="Whether the solution has been verified")
     error_code: Optional[str] = Field("", description="Machine/system error code")
     machine_name: Optional[str] = Field("", description="Name/tag of machine")
@@ -32,15 +36,8 @@ class SolutionModel(BaseModel):
     component: Optional[str] = Field("", description="Component involved")
     resolution_type: Optional[str] = Field(None, description="Type of resolution")
     downtime_impact: Optional[str] = Field(None, description="Impact on machine downtime")
-    safety_related: Optional[bool] = Field(False, description="Whether the issue has safety implications")
-    plant_name: Optional[str] = Field("", description="Name of the plant")
-    department: Optional[str] = Field("", description="Department name")
     tags: Optional[List[str]] = Field(default_factory=list, description="Tags for filtering")
-    title: Optional[str] = Field("", description="Title of the solution")
-    description: Optional[str] = Field("", description="Description of the solution")
-    solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
     links: Optional[List[LinkModel]] = Field(default_factory=list, description="Links to related documentation and resources")
-    confidence: Optional[str] = Field("", description="Confidence of the solution")
     created_at: Optional[datetime] = Field(None, description="Creation date of the solution")
     updated_at: Optional[datetime] = Field(None, description="Last update date of the solution")
 
@@ -56,7 +53,6 @@ class SolutionModel(BaseModel):
                 "component": "Pressure Sensor",
                 "resolution_type": "Corrective",
                 "downtime_impact": "High",
-                "safety_related": True,
                 "description": "Issue with pressure sensor readings",
                 "solution_steps": [
                     "1. Power down the system",

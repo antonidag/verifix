@@ -87,7 +87,7 @@ If it cannot be determined, return N/A.
 Report: {report}"""),
         ("links", f"""Extract relevant documentation links from the following report.
 Return only a JSON array of objects with 'title' and 'url' properties.
-Example: [{"title": "User Manual", "url": "https://..."}, {"title": "Technical Guide", "url": "https://..."}]
+Example: [{{"title": "User Manual", "url": "https://..."}}, {{"title": "Technical Guide", "url": "https://..."}}]
 If no links are found, return an empty array [].
 
 Report: {report}""")
