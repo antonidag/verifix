@@ -12,22 +12,22 @@ export interface SolutionWithMatch extends SolutionModel {
 
 export const useSolutionSearch = () => {
   const [isSearching, setIsSearching] = useState(false);
-  const [isInvestigating, setIsInvestigating] = useState(false);
   const [solutions, setSolutions] = useState<SolutionWithMatch[]>([]);
   const [solutionId, setSolutionId] = useState<string | null>(null);
 
-  useSolutionEvents(solutionId, (solution, inventory) => {
-    setSolutionId(null);
-    setIsInvestigating(false);
-    setIsSearching(false);
-    setSolutions([
-      {
-        ...solution,
-        matchScore: "1.0", // AI-generated solutions get full confidence
-        inventory: inventory,
-      },
-    ]);
-  });
+  const { status, isComplete } = useSolutionEvents(
+    solutionId,
+    (solution, inventory) => {
+      setSolutionId(null);
+      setSolutions([
+        {
+          ...solution,
+          matchScore: "1.0", // AI-generated solutions get full confidence
+          inventory: inventory,
+        },
+      ]);
+    }
+  );
 
   const handleSearch = async (problem: string, imageData: string | null) => {
     if (!problem.trim() && !imageData) return;
@@ -89,8 +89,8 @@ export const useSolutionSearch = () => {
     imageData: string | null
   ) => {
     if (!problem.trim() && !imageData) return;
-    clearSearch();
-    setIsInvestigating(true);
+    setSolutions([]);
+    setIsSearching(false);
 
     try {
       const result = await api.default.investigate({
@@ -107,7 +107,6 @@ export const useSolutionSearch = () => {
         description: "Failed to start investigation. Please try again.",
         variant: "destructive",
       });
-      setIsInvestigating(false);
     }
   };
 
@@ -115,12 +114,12 @@ export const useSolutionSearch = () => {
     setSolutionId(null);
     setSolutions([]);
     setIsSearching(false);
-    setIsInvestigating(false);
   };
 
   return {
     isSearching,
-    isInvestigating,
+    isInvestigating: Boolean(solutionId) && !isComplete,
+    investigationStatus: solutionId ? status : null,
     solutions,
     handleSearch,
     handleInvestigate,

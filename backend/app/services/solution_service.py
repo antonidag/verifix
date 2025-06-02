@@ -43,48 +43,55 @@ async def process_solution_report(report: str) -> Dict[str, Any]:
     """Process a solution report and extract relevant data."""
     prompts_list = [
         ("description", f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text."),
-        ("solution_steps", f"""Extract solution steps from the report below. Return a raw JSON array.
-Format the output as a minified JSON array of strings without any spaces, like this:
-["Step 1","Step 2","Step 3"]
-Do not include any markdown formatting, backticks, newlines, or other text - ONLY the raw JSON array.
-If no steps are found, return only: []
+        ("solution_steps", f"""Extract solution steps from the report below. Format each step as a clear, complete sentence.
+Return a properly formatted JSON array of strings, with normal spacing and punctuation.
+Example of good formatting:
+["1. Step 1.",
+ "2. Step 2.",
+ "3. Step 3."]
+Do not include any markdown formatting.
+Return only the JSON array, no other text or formatting. If no steps are found, return: []
 
 Report: {report}"""),
-        ("manufacturer", f"""Based on the following report, write the manufacturer of the machine.
-Only return the manufacturer name as a string (e.g., "Siemens").
-If the manufacturer cannot be confidently determined, return "N/A".
-Do not include any other text, explanation, or formatting.
+        ("manufacturer", f"""Extract the manufacturer name from this report.
+Return ONLY the manufacturer name with no additional text or formatting.
+Example good responses: "Siemens" or "N/A"
+Do not include quotes, explanations, or any other text.
 
 Report: {report}"""),
-        ("machine_name", f"""Extract the machine name from the following report.
-Return only the machine name, and nothing else.
-If it cannot be determined, return N/A.
+        ("machine_name", f"""Extract the machine name from this report.
+Return ONLY the machine name with no additional text or formatting.
+Example good responses: "CNC Mill 2000" or "N/A"
+Do not include quotes, explanations, or any other text.
 
 Report: {report}"""),
-        ("model_number", f"""Extract the model number of the machine from the following report.
-Return only the model number, and nothing else.
-If it cannot be determined, return N/A.
+        ("model_number", f"""Extract the model number from this report.
+Return ONLY the model number with no additional text or formatting.
+Example good responses: "XJ-2500" or "N/A"
+Do not include quotes, explanations, or any other text.
 
 Report: {report}"""),
-        ("error_code", f"""Based on the following report, write the error code of the machine.
-Only return the error code as a string (e.g., "E101").
-If you cannot confidently determine the error code from the report, return "N/A".
-Do not include any other text, explanation, or formatting.
+        ("error_code", f"""Extract the error code from this report.
+Return ONLY the error code with no additional text or formatting.
+Example good responses: "E101" or "N/A"
+Do not include quotes, explanations, or any other text.
 
 Report: {report}"""),
-        ("component", f"""Extract the component of the machine from the following report.
-Return only the component name, and nothing else.
-If it cannot be determined, return N/A.
+        ("component", f"""Extract the affected component from this report.
+Return ONLY the component name with no additional text or formatting.
+Example good responses: "Hydraulic Pump" or "N/A"
+Do not include quotes, explanations, or any other text.
 
 Report: {report}"""),
-        ("resolution_type", f"""Extract the resolution type from the following report.
-Return only the resolution type, and nothing else.
-If it cannot be determined, return N/A.
+        ("resolution_type", f"""Extract the resolution type from this report.
+Return ONLY the resolution type with no additional text or formatting.
+Example good responses: "Hardware Fix" or "Software Update" or "N/A"
+Do not include quotes, explanations, or any other text.
 
 Report: {report}"""),
-        ("downtime_impact", f"""Extract the downtime impact of the machine from the following report.
-Return only the downtime impact (e.g. High, Medium, Low), and nothing else.
-If it cannot be determined, return N/A.
+        ("downtime_impact", f"""Extract the downtime impact level from this report.
+Return ONLY one of these values: High, Medium, Low, N/A
+Do not include quotes, explanations, or any other text.
 
 Report: {report}"""),
         ("links", f"""Extract relevant documentation links from the following report. Return a raw JSON array.
@@ -111,6 +118,7 @@ Report: {report}""")
         if not isinstance(solution_steps, list):
             solution_steps = ["Could not parse solution steps - invalid format"]
     except json.JSONDecodeError:
+        print("Error parsing solution steps:", extracted_data['solution_steps'])
         solution_steps = ["Could not parse solution steps"]
 
     # Handle links parsing with fallback
@@ -119,6 +127,7 @@ Report: {report}""")
         if not isinstance(links, list):
             links = []
     except json.JSONDecodeError:
+        print("Error parsing links:", extracted_data['links'])
         links = []
 
     return {

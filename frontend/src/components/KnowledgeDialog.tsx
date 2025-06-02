@@ -192,9 +192,9 @@ export const KnowledgeDialog = ({
           {/* Description */}
           <DialogDescription>
             <h3 className="font-semibold text-slate-800 mb-2">Description</h3>
-            <p className="text-slate-700">
+            <div className="text-slate-700">
               <Markdown>{solution.description}</Markdown>
-            </p>
+            </div>
           </DialogDescription>
 
           {/* Detailed Steps */}

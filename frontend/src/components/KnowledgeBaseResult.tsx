@@ -50,33 +50,37 @@ export const KnowledgeBaseResult = ({
           )}
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2 flex-wrap md:flex-nowrap overflow-x-auto">
-            <h3 className="font-semibold text-slate-800 min-w-0 truncate flex-shrink">
+          <div className="space-y-2 mb-4">
+            <h3 className="font-semibold text-slate-800 break-words">
               {solution.title}
             </h3>
-            <div className="flex items-center gap-2 flex-nowrap flex-shrink-0">
+            <div className="flex flex-wrap gap-2">
               <Badge
                 variant="secondary"
-                className={getBadgeColors(solution.matchScore)}
+                className={`${getBadgeColors(
+                  solution.matchScore
+                )} whitespace-nowrap`}
               >
                 {getMatchScorePercentage(solution.matchScore)}% match
               </Badge>
               <Badge
                 variant="secondary"
-                className={
+                className={`whitespace-nowrap ${
                   solution.verified
                     ? "bg-blue-100 text-blue-700"
                     : "bg-orange-100 text-orange-700"
-                }
+                }`}
               >
                 {solution.confidence || "0"}% confidence
               </Badge>
               {solution.verified ? (
-                <Badge className="bg-blue-100 text-blue-700">Verified</Badge>
+                <Badge className="bg-blue-100 text-blue-700 whitespace-nowrap">
+                  Verified
+                </Badge>
               ) : (
                 <Badge
                   variant="secondary"
-                  className="bg-orange-100 text-orange-700"
+                  className="bg-orange-100 text-orange-700 whitespace-nowrap"
                 >
                   AI Generated
                 </Badge>
@@ -175,9 +179,9 @@ export const KnowledgeBaseResult = ({
             </div>
           )}
 
-          <p className="text-slate-700 mb-4">
+          <div className="text-slate-700 mb-4">
             <Markdown>{solution.description}</Markdown>
-          </p>
+          </div>
           {/* Solution Steps Preview */}
           <div className="bg-white/70 p-4 rounded-lg mb-4">
             <h4 className="font-medium text-slate-800 mb-2">Solution Steps:</h4>

@@ -27,6 +27,7 @@ class SolutionModel(BaseModel):
     title: Optional[str] = Field("", description="Title of the solution")
     description: Optional[str] = Field("", description="Description of the solution")
     solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
+    status: Optional[str] = Field("analyzing", description="Current status of the investigation: analyzing, processing, identifying, validating, storing, complete, or error")
     verified: bool = Field(False, description="Whether the solution has been verified")
     error_code: Optional[str] = Field("", description="Machine/system error code")
     machine_name: Optional[str] = Field("", description="Name/tag of machine")
@@ -38,6 +39,7 @@ class SolutionModel(BaseModel):
     downtime_impact: Optional[str] = Field(None, description="Impact on machine downtime")
     tags: Optional[List[str]] = Field(default_factory=list, description="Tags for filtering")
     links: Optional[List[LinkModel]] = Field(default_factory=list, description="Links to related documentation and resources")
+    inventory_id: Optional[str] = Field(None, description="ID of the associated inventory item")
     created_at: Optional[datetime] = Field(None, description="Creation date of the solution")
     updated_at: Optional[datetime] = Field(None, description="Last update date of the solution")
 
@@ -140,7 +142,6 @@ class ChatResponseModel(BaseModel):
         }
 
 class InventoryBase(BaseModel):
-    solution_id: str = Field(..., description="ID of the associated solution")
     manufacturer: str = Field(..., description="Equipment manufacturer (e.g., 'Siemens', 'ABB')")
     model_name: str = Field(..., description="Model name/number of the equipment")
     component_type: str = Field(..., description="Type of component (e.g., 'PLC', 'Robot', 'Drive')")

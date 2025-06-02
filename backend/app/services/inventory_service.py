@@ -33,20 +33,10 @@ async def extract_component_info(text: str) -> Dict[str, Any]:
         print(f"Error extracting component info: {e}")
         return {}
 
-async def store_model_info(solution_id: str, solution_data: Dict[str, Any]) -> str:
-    """Store component/machine model information in the inventory collection.
-
-    Args:
-        solution_id: The ID of the solution this inventory is associated with
-        solution_data: Dictionary containing the solution data with component info
-
-    Returns:
-        The ID of the created inventory record
-    """
+async def store_model_info(solution_data: Dict[str, Any]) -> str:
     component_info = await extract_component_info(solution_data.get('text', ''))
 
     inventory_data = {
-        'solution_id': solution_id, # TODO: Remove this field
         'manufacturer': solution_data.get('manufacturer', component_info.get('manufacturer', 'Unknown')),
         'model_name': component_info.get('model_name', 'Unknown'),
         'component_type': solution_data.get('component', component_info.get('component_type', 'Unknown')),

@@ -167,11 +167,8 @@ async def chat(data: AskRequestModel):
 async def get_solution_inventory(solution_id: str):
     """Get inventory information for a solution."""
     solution = solutions.get(solution_id)
-    if not solution:
+    if not solution or not solution.get('inventory_id'):
         raise HTTPException(status_code=404, detail=f"Solution id: {solution_id} inventory not found")
-
-    if not solution.get('inventory_id'):
-        return None
 
     inventory_item = inventory.get(solution['inventory_id'])
     return inventory_item
@@ -180,34 +177,47 @@ async def get_solution_inventory(solution_id: str):
 async def solution_status(solution_id: str):
     """Get solution status via Server-Sent Events."""
     async def event_generator():
+        last_status = None
         while True:
             solution = solutions.get(solution_id)
-            if solution and solution.get('description'):
-                # Fetch inventory data if available
-                inventory_data = None
-                if solution.get('inventory_id'):
-                    inventory_data = inventory.get(solution['inventory_id'])
-
-                # Solution is ready
+            if not solution:
                 yield {
-                    "event": "solution_ready",
+                    "event": "error",
                     "data": json.dumps({
                         "id": solution_id,
-                        "status": "ready",
-                        "solution": solution,
-                        "inventory": inventory_data
+                        "status": "error",
+                        "error": "Solution not found"
                     })
                 }
                 break
-            else:
-                # Solution still processing
-                yield {
-                    "event": "processing",
-                    "data": json.dumps({
-                        "id": solution_id,
-                        "status": "processing"
-                    })
+
+            current_status = solution.get('status')
+            if current_status != last_status:
+                # Send the new status
+                data = {
+                    "id": solution_id,
+                    "status": current_status
                 }
-            await asyncio.sleep(2)  # Check every 2 seconds
+
+                # Include solution data if complete
+                if current_status == 'complete':
+                    inventory_data = None
+                    if solution.get('inventory_id'):
+                        inventory_data = inventory.get(solution['inventory_id'])
+                    data["solution"] = solution
+                    data["inventory"] = inventory_data
+
+                yield {
+                    "event": current_status,
+                    "data": json.dumps(data)
+                }
+
+                # Break the loop if we're in a final state
+                if current_status in ['complete', 'error']:
+                    break
+
+                last_status = current_status
+
+            await asyncio.sleep(1)  # Check every second
 
     return EventSourceResponse(event_generator())
