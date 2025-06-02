@@ -37,7 +37,8 @@ COPY backend/app/ ./app
 COPY --from=build-frontend /frontend/dist ./app/static
 
 # Set environment variables
-ENV FAST_LLM=google_vertexai:gemini-2.5-flash-preview-05-20 \
+ENV RETRIEVER=google \
+    FAST_LLM=google_vertexai:gemini-2.5-flash-preview-05-20 \
     SMART_LLM=google_vertexai:gemini-2.5-pro-preview-05-06 \
     STRATEGIC_LLM=google_vertexai:gemini-2.5-pro-preview-05-06 \
     EMBEDDING=google_vertexai:text-embedding-004 \
