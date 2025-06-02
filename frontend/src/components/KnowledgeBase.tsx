@@ -1,6 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, CheckCircle, Clock, Database, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Database,
+  TrendingUp,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { Button } from "./ui/button";
@@ -9,15 +15,15 @@ import { api } from "@/api/apiClient";
 
 export const KnowledgeBase = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedSolution, setSelectedSolution] = useState<SolutionModel | null>(null);
+  const [selectedSolution, setSelectedSolution] =
+    useState<SolutionModel | null>(null);
   const [solutions, setSolutions] = useState<SolutionModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     const fetchSolutions = async () => {
       try {
-        const apiSolutions = await api.default.listSolutions();
-        setSolutions(apiSolutions);
+        const recentSolutions = await api.default.listRecentSolutions();
+        setSolutions(recentSolutions);
       } catch (error) {
         console.error("Error fetching solutions:", error);
       } finally {
@@ -36,8 +42,12 @@ export const KnowledgeBase = () => {
   return (
     <section id="knowledge" className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-slate-800 mb-4">Knowledge Base</h2>
-        <p className="text-slate-600">Self-learning system that grows smarter over time</p>
+        <h2 className="text-3xl font-bold text-slate-800 mb-4">
+          Knowledge Base
+        </h2>
+        <p className="text-slate-600">
+          Self-learning system that grows smarter over time
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -46,14 +56,21 @@ export const KnowledgeBase = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="w-5 h-5 text-blue-600" />
-                Recent Solutions
+                Latest Solutions
+                <span className="text-sm font-normal text-slate-500">
+                  (Most Recent 5)
+                </span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoading ? (
-                <div className="text-center py-8 text-slate-500">Loading solutions...</div>
+                <div className="text-center py-8 text-slate-500">
+                  Loading solutions...
+                </div>
               ) : solutions.length === 0 ? (
-                <div className="text-center py-8 text-slate-500">No solutions found</div>
+                <div className="text-center py-8 text-slate-500">
+                  No solutions found
+                </div>
               ) : (
                 solutions.map((solution) => (
                   <div
@@ -62,7 +79,9 @@ export const KnowledgeBase = () => {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-slate-800">{solution.title}</h3>
+                        <h3 className="font-semibold text-slate-800">
+                          {solution.title}
+                        </h3>
                         {solution.verified ? (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
@@ -115,19 +134,23 @@ export const KnowledgeBase = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600">{solutions.length}</div>
-                <div className="text-sm text-blue-700">Total Solutions</div>
+                <div className="text-3xl font-bold text-blue-600">
+                  {solutions.length}
+                </div>
+                <div className="text-sm text-blue-700">Recent Solutions</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-green-600">
                   {solutions.length > 0
                     ? Math.round(
-                        (solutions.filter((s) => s.verified).length / solutions.length) * 100
+                        (solutions.filter((s) => s.verified).length /
+                          solutions.length) *
+                          100
                       )
                     : 0}
                   %
                 </div>
-                <div className="text-sm text-green-700">Verified Solutions</div>
+                <div className="text-sm text-green-700">Verified</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600">
@@ -140,7 +163,9 @@ export const KnowledgeBase = () => {
                     }).length
                   }
                 </div>
-                <div className="text-sm text-purple-700">Solutions Added Today</div>
+                <div className="text-sm text-purple-700">
+                  Solutions Added Today
+                </div>
               </div>
             </CardContent>
           </Card>

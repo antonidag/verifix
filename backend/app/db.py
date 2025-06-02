@@ -1,7 +1,8 @@
 from google.cloud import firestore
 from datetime import datetime
-import os
 from typing import Optional, Dict, List, Any
+from utils import parse_json_field, serialize_datetime
+import os
 import json
 import numpy as np
 
@@ -21,14 +22,6 @@ def init():
 class FirestoreSolution:
     def __init__(self):
         self.collection = get_db().collection('solutions')
-
-    def _serialize_datetime(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Convert Firestore datetime objects to ISO format strings"""
-        result = data.copy()
-        for key, value in result.items():
-            if hasattr(value, 'isoformat'):  # Check if it's any datetime-like object
-                result[key] = value.isoformat()
-        return result
 
     def create(self, solution_data: Dict[str, Any]) -> str:
         """Create a new solution document"""
@@ -55,12 +48,9 @@ class FirestoreSolution:
         if doc.exists:
             data = doc.to_dict()
             data['id'] = doc.id
-            # Convert stored JSON strings back to lists
-            if 'solution_steps' in data and isinstance(data['solution_steps'], str):
-                data['solution_steps'] = json.loads(data['solution_steps'])
-            if 'tags' in data and isinstance(data['tags'], str):
-                data['tags'] = json.loads(data['tags'])
-            return self._serialize_datetime(data)
+            data['solution_steps'] = parse_json_field(data, 'solution_steps')
+            data['tags'] = parse_json_field(data, 'tags')
+            return serialize_datetime(data)
         return None
 
     def list_all(self) -> List[Dict[str, Any]]:
@@ -71,12 +61,25 @@ class FirestoreSolution:
             print(f"Processing document: {doc.id}")
             data = doc.to_dict()
             data['id'] = doc.id
-            # Convert stored JSON strings back to lists
-            if 'solution_steps' in data and isinstance(data['solution_steps'], str):
-                data['solution_steps'] = json.loads(data['solution_steps'])
-            if 'tags' in data and isinstance(data['tags'], str):
-                data['tags'] = json.loads(data['tags'])
-            solutions.append(self._serialize_datetime(data))
+            data['solution_steps'] = parse_json_field(data, 'solution_steps')
+            data['tags'] = parse_json_field(data, 'tags')
+            solutions.append(serialize_datetime(data))
+        return solutions
+
+    def list_recent(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get most recent solutions"""
+        docs = (self.collection
+               .order_by('created_at', direction=firestore.Query.DESCENDING)
+               .limit(limit)
+               .stream())
+
+        solutions = []
+        for doc in docs:
+            data = doc.to_dict()
+            data['id'] = doc.id
+            data['solution_steps'] = parse_json_field(data, 'solution_steps')
+            data['tags'] = parse_json_field(data, 'tags')
+            solutions.append(serialize_datetime(data))
         return solutions
 
     def update(self, solution_id: str, solution_data: Dict[str, Any]) -> bool:
@@ -84,10 +87,9 @@ class FirestoreSolution:
         solution_data['updated_at'] = datetime.utcnow()
 
         # Convert lists to JSON strings for storage
-        if 'solution_steps' in solution_data and isinstance(solution_data['solution_steps'], list):
-            solution_data['solution_steps'] = json.dumps(solution_data['solution_steps'])
-        if 'tags' in solution_data and isinstance(solution_data['tags'], list):
-            solution_data['tags'] = json.dumps(solution_data['tags'])
+        for field in ['solution_steps', 'tags']:
+            if field in solution_data and isinstance(solution_data[field], list):
+                solution_data[field] = json.dumps(solution_data[field])
 
         doc_ref = self.collection.document(solution_id)
         if doc_ref.get().exists:
@@ -99,14 +101,6 @@ class FirestoreQuestion:
     def __init__(self):
         self.collection = get_db().collection('questions')
         self.THRESHOLD = 0.8  # Similarity threshold
-
-    def _serialize_datetime(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Convert Firestore datetime objects to ISO format strings"""
-        result = data.copy()
-        for key, value in result.items():
-            if hasattr(value, 'isoformat'):  # Check if it's any datetime-like object
-                result[key] = value.isoformat()
-        return result
 
     def create(self, question_data: Dict[str, Any]) -> str:
         """Create a new question document with embedding"""
@@ -129,13 +123,13 @@ class FirestoreQuestion:
         if doc.exists:
             data = doc.to_dict()
             data['id'] = doc.id
-            return self._serialize_datetime(data)
+            return serialize_datetime(data)
         return None
 
     def list_all(self) -> List[Dict[str, Any]]:
         """Get all questions"""
         docs = self.collection.stream()
-        return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
+        return [serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
 
     def find_similar(self, embedding, limit: int = 5, min_score: float = 0.75) -> List[Dict[str, Any]]:
         """Find most similar questions using cosine similarity.
@@ -177,7 +171,7 @@ class FirestoreQuestion:
                 # Ensure solution_id is a string
                 if 'solution_id' in match_data:
                     match_data['solution_id'] = str(match_data['solution_id'])
-                matches.append(self._serialize_datetime(match_data))
+                matches.append(serialize_datetime(match_data))
 
         # Sort matches by score in descending order
         matches.sort(key=lambda x: x['score'], reverse=True)
@@ -188,14 +182,6 @@ class FirestoreQuestion:
 class FirestoreInventory:
     def __init__(self):
         self.collection = get_db().collection('inventory')
-
-    def _serialize_datetime(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Convert Firestore datetime objects to ISO format strings"""
-        result = data.copy()
-        for key, value in result.items():
-            if hasattr(value, 'isoformat'):  # Check if it's any datetime-like object
-                result[key] = value.isoformat()
-        return result
 
     def create(self, inventory_data: Dict[str, Any]) -> str:
         """Create a new inventory document"""
@@ -215,13 +201,13 @@ class FirestoreInventory:
         if doc.exists:
             data = doc.to_dict()
             data['id'] = doc.id
-            return self._serialize_datetime(data)
+            return serialize_datetime(data)
         return None
 
     def list_all(self) -> List[Dict[str, Any]]:
         """Get all inventory items"""
         docs = self.collection.stream()
-        return [self._serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
+        return [serialize_datetime({**doc.to_dict(), 'id': doc.id}) for doc in docs]
 
     def get_multiple(self, inventory_ids: List[str]) -> List[Dict[str, Any]]:
         """Get multiple inventory items by their IDs"""

@@ -172,6 +172,18 @@ export class DefaultService {
         });
     }
     /**
+     * Get recent solutions
+     * Retrieve the 5 most recent solutions from the database
+     * @returns SolutionModel Successful Response
+     * @throws ApiError
+     */
+    public listRecentSolutions(): CancelablePromise<Array<SolutionModel>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/v1/solutions/recent',
+        });
+    }
+    /**
      * Spa Fallback
      * @param fullPath
      * @returns any Successful Response

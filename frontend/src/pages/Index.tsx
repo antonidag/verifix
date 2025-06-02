@@ -12,7 +12,7 @@ const Index = () => {
       <Hero />
       <ProblemSubmission />
       <HeroFeatures />
-      {/* <KnowledgeBase /> */}
+      <KnowledgeBase />
       <Features />
       <Footer />
       <LiveChat />

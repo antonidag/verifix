@@ -203,3 +203,11 @@ async def solution_status(solution_id: str):
             await asyncio.sleep(2)  # Check every 2 seconds
 
     return EventSourceResponse(event_generator())
+
+@router.get("/solutions/recent",
+            response_model=List[SolutionModel],
+            summary="Get recent solutions",
+            description="Retrieve the 5 most recent solutions from the database",
+            operation_id="listRecentSolutions")
+def get_recent_solutions():
+    return solutions.list_recent()
