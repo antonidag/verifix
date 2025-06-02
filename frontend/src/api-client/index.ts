@@ -15,11 +15,10 @@ export type { AskResponseModel } from './models/AskResponseModel';
 export type { ChatResponseModel } from './models/ChatResponseModel';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { InventoryBase } from './models/InventoryBase';
+export type { LinkModel } from './models/LinkModel';
 export type { Match } from './models/Match';
 export type { QuestionModel } from './models/QuestionModel';
 export type { SolutionModel } from './models/SolutionModel';
-export type { SolutionPartModel } from './models/SolutionPartModel';
-export type { SolutionRequest } from './models/SolutionRequest';
 export type { SolutionResponseModel } from './models/SolutionResponseModel';
 export type { ValidationError } from './models/ValidationError';
 

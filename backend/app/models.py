@@ -2,40 +2,27 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 
+class LinkModel(BaseModel):
+    title: str = Field(..., description="Title of the link")
+    url: str = Field(..., description="URL of the link")
+
 class QuestionInput(BaseModel):
     question: str = Field(..., description="The question to be asked")
 
-class SolutionPartModel(BaseModel):
-    machine_name: Optional[str] = Field(None, description="Name/tag of machine (e.g., 'Press #3')")
-    machine_type: Optional[str] = Field(None, description="Type of machine (e.g., 'Press', 'Conveyor', 'Robot Arm')")
-    manufacturer: Optional[str] = Field(None, description="Equipment manufacturer (e.g., 'Siemens', 'ABB', 'KUKA')")
-    model_number: Optional[str] = Field(None, description="Specific model number of the equipment")
-    component: Optional[str] = Field(None, description="Specific component involved (e.g., 'Motor', 'PLC', 'Sensor')")
-    error_code: Optional[str] = Field(None, description="Machine/system error code")
-
 class AskRequestModel(BaseModel):
     question: str = Field(..., description="The main question or issue to be resolved")
-    solution: Optional[SolutionPartModel] = Field(None, description="Optional solution details")
     image_data: Optional[str] = Field(None, description="Optional base64 encoded image data")
 
     class Config:
         json_schema_extra = {
             "example": {
                 "question": "Machine keeps stopping unexpectedly",
-                "solution": {
-                    "machine_name": "Press #3",
-                    "machine_type": "Hydraulic Press",
-                    "manufacturer": "Siemens",
-                    "component": "Pressure Sensor",
-                    "error_code": "E5023"
-                }
             }
         }
 
 class SolutionModel(BaseModel):
     id: Optional[str] = Field(None, description="The solution id")
     text: str = Field(..., description="The solution text")
-    document_link: Optional[str] = Field("", description="Link to related documentation")
     verified: bool = Field(False, description="Whether the solution has been verified")
     error_code: Optional[str] = Field("", description="Machine/system error code")
     machine_name: Optional[str] = Field("", description="Name/tag of machine")
@@ -52,6 +39,7 @@ class SolutionModel(BaseModel):
     title: Optional[str] = Field("", description="Title of the solution")
     description: Optional[str] = Field("", description="Description of the solution")
     solution_steps: Optional[List[str]] = Field(default_factory=list, description="List of solution steps")
+    links: Optional[List[LinkModel]] = Field(default_factory=list, description="Links to related documentation and resources")
     confidence: Optional[str] = Field("", description="Confidence of the solution")
     created_at: Optional[datetime] = Field(None, description="Creation date of the solution")
     updated_at: Optional[datetime] = Field(None, description="Last update date of the solution")
@@ -60,7 +48,6 @@ class SolutionModel(BaseModel):
         json_schema_extra = {
             "example": {
                 "text": "Replace the pressure sensor and recalibrate the system",
-                "document_link": "https://docs.example.com/solutions/5023",
                 "verified": True,
                 "error_code": "E5023",
                 "machine_name": "Press #3",

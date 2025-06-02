@@ -19,7 +19,6 @@ async def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
     Solution Title: {solution_dict.get('title', '')}
     Description: {solution_dict.get('description', '')}
     Steps: {solution_dict.get('solution_steps', [])}
-    Documentation: {solution_dict.get('document_link', '')}
     Manufacturer: {solution_dict.get('manufacturer', '')}
     Machine Type: {solution_dict.get('machine_type', '')}
     Machine Name: {solution_dict.get('machine_name', '')}
@@ -85,6 +84,12 @@ Report: {report}"""),
 Return only the downtime impact (e.g. High, Medium, Low), and nothing else.
 If it cannot be determined, return N/A.
 
+Report: {report}"""),
+        ("links", f"""Extract relevant documentation links from the following report.
+Return only a JSON array of objects with 'title' and 'url' properties.
+Example: [{"title": "User Manual", "url": "https://..."}, {"title": "Technical Guide", "url": "https://..."}]
+If no links are found, return an empty array [].
+
 Report: {report}""")
     ]
 
@@ -111,5 +116,6 @@ Report: {report}""")
         'error_code': extracted_data['error_code'],
         'component': extracted_data['component'],
         'resolution_type': extracted_data['resolution_type'],
-        'downtime_impact': extracted_data['downtime_impact']
+        'downtime_impact': extracted_data['downtime_impact'],
+        'links': json.loads(extracted_data['links']) if extracted_data['links'] else []
     }

@@ -31,5 +31,13 @@ export type InventoryBase = {
      * Additional metadata like installation date, service history
      */
     metadata?: (Record<string, any> | null);
+    /**
+     * Creation date of the solution
+     */
+    created_at?: (string | null);
+    /**
+     * Last update date of the solution
+     */
+    updated_at?: (string | null);
 };
 

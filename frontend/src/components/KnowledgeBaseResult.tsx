@@ -233,21 +233,33 @@ export const KnowledgeBaseResult = ({
             </div>
           )}
           {/* Document Link */}
-          {solution.document_link && (
+          {solution.links?.length > 0 && (
             <div className="bg-white/70 p-4 rounded-lg mb-4">
               <h4 className="font-medium text-slate-800 mb-2">
-                Related Documents:
+                Related Resources:
               </h4>
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <FileText className="w-4 h-4" />
-                <a
-                  href={solution.document_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  View Documentation
-                </a>
+              <div className="space-y-2">
+                {solution.links?.slice(0, 2).map((link, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 text-sm text-slate-600"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      {link.title}
+                    </a>
+                  </div>
+                ))}
+                {solution.links?.length > 2 && (
+                  <div className="text-xs text-slate-500 mt-1">
+                    + {solution.links.length - 2} more resources available
+                  </div>
+                )}
               </div>
             </div>
           )}

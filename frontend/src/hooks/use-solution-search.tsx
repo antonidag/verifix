@@ -1,11 +1,5 @@
 import { useState } from "react";
-
-import {
-  AskRequestModel,
-  InventoryBase,
-  SolutionModel,
-  SolutionPartModel,
-} from "@/api-client";
+import { AskRequestModel, InventoryBase, SolutionModel } from "@/api-client";
 import { api } from "@/api/apiClient";
 import { toast } from "@/hooks/use-toast";
 
@@ -44,7 +38,6 @@ export const useSolutionSearch = () => {
     try {
       const askRequest: AskRequestModel = {
         question: problem.trim(),
-        solution: {} as SolutionPartModel,
         image_data: imageData,
       };
 
@@ -102,7 +95,6 @@ export const useSolutionSearch = () => {
     try {
       const result = await api.default.investigate({
         question: problem.trim(),
-        solution: {} as SolutionPartModel,
         image_data: imageData,
       });
 

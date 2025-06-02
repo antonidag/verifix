@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { LinkModel } from './LinkModel';
 export type SolutionModel = {
     /**
      * The solution id
@@ -11,10 +12,6 @@ export type SolutionModel = {
      * The solution text
      */
     text: string;
-    /**
-     * Link to related documentation
-     */
-    document_link?: (string | null);
     /**
      * Whether the solution has been verified
      */
@@ -79,6 +76,10 @@ export type SolutionModel = {
      * List of solution steps
      */
     solution_steps?: (Array<string> | null);
+    /**
+     * Links to related documentation and resources
+     */
+    links?: (Array<LinkModel> | null);
     /**
      * Confidence of the solution
      */

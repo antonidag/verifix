@@ -125,26 +125,31 @@ export const KnowledgeDialog = ({
           )}
 
           {/* Links Section */}
-          {solution.document_link && (
+          {solution.links?.length > 0 && (
             <div>
               <h3 className="font-semibold text-slate-800 mb-3">
                 Helpful Links
               </h3>
               <div className="space-y-2">
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                  <Link2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                  <div className="flex-1">
-                    <a
-                      href={solution.document_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                    >
-                      Documentation
-                    </a>
+                {solution.links.map((link, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                  >
+                    <Link2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <div className="flex-1">
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                      >
+                        {link.title}
+                      </a>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-slate-400" />
                   </div>
-                  <ExternalLink className="w-4 h-4 text-slate-400" />
-                </div>
+                ))}
               </div>
             </div>
           )}
