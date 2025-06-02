@@ -5,8 +5,6 @@ import {
   Database,
   Eye,
   FileText,
-  ThumbsDown,
-  ThumbsUp,
   Wrench,
 } from "lucide-react";
 import Markdown from "react-markdown";
@@ -15,11 +13,11 @@ import { SolutionModel } from "@/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { aiDisclaimer } from "@/data/solutions";
+import { SolutionWithMatch } from "@/hooks/use-solution-search";
 import {
   getBadgeColors,
   getMatchScorePercentage,
 } from "@/utils/matchScoreUtils";
-import { SolutionWithMatch } from "@/hooks/use-solution-search";
 
 interface KnowledgeBaseResultProps {
   solution: SolutionWithMatch;
@@ -80,7 +78,7 @@ export const KnowledgeBaseResult = ({
                   variant="secondary"
                   className="bg-orange-100 text-orange-700"
                 >
-                  AI
+                  AI Generated
                 </Badge>
               )}
             </div>

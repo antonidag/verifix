@@ -19,15 +19,14 @@ async def process_research_report(question: str, researcher: GPTResearcher, solu
         # Generate confidence score
         solution_data['confidence'] = await generate_confidence_score(solution_data)
 
-        # Run database operations in parallel
+        await store_model_info(solution_id, solution_data)
         embedding = embed_text(question)
-        solutions.update(solution_id, solution_data),
         questions.create({
             'text': question,
             'solution_id': solution_id,
             'embedding': embedding
-        }),
-        await store_model_info(solution_id, solution_data)
+        })
+        solutions.update(solution_id, solution_data)
 
     except Exception as e:
         print(f"Error in process_research_report: {str(e)}")

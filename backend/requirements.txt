@@ -12,3 +12,4 @@ sqlalchemy
 uvicorn
 vertexai
 google.cloud
+sse-starlette

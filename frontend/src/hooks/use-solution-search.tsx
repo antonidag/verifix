@@ -1,5 +1,5 @@
 import { Bot } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import {
   AskRequestModel,
@@ -21,6 +21,66 @@ export const useSolutionSearch = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [solutions, setSolutions] = useState<SolutionWithMatch[]>([]);
   const [searchResults, setSearchResults] = useState<AskResponseModel>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  useEffect(() => {
+    // Cleanup any existing event source on unmount
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);
+
+  const setupSolutionEventSource = (solutionId: string) => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    const eventSource = new EventSource(
+      `/api/v1/solutions/${solutionId}/status`
+    );
+    eventSourceRef.current = eventSource;
+
+    eventSource.addEventListener("solution_ready", async (event) => {
+      const data = JSON.parse(event.data);
+      if (data.solution) {
+        // Fetch inventory data for the solution
+        let inventory = null;
+        try {
+          inventory = await api.default.getSolutionInventory(solutionId);
+        } catch (error) {
+          console.log("No inventory data found for solution:", solutionId);
+        }
+
+        setSolutions([
+          {
+            ...data.solution,
+            matchScore: "1.0", // AI-generated solutions get full confidence
+            inventory: inventory,
+          },
+        ]);
+
+        toast({
+          title: "Investigation Complete",
+          description: "We've found a potential solution for your problem.",
+        });
+
+        eventSource.close();
+      }
+    });
+
+    eventSource.addEventListener("error", (error) => {
+      console.error("SSE Error:", error);
+      toast({
+        title: "Error",
+        description:
+          "Failed to monitor investigation progress. Please try again.",
+        variant: "destructive",
+      });
+      eventSource.close();
+    });
+  };
 
   const handleSearch = async (problem: string, imageData: string | null) => {
     if (!problem.trim() && !imageData) return;
@@ -106,6 +166,7 @@ export const useSolutionSearch = () => {
       title: "Investigation Started",
       description: "We'll notify you when the results are ready.",
     });
+
     try {
       const askRequest: AskRequestModel = {
         question: problem.trim(),
@@ -115,9 +176,8 @@ export const useSolutionSearch = () => {
 
       const response = await api.default.investigate(askRequest);
 
-      // Start polling for results
       if (response.solution?.id) {
-        await pollInvestigationResults(response.solution.id);
+        setupSolutionEventSource(response.solution.id);
       }
     } catch (error) {
       toast({
@@ -128,39 +188,10 @@ export const useSolutionSearch = () => {
     }
   };
 
-  const pollInvestigationResults = async (solutionId: string) => {
-    try {
-      const solution = await api.default.getSolution(solutionId);
-      if (solution.text && solution.text !== "") {
-        // Fetch inventory data for the solution
-        let inventory = null;
-        try {
-          inventory = await api.default.getSolutionInventory(solutionId);
-        } catch (error) {
-          console.log("No inventory data found for solution:", solutionId);
-        }
-
-        setSolutions([
-          {
-            ...solution,
-            matchScore: "1.0", // AI-generated solutions get full confidence
-            inventory: inventory,
-          },
-        ]);
-        toast({
-          title: "Investigation Complete",
-          description: "We've found a potential solution for your problem.",
-        });
-      } else {
-        // If solution is not ready, poll again in 5 seconds
-        setTimeout(() => pollInvestigationResults(solutionId), 5000);
-      }
-    } catch (error) {
-      console.error("Error polling for results:", error);
-    }
-  };
-
   const clearSearch = () => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
     setSolutions([]);
     setSearchResults(null);
   };

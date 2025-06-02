@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
+from sse_starlette.sse import EventSourceResponse
 from typing import List
+import json
+import asyncio
 from llm_model import generate_response
 from gpt_researcher import GPTResearcher
 from services.question_service import prepare_question, find_existing_solution
@@ -159,3 +162,33 @@ async def get_solution_inventory(solution_id: str):
     if not inventory_data:
         raise HTTPException(status_code=404, detail="Inventory not found")
     return inventory_data
+
+@router.get("/solutions/{solution_id}/status")
+async def solution_status(solution_id: str):
+    """Get solution status via Server-Sent Events."""
+    async def event_generator():
+        while True:
+            solution = solutions.get(solution_id)
+            if solution and solution.get('description'):
+                # Solution is ready
+                yield {
+                    "event": "solution_ready",
+                    "data": json.dumps({
+                        "id": solution_id,
+                        "status": "ready",
+                        "solution": solution
+                    })
+                }
+                break
+            else:
+                # Solution still processing
+                yield {
+                    "event": "processing",
+                    "data": json.dumps({
+                        "id": solution_id,
+                        "status": "processing"
+                    })
+                }
+            await asyncio.sleep(2)  # Check every 2 seconds
+
+    return EventSourceResponse(event_generator())
