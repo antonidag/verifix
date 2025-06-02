@@ -102,10 +102,21 @@ Report: {report}""")
     # Map results back using the keys from prompts_list
     extracted_data = {key: result for (key, _), result in zip(prompts_list, results)}
 
+    # Handle solution steps parsing with fallback
     try:
         solution_steps = json.loads(extracted_data['solution_steps'])
+        if not isinstance(solution_steps, list):
+            solution_steps = ["Could not parse solution steps - invalid format"]
     except json.JSONDecodeError:
         solution_steps = ["Could not parse solution steps"]
+
+    # Handle links parsing with fallback
+    try:
+        links = json.loads(extracted_data['links']) if extracted_data['links'].strip() else []
+        if not isinstance(links, list):
+            links = []
+    except json.JSONDecodeError:
+        links = []
 
     return {
         'description': extracted_data['description'],
@@ -117,5 +128,5 @@ Report: {report}""")
         'component': extracted_data['component'],
         'resolution_type': extracted_data['resolution_type'],
         'downtime_impact': extracted_data['downtime_impact'],
-        'links': json.loads(extracted_data['links']) if extracted_data['links'] else []
+        'links': links
     }
