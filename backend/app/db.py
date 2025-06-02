@@ -28,6 +28,7 @@ class FirestoreSolution:
         # Add timestamps
         solution_data['created_at'] = datetime.utcnow()
         solution_data['updated_at'] = datetime.utcnow()
+        solution_data['status'] = 'created'  # Add initial status
 
         # Convert any None values to empty strings for Firestore
         for key, value in solution_data.items():
@@ -94,6 +95,20 @@ class FirestoreSolution:
         doc_ref = self.collection.document(solution_id)
         if doc_ref.get().exists:
             doc_ref.update(solution_data)
+            return True
+        return False
+
+    def update_status(self, solution_id: str, status: str, progress_message: str = None) -> bool:
+        """Update solution status and progress message"""
+        doc_ref = self.collection.document(solution_id)
+        if doc_ref.get().exists:
+            update_data = {
+                'status': status,
+                'updated_at': datetime.utcnow()
+            }
+            if progress_message:
+                update_data['progress_message'] = progress_message
+            doc_ref.update(update_data)
             return True
         return False
 

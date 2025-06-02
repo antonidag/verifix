@@ -182,13 +182,27 @@ async def solution_status(solution_id: str):
     async def event_generator():
         while True:
             solution = solutions.get(solution_id)
-            if solution and solution.get('description'):
-                # Fetch inventory data if available
+            if not solution:
+                yield {
+                    "event": "error",
+                    "data": json.dumps({
+                        "id": solution_id,
+                        "status": "error",
+                        "message": "Solution not found"
+                    })
+                }
+                break
+
+            # Get current status
+            status = solution.get('status', 'processing')
+            progress_message = solution.get('progress_message', '')
+
+            if status == 'ready':
+                # Solution is complete
                 inventory_data = None
                 if solution.get('inventory_id'):
                     inventory_data = inventory.get(solution['inventory_id'])
 
-                # Solution is ready
                 yield {
                     "event": "solution_ready",
                     "data": json.dumps({
@@ -199,13 +213,25 @@ async def solution_status(solution_id: str):
                     })
                 }
                 break
+            elif status == 'error':
+                # Solution encountered an error
+                yield {
+                    "event": "error",
+                    "data": json.dumps({
+                        "id": solution_id,
+                        "status": "error",
+                        "message": progress_message or "An error occurred"
+                    })
+                }
+                break
             else:
                 # Solution still processing
                 yield {
                     "event": "processing",
                     "data": json.dumps({
                         "id": solution_id,
-                        "status": "processing"
+                        "status": status,
+                        "message": progress_message or f"Status: {status}"
                     })
                 }
             await asyncio.sleep(2)  # Check every 2 seconds
