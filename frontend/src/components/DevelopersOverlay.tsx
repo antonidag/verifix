@@ -37,11 +37,11 @@ export const DevelopersOverlay = () => {
           key={dev.name}
           target="_blank"
           rel="noopener noreferrer"
-          className={`fixed bottom-4 ${
-            index === 0 ? "right-4" : "left-4"
-          } flex items-center gap-3 p-4 bg-white/80 backdrop-blur-sm rounded-full shadow-lg transition-all hover:scale-105`}
+          className={`fixed bottom-6 ${
+            index === 0 ? "right-6" : "left-6"
+          } flex items-center gap-4 p-5 bg-white/90 backdrop-blur-sm rounded-full shadow-xl transition-all hover:scale-105`}
         >
-          <Avatar>
+          <Avatar className="w-12 h-12">
             <AvatarImage src={dev.image} />
             <AvatarFallback className="bg-slate-100 text-slate-500">
               {dev.name
@@ -50,16 +50,16 @@ export const DevelopersOverlay = () => {
                 .join("")}
             </AvatarFallback>
           </Avatar>
-          <div className="text-sm">
-            <div className="font-medium text-slate-800 flex items-center gap-2">
+          <div className="text-base">
+            <div className="font-semibold text-slate-800 flex items-center gap-2">
               {dev.name}
               <img
                 src={linkedin}
                 alt="LinkedIn"
-                className="w-4 h-4 inline-block"
+                className="w-5 h-5 inline-block"
               />
             </div>
-            <div className="text-slate-500 text-xs">
+            <div className="text-slate-500 text-sm">
               {dev.role}
               <span className="mx-1">·</span>
               {dev.company}
