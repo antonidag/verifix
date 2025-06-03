@@ -39,7 +39,7 @@ async def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
     except ValueError:
         return "0"  # Default if LLM doesn't return a valid number
 
-async def process_solution_report(report: str) -> Dict[str, Any]:
+async def process_solution_report(question: str, report: str) -> Dict[str, Any]:
     """Process a solution report and extract relevant data."""
     prompts_list = [
         ("description", f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text."),
