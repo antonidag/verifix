@@ -86,6 +86,7 @@ export const useSolutionSearch = () => {
           );
 
           setSolutions(solutions.filter((sol) => sol !== null));
+          setIsSearching(false);
         },
         onError: (error) => {
           toast({
@@ -93,9 +94,6 @@ export const useSolutionSearch = () => {
             description: "Failed to search for solutions. Please try again.",
             variant: "destructive",
           });
-        },
-        onSettled: () => {
-          setIsSearching(false);
         },
       }
     );

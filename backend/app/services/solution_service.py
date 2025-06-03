@@ -191,7 +191,7 @@ Relevant links include URLs pointing to technical manuals, knowledge base articl
 Format the output as a single, minified, valid JSON array of objects. Each object in the array MUST have a "title" property (string) and a "url" property (string).
 
 Example of the EXACT expected JSON output format (assuming relevance to a question):
-[{{"title":"Operator Manual PX200 - Section on Error Codes","url":"https://example.com/manual/px200#errors"}},{{"title":"KB Article - Troubleshooting '{question_subject}'","url":"https://support.example.com/kb/question_subject_fix"}}]
+[{{"title":"Operator Manual PX200 - Section on Error Codes","url":"https://example.com/manual/px200#errors"}},{{"title":"KB Article - Troubleshooting","url":"https://support.example.com/kb/question_subject_fix"}}]
 
 IMPORTANT INSTRUCTIONS FOR OUTPUT:
 1. Your entire response MUST be the raw, minified JSON array and nothing else.

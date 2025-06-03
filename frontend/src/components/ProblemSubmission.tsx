@@ -145,17 +145,8 @@ export const ProblemSubmission = () => {
                     disabled={isInvestigating}
                     className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 w-full sm:w-auto"
                   >
-                    {isInvestigating ? (
-                      <>
-                        <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                        Investigating...
-                      </>
-                    ) : (
-                      <>
-                        <Bot className="mr-2 w-4 h-4" />
-                        Start AI Investigation
-                      </>
-                    )}
+                    <Bot className="mr-2 w-4 h-4" />
+                    Start AI Investigation
                   </Button>
                 </div>
                 {solutions.map((solution) => (
