@@ -154,107 +154,6 @@ export const KnowledgeDialog = ({
               ))}
             </div>
 
-            {/* Technical Details */}
-            <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-slate-800">
-                  Technical Details
-                </h4>
-                {solution.manufacturer && (
-                  <Badge variant="outline" className="bg-slate-100">
-                    {solution.manufacturer}
-                  </Badge>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                {solution.machine_name && (
-                  <div className="bg-white/70 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Machine Name</div>
-                    <div className="font-medium text-slate-800">
-                      {solution.machine_name}
-                    </div>
-                  </div>
-                )}
-                {solution.machine_type && (
-                  <div className="bg-white/70 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Machine Type</div>
-                    <div className="font-medium text-slate-800">
-                      {solution.machine_type}
-                    </div>
-                  </div>
-                )}
-                {solution.component && (
-                  <div className="bg-white/70 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Component</div>
-                    <div className="font-medium text-slate-800">
-                      {solution.component}
-                    </div>
-                  </div>
-                )}
-                {solution.model_number && (
-                  <div className="bg-white/70 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Model Number</div>
-                    <div className="font-medium text-slate-800">
-                      {solution.model_number}
-                    </div>
-                  </div>
-                )}
-                {solution.error_code && (
-                  <div className="bg-white/70 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Error Code</div>
-                    <div className="font-medium text-slate-800">
-                      {solution.error_code}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Operational Details */}
-            <div>
-              <h3 className="font-semibold text-slate-800 mb-3">
-                Operational Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {solution.resolution_type && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">
-                      Resolution Type
-                    </div>
-                    <div className="font-medium text-slate-800">
-                      {solution.resolution_type}
-                    </div>
-                  </div>
-                )}
-                {solution.downtime_impact && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">
-                      Downtime Impact
-                    </div>
-                    <div className="font-medium text-slate-800">
-                      {solution.downtime_impact}
-                    </div>
-                  </div>
-                )}
-                {solution.created_at && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Created At</div>
-                    <div className="font-medium text-slate-800">
-                      {new Date(solution.created_at).toLocaleString()}
-                    </div>
-                  </div>
-                )}
-                {solution.updated_at && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Last Updated</div>
-                    <div className="font-medium text-slate-800">
-                      {new Date(solution.updated_at).toLocaleString()}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* Description */}
             <DialogDescription>
               <h3 className="font-semibold text-slate-800 mb-2">Description</h3>
@@ -288,6 +187,109 @@ export const KnowledgeDialog = ({
                 </div>
               </div>
             )}
+
+            {/* Technical Details */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-slate-800">
+                  Technical Details
+                </h3>
+                {solution.manufacturer && (
+                  <Badge variant="outline" className="bg-slate-100">
+                    {solution.manufacturer}
+                  </Badge>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {solution.machine_name && solution.machine_name !== "N/A" && (
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Machine Name</div>
+                    <div className="font-medium text-slate-800">
+                      {solution.machine_name}
+                    </div>
+                  </div>
+                )}
+                {solution.machine_type && solution.machine_type !== "N/A" && (
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Machine Type</div>
+                    <div className="font-medium text-slate-800">
+                      {solution.machine_type}
+                    </div>
+                  </div>
+                )}
+                {solution.component && solution.component !== "N/A" && (
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Component</div>
+                    <div className="font-medium text-slate-800">
+                      {solution.component}
+                    </div>
+                  </div>
+                )}
+                {solution.model_number && solution.model_number !== "N/A" && (
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Model Number</div>
+                    <div className="font-medium text-slate-800">
+                      {solution.model_number}
+                    </div>
+                  </div>
+                )}
+                {solution.error_code && solution.error_code !== "N/A" && (
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Error Code</div>
+                    <div className="font-medium text-slate-800">
+                      {solution.error_code}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Operational Details */}
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-3">
+                Operational Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                {solution.resolution_type &&
+                  solution.resolution_type !== "N/A" && (
+                    <div className="bg-slate-50 p-3 rounded-lg">
+                      <div className="text-sm text-slate-500">
+                        Resolution Type
+                      </div>
+                      <div className="font-medium text-slate-800">
+                        {solution.resolution_type}
+                      </div>
+                    </div>
+                  )}
+                {solution.downtime_impact &&
+                  solution.downtime_impact !== "N/A" && (
+                    <div className="bg-slate-50 p-3 rounded-lg">
+                      <div className="text-sm text-slate-500">
+                        Downtime Impact
+                      </div>
+                      <div className="font-medium text-slate-800">
+                        {solution.downtime_impact}
+                      </div>
+                    </div>
+                  )}
+                {solution.created_at && (
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Created At</div>
+                    <div className="font-medium text-slate-800">
+                      {new Date(solution.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                )}
+                {solution.updated_at && (
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Last Updated</div>
+                    <div className="font-medium text-slate-800">
+                      {new Date(solution.updated_at).toLocaleString()}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Links Section */}
             {solution.links?.length > 0 && (

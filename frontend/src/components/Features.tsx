@@ -1,12 +1,12 @@
 import {
   Bot,
   Brain,
-  Camera,
   Cloud,
   Code,
   Database,
   Search,
   Zap,
+  MessageCircle,
 } from "lucide-react";
 
 const techStack = [
@@ -49,79 +49,76 @@ export const HeroFeatures = () => (
       <h2 className="text-2xl font-semibold text-slate-800 mb-6">
         How It Works
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-14 relative">
         {/* Connecting Lines (hidden on mobile) */}
         <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -z-10 transform -translate-y-1/2" />
 
         {/* Step 1 */}
         <div className="relative">
           <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
-            <div className="relative">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Camera className="w-8 h-8 text-blue-600 flex-shrink-0" />
-                <h3 className="font-semibold text-slate-800">Submit Issue</h3>
-              </div>
-              <div className="hidden md:block absolute -right-10 top-1/2 w-8 h-8 text-slate-400">
-                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                  <path
-                    d="M5 12h14m-4 -4l4 4l-4 4"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
-              </div>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <MessageCircle className="w-8 h-8 text-blue-600 flex-shrink-0" />
+              <h3 className="font-semibold text-slate-800">Submit Issue</h3>
             </div>
             <p className="text-slate-600 text-sm">
-              Upload a photo or describe your problem in detail
+              Describe the problem and/or upload a photo
             </p>
+          </div>
+          <div className="hidden md:flex absolute -right-9 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 justify-center items-center">
+            <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+              <path
+                d="M5 12h14m-4 -4l4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
           </div>
         </div>
 
         {/* Step 2 */}
         <div className="relative">
           <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
-            <div className="relative">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Search className="w-8 h-8 text-purple-600 flex-shrink-0" />
-                <h3 className="font-semibold text-slate-800">Smart Search</h3>
-              </div>
-              <div className="hidden md:block absolute -right-10 top-1/2 w-8 h-8 text-slate-400">
-                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                  <path
-                    d="M5 12h14m-4 -4l4 4l-4 4"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
-              </div>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Search className="w-8 h-8 text-purple-600 flex-shrink-0" />
+              <h3 className="font-semibold text-slate-800">Smart Search</h3>
             </div>
             <p className="text-slate-600 text-sm">
               System searches for similar past solutions
             </p>
+          </div>
+          <div className="hidden md:flex absolute -right-9 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 justify-center items-center">
+            <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+              <path
+                d="M5 12h14m-4 -4l4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
           </div>
         </div>
 
         {/* Step 3 */}
         <div className="relative">
           <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
-            <div className="relative">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Bot className="w-8 h-8 text-green-600 flex-shrink-0" />
-                <h3 className="font-semibold text-slate-800">AI Analysis</h3>
-              </div>
-              <div className="hidden md:block absolute -right-10 top-1/2 w-8 h-8 text-slate-400">
-                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                  <path
-                    d="M5 12h14m-4 -4l4 4l-4 4"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
-              </div>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Bot className="w-8 h-8 text-green-600 flex-shrink-0" />
+              <h3 className="font-semibold text-slate-800">AI Analysis</h3>
             </div>
             <p className="text-slate-600 text-sm">
-              Gemini investigates and generates solutions
+              Research agent produces solutions using Google Gemini
             </p>
+          </div>
+          <div className="hidden md:flex absolute -right-9 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400 justify-center items-center">
+            <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+              <path
+                d="M5 12h14m-4 -4l4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
           </div>
         </div>
 
@@ -133,7 +130,7 @@ export const HeroFeatures = () => (
               <h3 className="font-semibold text-slate-800">Knowledge Growth</h3>
             </div>
             <p className="text-slate-600 text-sm">
-              Solution is verified and added to database
+              Solution is saved to enhance future recommendations
             </p>
           </div>
         </div>

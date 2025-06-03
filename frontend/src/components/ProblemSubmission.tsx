@@ -82,7 +82,7 @@ export const ProblemSubmission = () => {
                 placeholder="Describe the problem: alarms, error codes, symptoms..."
                 className="min-h-24 pr-12 border-slate-300 focus:border-blue-500"
               />
-              <VoiceInput onInputCapture={setProblem} />
+              {/* <VoiceInput onInputCapture={setProblem} /> */}
             </div>
 
             <ImageUploadSection
