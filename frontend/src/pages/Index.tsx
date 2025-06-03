@@ -4,6 +4,7 @@ import { Hero } from "@/components/Hero";
 import { KnowledgeBase } from "@/components/KnowledgeBase";
 import { LiveChat } from "@/components/LiveChat";
 import { ProblemSubmission } from "@/components/ProblemSubmission";
+import { DevelopersOverlay } from "@/components/DevelopersOverlay";
 
 const Index = () => {
   return (
@@ -15,6 +16,7 @@ const Index = () => {
       <KnowledgeBase />
       <Features />
       <Footer />
+      <DevelopersOverlay />
       {/* <LiveChat /> */}
     </div>
   );
