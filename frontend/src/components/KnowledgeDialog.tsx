@@ -14,15 +14,6 @@ import { useState } from "react";
 import Markdown from "react-markdown";
 
 import { SolutionModel } from "@/api-client";
-import { api } from "@/api/apiClient";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +24,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useDeleteSolution, useVerifySolution } from "@/hooks/use-solution-api";
 import { toast } from "@/hooks/use-toast";
 
 interface KnowledgeDialogProps {
@@ -58,16 +58,18 @@ export const KnowledgeDialog = ({
   onSolutionUpdate,
   onSolutionDelete,
 }: KnowledgeDialogProps) => {
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+
+  const { mutateAsync: verifySolution, isPending: isVerifying } =
+    useVerifySolution();
+  const { mutateAsync: deleteSolution, isPending: isDeleting } =
+    useDeleteSolution();
 
   const handleVerify = async () => {
     if (!solution) return;
 
-    setIsVerifying(true);
     try {
-      const verifiedSolution = await api.default.verifySolution(solution.id);
+      const verifiedSolution = await verifySolution(solution.id);
       toast({
         title: "Solution verified",
         description: "The solution has been marked as verified.",
@@ -79,17 +81,14 @@ export const KnowledgeDialog = ({
         description: "Failed to verify the solution. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsVerifying(false);
     }
   };
 
   const handleDelete = async () => {
     if (!solution) return;
 
-    setIsDeleting(true);
     try {
-      await api.default.deleteSolution(solution.id);
+      await deleteSolution(solution.id);
       toast({
         title: "Solution deleted",
         description: "The solution has been permanently deleted.",
@@ -102,9 +101,6 @@ export const KnowledgeDialog = ({
         description: "Failed to delete the solution. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteAlert(false);
     }
   };
 

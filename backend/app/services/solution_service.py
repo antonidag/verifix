@@ -42,65 +42,165 @@ async def generate_confidence_score(solution_dict: Dict[str, Any]) -> str:
 async def process_solution_report(question: str, report: str) -> Dict[str, Any]:
     """Process a solution report and extract relevant data."""
     prompts_list = [
-        ("description", f"Based on the following report, write a description of the solution: {report}. Only return the description, no other text."),
-        ("solution_steps", f"""Extract solution steps from the report below. Format each step as a clear, complete sentence.
-Return a properly formatted JSON array of strings, with normal spacing and punctuation.
-Example of good formatting:
-["1. Step 1.",
- "2. Step 2.",
- "3. Step 3."]
-Do not include any markdown formatting.
-Return only the JSON array, no other text or formatting. If no steps are found, return: []
+        ("description",
+     f"""You are an expert technical writer.
+Based on the provided report and the specific question asked, generate a concise and informative description.
+The description MUST directly address the question: '{question}'
+It MUST clearly summarize the solution relevant to this question, as detailed in the report: '{report}'.
+The description must be self-contained.
 
-Report: {report}"""),
-        ("manufacturer", f"""Extract the manufacturer name from this report.
-Return ONLY the manufacturer name with no additional text or formatting.
-Example good responses: "Siemens" or "N/A"
-Do not include quotes, explanations, or any other text.
+Your entire response MUST consist SOLELY of this description text.
+Ensure no preamble, titles, introductory/concluding remarks, or any other text whatsoever accompanies the description."""),
 
-Report: {report}"""),
-        ("machine_name", f"""Extract the machine name from this report.
-Return ONLY the machine name with no additional text or formatting.
-Example good responses: "CNC Mill 2000" or "N/A"
-Do not include quotes, explanations, or any other text.
+    ("solution_steps",
+     f"""From the report provided below, extract the distinct solution steps that directly address the issue raised in the question: '{question}'.
+Each step MUST be a complete sentence, clearly articulating an action or instruction.
+Format the output as a valid JSON array of strings. Ensure standard JSON spacing and punctuation.
 
-Report: {report}"""),
-        ("model_number", f"""Extract the model number from this report.
-Return ONLY the model number with no additional text or formatting.
-Example good responses: "XJ-2500" or "N/A"
-Do not include quotes, explanations, or any other text.
+Example of the EXACT expected JSON output format:
+["1. First, perform action A to resolve the specific issue.", "2. Next, meticulously verify that result B is achieved for that issue.", "3. Finally, complete action C as documented for the resolution."]
 
-Report: {report}"""),
-        ("error_code", f"""Extract the error code from this report.
-Return ONLY the error code with no additional text or formatting.
-Example good responses: "E101" or "N/A"
-Do not include quotes, explanations, or any other text.
+IMPORTANT INSTRUCTIONS FOR OUTPUT:
+1. Your entire response MUST be the raw JSON array and nothing else.
+2. Ensure no text, explanations, apologies, conversational filler, or any other characters precede or follow the JSON array.
+3. The JSON array itself must be clean, without any markdown formatting (such as ```json ... ```).
+4. If no distinct solution steps relevant to the question are found in the report, your entire response MUST be an empty JSON array: []
 
-Report: {report}"""),
-        ("component", f"""Extract the affected component from this report.
-Return ONLY the component name with no additional text or formatting.
-Example good responses: "Hydraulic Pump" or "N/A"
-Do not include quotes, explanations, or any other text.
+Report:
+{report}"""),
 
-Report: {report}"""),
-        ("resolution_type", f"""Extract the resolution type from this report.
-Return ONLY the resolution type with no additional text or formatting.
-Example good responses: "Hardware Fix" or "Software Update" or "N/A"
-Do not include quotes, explanations, or any other text.
+    ("manufacturer",
+     f"""Analyze the following report, focusing on the equipment or system pertinent to the question: '{question}'.
+Identify the manufacturer's name for this primary equipment/system.
+Your entire response MUST be ONLY the manufacturer's name as a plain string, or the string "N/A".
+If no manufacturer name is explicitly mentioned or clearly identifiable for the relevant equipment, provide "N/A".
 
-Report: {report}"""),
-        ("downtime_impact", f"""Extract the downtime impact level from this report.
-Return ONLY one of these values: High, Medium, Low, N/A
-Do not include quotes, explanations, or any other text.
+Examples of valid, complete, and EXACT output strings:
+Siemens
+N/A
 
-Report: {report}"""),
-        ("links", f"""Extract relevant documentation links from the following report. Return a raw JSON array.
-Format the output as a minified JSON array of objects with 'title' and 'url' properties, like this:
-[{{"title":"User Manual","url":"https://..."}},{{"title":"Technical Guide","url":"https://..."}}]
-Do not include any markdown formatting, backticks, or other text - ONLY the raw JSON array.
-If no links are found, return only: []
+CRITICAL OUTPUT REQUIREMENTS:
+The output string must be solely the manufacturer's name (or "N/A").
+It must not contain any quotation marks, descriptive text, labels, or any other formatting.
 
-Report: {report}""")
+Report:
+{report}"""),
+
+    ("machine_name",
+     f"""Analyze the following report, focusing on the specific machine or equipment discussed in relation to the question: '{question}'.
+Identify the name of this machine/equipment.
+Your entire response MUST be ONLY the machine name as a plain string, or the string "N/A".
+If no machine name is explicitly mentioned or clearly identifiable for the relevant equipment, provide "N/A".
+
+Examples of valid, complete, and EXACT output strings:
+CNC Mill 2000
+N/A
+
+CRITICAL OUTPUT REQUIREMENTS:
+The output string must be solely the machine name (or "N/A").
+It must not contain any quotation marks, descriptive text, labels, or any other formatting.
+
+Report:
+{report}"""),
+
+    ("model_number",
+     f"""Analyze the following report, focusing on the specific equipment or system relevant to the question: '{question}'.
+Identify the model number of this equipment/system.
+Your entire response MUST be ONLY the model number as a plain string, or the string "N/A".
+If no model number is explicitly mentioned or clearly identifiable for the relevant equipment, provide "N/A".
+
+Examples of valid, complete, and EXACT output strings:
+XJ-2500
+N/A
+
+CRITICAL OUTPUT REQUIREMENTS:
+The output string must be solely the model number (or "N/A").
+It must not contain any quotation marks, descriptive text, labels, or any other formatting.
+
+Report:
+{report}"""),
+
+    ("error_code",
+     f"""Analyze the following report to identify the error code(s) specifically related to the issue or component mentioned in the question: '{question}'.
+If multiple distinct error codes relevant to the question are present, list them in a single string, separated by a single comma and a space (e.g., "E101, E102, F003").
+Your entire response MUST be ONLY the relevant error code(s) as a plain string, or the string "N/A".
+If no error code relevant to the question is explicitly mentioned or clearly identifiable, provide "N/A".
+
+Examples of valid, complete, and EXACT output strings:
+E101
+E101, E102
+N/A
+
+CRITICAL OUTPUT REQUIREMENTS:
+The output string must be solely the error code(s) (or "N/A").
+It must not contain any quotation marks, descriptive text, labels, or any other formatting.
+
+Report:
+{report}"""),
+
+    ("component",
+     f"""Analyze the following report to identify the primary affected component that is the subject of, or directly related to, the question: '{question}'.
+Your entire response MUST be ONLY the component name as a plain string, or the string "N/A".
+If no specific component relevant to the question is explicitly mentioned or clearly identifiable as the primary one affected, provide "N/A".
+
+Examples of valid, complete, and EXACT output strings:
+Hydraulic Pump
+N/A
+
+CRITICAL OUTPUT REQUIREMENTS:
+The output string must be solely the component name (or "N/A").
+It must not contain any quotation marks, descriptive text, labels, or any other formatting.
+
+Report:
+{report}"""),
+
+    ("resolution_type",
+     f"""Analyze the resolution described in the following report, specifically for the issue raised in the question: '{question}'.
+Classify the type of this specific resolution.
+Consider common types like "Hardware Fix", "Software Update", "Configuration Change", "Replacement", "Adjustment", "Maintenance", "Consultation", "No Action Required", or a similar concise category if clearly indicated in the report for the relevant issue.
+Your entire response MUST be ONLY the resolution type as a plain string, or the string "N/A".
+If no specific resolution type for the issue in the question can be determined, or if the resolution is not described, provide "N/A".
+
+Examples of valid, complete, and EXACT output strings:
+Hardware Fix
+Software Update
+N/A
+
+CRITICAL OUTPUT REQUIREMENTS:
+The output string must be solely the resolution type (or "N/A").
+It must not contain any quotation marks, descriptive text, labels, or any other formatting.
+
+Report:
+{report}"""),
+
+    ("downtime_impact",
+     f"""Analyze the following report to determine the downtime impact level associated with the issue or event described in the question: '{question}'.
+Your entire response MUST be EXACTLY one of the following predefined plain string values: High, Medium, Low, or N/A.
+Choose the most appropriate value based on the report's content related to the question. If the impact is not specified or cannot be determined for the issue in question, use "N/A".
+
+CRITICAL OUTPUT REQUIREMENTS:
+The output string must be solely the selected value.
+It must not contain quotation marks, descriptive text, explanations, or any other formatting.
+
+Report:
+{report}"""),
+
+    ("links",
+     f"""From the report below, identify and extract documentation links that are relevant to answering or providing more information about the question: '{question}'.
+Relevant links include URLs pointing to technical manuals, knowledge base articles, official support pages, or troubleshooting guides pertinent to the question's subject.
+Format the output as a single, minified, valid JSON array of objects. Each object in the array MUST have a "title" property (string) and a "url" property (string).
+
+Example of the EXACT expected JSON output format (assuming relevance to a question):
+[{{"title":"Operator Manual PX200 - Section on Error Codes","url":"https://example.com/manual/px200#errors"}},{{"title":"KB Article - Troubleshooting '{question_subject}'","url":"https://support.example.com/kb/question_subject_fix"}}]
+
+IMPORTANT INSTRUCTIONS FOR OUTPUT:
+1. Your entire response MUST be the raw, minified JSON array and nothing else.
+2. Ensure no text, explanations, apologies, conversational filler, or any other characters precede or follow the JSON array.
+3. The JSON array itself must be clean, valid JSON, without any markdown formatting (such as ```json ... ```), backticks, or other non-JSON characters.
+4. If no links relevant to the question are found in the report, your entire response MUST be an empty JSON array: []
+
+Report:
+{report}""")
     ]
 
     # Create list of coroutines for parallel execution

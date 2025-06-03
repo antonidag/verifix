@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { AskRequestModel, InventoryBase, SolutionModel } from "@/api-client";
+import { InventoryBase, SolutionModel } from "@/api-client";
 import { api } from "@/api/apiClient";
+import { useAskQuestion, useInvestigate } from "@/hooks/use-solution-api";
 import { toast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { useSolutionEvents } from "./use-solution-events";
 
@@ -28,85 +30,105 @@ export const useSolutionSearch = () => {
     ]);
   });
 
-  const handleSearch = async (problem: string, imageData: string | null) => {
+  const { mutateAsync: askQuestion } = useAskQuestion();
+  const { mutateAsync: getSolutionAsync } = useMutation({
+    mutationFn: (id: string) => api.default.getSolution(id),
+  });
+  const { mutateAsync: getInventoryAsync } = useMutation({
+    mutationFn: (id: string) => api.default.getSolutionInventory(id),
+  });
+
+  const handleSearch = (problem: string, imageData: string | null) => {
     if (!problem.trim() && !imageData) return;
 
     setIsSearching(true);
     setSolutions([]);
 
-    try {
-      const askRequest: AskRequestModel = {
+    askQuestion(
+      {
         question: problem.trim(),
         image_data: imageData,
-      };
-
-      const data = await api.default.ask(askRequest);
-      if (!data || !data.matches || data.matches.length === 0) {
-        // Automatically start an investigation when no solutions are found
-        await handleInvestigate(problem, imageData);
-        return;
-      }
-
-      const solutions = await Promise.all(
-        data.matches.map(async (match) => {
-          const [solution, inventory] = await Promise.all([
-            api.default.getSolution(match.solution_id),
-            api.default.getSolutionInventory(match.solution_id).catch(() => {
-              console.log(
-                "No inventory data found for solution:",
-                match.solution_id
-              );
-              return null;
-            }),
-          ]);
-
-          if (solution) {
-            return {
-              ...solution,
-              matchScore: match.score.toString(),
-              inventory: inventory,
-            };
+      },
+      {
+        onSuccess: async (data) => {
+          if (!data || !data.matches || data.matches.length === 0) {
+            // Automatically start an investigation when no solutions are found
+            handleInvestigate(problem, imageData);
+            return;
           }
-          return null;
-        })
-      );
 
-      setSolutions(solutions.filter((sol) => sol !== null));
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to search for solutions. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSearching(false);
-    }
+          const solutions = await Promise.all(
+            data.matches.map(async (match) => {
+              try {
+                const [solution, inventory] = await Promise.all([
+                  getSolutionAsync(match.solution_id),
+                  getInventoryAsync(match.solution_id).catch(() => {
+                    console.log(
+                      "No inventory data found for solution:",
+                      match.solution_id
+                    );
+                    return null;
+                  }),
+                ]);
+
+                if (solution) {
+                  return {
+                    ...solution,
+                    matchScore: match.score.toString(),
+                    inventory: inventory,
+                  };
+                }
+              } catch (error) {
+                console.error("Error fetching solution details:", error);
+              }
+              return null;
+            })
+          );
+
+          setSolutions(solutions.filter((sol) => sol !== null));
+        },
+        onError: (error) => {
+          toast({
+            title: "Error",
+            description: "Failed to search for solutions. Please try again.",
+            variant: "destructive",
+          });
+        },
+        onSettled: () => {
+          setIsSearching(false);
+        },
+      }
+    );
   };
 
-  const handleInvestigate = async (
-    problem: string,
-    imageData: string | null
-  ) => {
+  const investigateMutation = useInvestigate();
+
+  const handleInvestigate = (problem: string, imageData: string | null) => {
     if (!problem.trim() && !imageData) return;
     clearSearch();
     setIsInvestigating(true);
 
-    try {
-      const result = await api.default.investigate({
+    investigateMutation.mutate(
+      {
         question: problem.trim(),
         image_data: imageData,
-      });
-
-      if (result.solution?.id) {
-        setSolutionId(result.solution.id);
+      },
+      {
+        onSuccess: (result) => {
+          if (result.solution?.id) {
+            setSolutionId(result.solution.id);
+          }
+        },
+        onError: () => {
+          setIsInvestigating(false);
+          toast({
+            title: "Error",
+            description: "Failed to start investigation. Please try again.",
+            variant: "destructive",
+          });
+        },
       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to start investigation. Please try again.",
-        variant: "destructive",
-      });
-    }
+    );
   };
 
   const clearSearch = () => {

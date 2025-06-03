@@ -1,10 +1,10 @@
 import { Clock, Database, FileText, TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { SolutionModel } from "@/api-client";
-import { api } from "@/api/apiClient";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRecentSolutions } from "@/hooks/use-solution-api";
 import Markdown from "react-markdown";
 import { KnowledgeDialog } from "./KnowledgeDialog";
 import { Button } from "./ui/button";
@@ -13,22 +13,8 @@ export const KnowledgeBase = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedSolution, setSelectedSolution] =
     useState<SolutionModel | null>(null);
-  const [solutions, setSolutions] = useState<SolutionModel[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const fetchSolutions = async () => {
-      try {
-        const recentSolutions = await api.default.listRecentSolutions();
-        setSolutions(recentSolutions);
-      } catch (error) {
-        console.error("Error fetching solutions:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    fetchSolutions();
-  }, []);
+  const { data: solutions = [], isLoading } = useRecentSolutions();
 
   const handleViewDetails = (solution: SolutionModel) => {
     setSelectedSolution(solution);

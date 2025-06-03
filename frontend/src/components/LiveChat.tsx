@@ -3,10 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { openChat, useChatContext } from "@/hooks/use-chat-context";
-import { Bot, Maximize2, MessageCircle, Minimize2, Send, User, X } from "lucide-react";
+import {
+  Bot,
+  Maximize2,
+  MessageCircle,
+  Minimize2,
+  Send,
+  User,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { AskRequestModel } from "@/api-client";
-import { api } from "@/api/apiClient";
+import { useChat } from "@/hooks/use-solution-api";
 
 interface Message {
   id: string;
@@ -38,7 +45,9 @@ export const LiveChat = () => {
 
       const contextMessage: Message = {
         id: `context-${Date.now()}`,
-        content: `I see you're asking about the solution: "${context.solution.title}". This is a ${
+        content: `I see you're asking about the solution: "${
+          context.solution.title
+        }". This is a ${
           context.solution.verified ? "verified" : "ai"
         } solution. How can I help you with this specific solution?`,
         sender: "bot",
@@ -57,21 +66,9 @@ export const LiveChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  const generateBotResponse = async (userInput: string) => {
-    try {
-      const request: AskRequestModel = {
-        question: userInput,
-      };
+  const { mutate: sendChatMessage } = useChat();
 
-      const response = await api.default.chat(request);
-      return response.message;
-    } catch (error) {
-      console.error("Error getting response:", error);
-      return "I apologize, but I encountered an error while processing your request. Please try again or rephrase your question.";
-    }
-  };
-
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!currentMessage.trim()) return;
 
     const userMessage: Message = {
@@ -85,27 +82,34 @@ export const LiveChat = () => {
     setCurrentMessage("");
     setIsTyping(true);
 
-    try {
-      const botResponse = await generateBotResponse(currentMessage);
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: botResponse,
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
-      console.error("Error in chat:", error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "I apologize, but I encountered an error. Please try again.",
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsTyping(false);
-    }
+    sendChatMessage(
+      { question: currentMessage },
+      {
+        onSuccess: (response) => {
+          const botMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            content: response.message,
+            sender: "bot",
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, botMessage]);
+        },
+        onError: (error) => {
+          console.error("Error in chat:", error);
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            content:
+              "I apologize, but I encountered an error. Please try again.",
+            sender: "bot",
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, errorMessage]);
+        },
+        onSettled: () => {
+          setIsTyping(false);
+        },
+      }
+    );
   };
 
   const formatTime = (date: Date) => {
@@ -137,7 +141,10 @@ export const LiveChat = () => {
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5" />
               <CardTitle className="text-sm">AI Assistant</CardTitle>
-              <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+              <Badge
+                variant="secondary"
+                className="bg-green-100 text-green-800 text-xs"
+              >
                 Online
               </Badge>
             </div>
@@ -188,7 +195,11 @@ export const LiveChat = () => {
                       <Bot className="w-4 h-4 text-slate-600" />
                     )}
                   </div>
-                  <div className={`flex-1 ${message.sender === "user" ? "text-right" : ""}`}>
+                  <div
+                    className={`flex-1 ${
+                      message.sender === "user" ? "text-right" : ""
+                    }`}
+                  >
                     <div
                       className={`p-3 rounded-lg text-sm ${
                         message.sender === "user"

@@ -18,7 +18,7 @@ async def process_research_report(question: str, researcher: GPTResearcher, solu
 
         # Update status to identifying
         solutions.update(solution_id, {'status': 'identifying'})
-        solution_data = await process_solution_report(report)
+        solution_data = await process_solution_report(question, report)
         solution_data['text'] = report
         solution_data['verified'] = False
 

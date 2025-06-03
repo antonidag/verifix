@@ -33,9 +33,7 @@ async def ask_question(request: AskRequestModel):
     # Prepare the question by combining text and image analysis if available
     question_text = request.question.strip()
     if image_analysis:
-        full_question = await prepare_question(
-            f"Question: {question_text}\nImage Analysis: {image_analysis}"
-        )
+        full_question = await prepare_question(f"Question: {question_text}\nImage Analysis: {image_analysis}")
     else:
         full_question = await prepare_question(question_text)
 
