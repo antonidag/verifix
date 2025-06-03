@@ -6,7 +6,7 @@ export const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-slate-400 text-sm">
-            © 2025 Verifix. Built for Google AI Hackathon.
+            © 2025 Team Trust Makers. Built for Google AI Hackathon.
           </p>
         </div>
       </div>

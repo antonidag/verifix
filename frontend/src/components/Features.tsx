@@ -1,107 +1,169 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Brain, Database, Zap, FileText, TrendingUp, Bot, Cpu } from "lucide-react";
+import {
+  Bot,
+  Brain,
+  Camera,
+  Cloud,
+  Code,
+  Database,
+  Search,
+  Zap,
+} from "lucide-react";
 
-const features = [
+const techStack = [
   {
-    icon: Search,
-    title: "Semantic Search",
-    description: "Hybrid vector search finds the most relevant past solutions to current problems",
+    icon: Cloud,
+    title: "Cloud",
+    items: ["Google Cloud Platform", "Google Cloud Run", "Docker"],
     color: "text-blue-600",
   },
   {
     icon: Brain,
-    title: "LLM-Powered Generation",
-    description: "When no solution exists, AI researches and drafts potential fixes",
+    title: "AI Tools",
+    items: ["Google Gemini", "GPT Researcher", "Vector Embeddings"],
     color: "text-purple-600",
   },
   {
     icon: Database,
-    title: "Verified Solutions",
-    description: "Store and retrieve verified fixes with optional documentation links",
+    title: "Data Storage",
+    items: ["Google Firestore"],
     color: "text-green-600",
   },
   {
-    icon: TrendingUp,
-    title: "Self-Learning Knowledge Base",
-    description: "System becomes smarter with each new problem and resolution",
+    icon: Zap,
+    title: "Backend",
+    items: ["Python", "FastAPI"],
     color: "text-orange-600",
   },
   {
-    icon: Zap,
-    title: "FastAPI Backend",
-    description: "Built with Python, FastAPI, and Qdrant for high performance",
+    icon: Code,
+    title: "Frontend",
+    items: ["React", "Typescript"],
     color: "text-cyan-600",
-  },
-  {
-    icon: FileText,
-    title: "Comprehensive API",
-    description: "RESTful endpoints for integration with existing systems",
-    color: "text-indigo-600",
   },
 ];
 
 export const HeroFeatures = () => (
-  <section className="container mx-auto px-4 py-8">
-    <div className="text-center max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all">
-          <Cpu className="w-8 h-8 text-blue-600 mb-4" />
-          <h3 className="font-semibold text-slate-800 mb-2">Semantic Search</h3>
-          <p className="text-slate-600 text-sm">
-            Hybrid vector search finds the most relevant solutions
-          </p>
+  <section className="container mx-auto px-4 py-8 space-y-12">
+    {/* Key Features Flow */}
+    <div className="text-center max-w-6xl mx-auto">
+      <h2 className="text-2xl font-semibold text-slate-800 mb-6">
+        How It Works
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+        {/* Connecting Lines (hidden on mobile) */}
+        <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -z-10 transform -translate-y-1/2" />
+
+        {/* Step 1 */}
+        <div className="relative">
+          <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
+            <div className="relative">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Camera className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                <h3 className="font-semibold text-slate-800">Submit Issue</h3>
+              </div>
+              <div className="hidden md:block absolute -right-10 top-1/2 w-8 h-8 text-slate-400">
+                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+                  <path
+                    d="M5 12h14m-4 -4l4 4l-4 4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-slate-600 text-sm">
+              Upload a photo or describe your problem in detail
+            </p>
+          </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all">
-          <Bot className="w-8 h-8 text-cyan-600 mb-4" />
-          <h3 className="font-semibold text-slate-800 mb-2">LLM Generation</h3>
-          <p className="text-slate-600 text-sm">
-            AI researches and drafts solutions when none exist
-          </p>
+        {/* Step 2 */}
+        <div className="relative">
+          <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
+            <div className="relative">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Search className="w-8 h-8 text-purple-600 flex-shrink-0" />
+                <h3 className="font-semibold text-slate-800">Smart Search</h3>
+              </div>
+              <div className="hidden md:block absolute -right-10 top-1/2 w-8 h-8 text-slate-400">
+                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+                  <path
+                    d="M5 12h14m-4 -4l4 4l-4 4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-slate-600 text-sm">
+              System searches for similar past solutions
+            </p>
+          </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all">
-          <Database className="w-8 h-8 text-blue-600 mb-4" />
-          <h3 className="font-semibold text-slate-800 mb-2">Self-Learning</h3>
-          <p className="text-slate-600 text-sm">
-            Knowledge base grows smarter with each resolution
-          </p>
+        {/* Step 3 */}
+        <div className="relative">
+          <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
+            <div className="relative">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Bot className="w-8 h-8 text-green-600 flex-shrink-0" />
+                <h3 className="font-semibold text-slate-800">AI Analysis</h3>
+              </div>
+              <div className="hidden md:block absolute -right-10 top-1/2 w-8 h-8 text-slate-400">
+                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+                  <path
+                    d="M5 12h14m-4 -4l4 4l-4 4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-slate-600 text-sm">
+              Gemini investigates and generates solutions
+            </p>
+          </div>
         </div>
+
+        {/* Step 4 */}
+        <div>
+          <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Database className="w-8 h-8 text-cyan-600 flex-shrink-0" />
+              <h3 className="font-semibold text-slate-800">Knowledge Growth</h3>
+            </div>
+            <p className="text-slate-600 text-sm">
+              Solution is verified and added to database
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Tech Stack */}
+    <div className="text-center max-w-6xl mx-auto">
+      <h2 className="text-2xl font-semibold text-slate-800 mb-6">Tech Stack</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        {techStack.map((tech) => (
+          <div
+            key={tech.title}
+            className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <tech.icon className={`w-8 h-8 ${tech.color} flex-shrink-0`} />
+              <h3 className="font-semibold text-slate-800">{tech.title}</h3>
+            </div>
+            <ul className="text-slate-600 text-sm space-y-2 text-left">
+              {tech.items.map((item) => (
+                <li key={item} className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   </section>
 );
-
-export const Features = () => {
-  return (
-    <section id="features" className="container mx-auto px-4 py-8 bg-white/30 backdrop-blur-sm">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-slate-800 mb-4">Key Features</h2>
-        <p className="text-slate-600 max-w-2xl mx-auto">
-          Advanced AI capabilities designed to revolutionize troubleshooting workflows
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map((feature, index) => (
-          <Card
-            key={index}
-            className="bg-white/80 backdrop-blur-sm border-slate-200 hover:shadow-lg transition-all hover:-translate-y-1"
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg bg-slate-100 ${feature.color}`}>
-                  <feature.icon className="w-6 h-6" />
-                </div>
-                <span className="text-slate-800">{feature.title}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-600">{feature.description}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
-  );
-};

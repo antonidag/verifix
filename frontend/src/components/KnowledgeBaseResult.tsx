@@ -13,14 +13,14 @@ import { SolutionModel } from "@/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { aiDisclaimer } from "@/data/solutions";
-import { SolutionWithMatch } from "@/hooks/use-solution-search";
+import { Solution } from "@/hooks/use-solution-search";
 import {
   getBadgeColors,
   getMatchScorePercentage,
 } from "@/utils/matchScoreUtils";
 
 interface KnowledgeBaseResultProps {
-  solution: SolutionWithMatch;
+  solution: Solution;
   onViewDetails: (solution: SolutionModel & { matchScore: string }) => void;
 }
 
@@ -87,101 +87,104 @@ export const KnowledgeBaseResult = ({
               )}
             </div>
           </div>
-          {/* Add inventory details if available */}
-          {solution.inventory && (
-            <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-slate-800">
-                  Component Details
-                </h4>
-                {solution.inventory.manufacturer && (
-                  <Badge variant="outline" className="bg-slate-100">
-                    {solution.inventory.manufacturer}
-                  </Badge>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                {solution.inventory.component_type && (
-                  <div>
-                    <span className="text-slate-500">Component Type:</span>
-                    <p className="text-slate-800">
-                      {solution.inventory.component_type}
-                    </p>
+
+          {/* Technical Details */}
+          <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium text-slate-800">Technical Details</h4>
+              {solution.manufacturer && (
+                <Badge variant="outline" className="bg-slate-100">
+                  {solution.manufacturer}
+                </Badge>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              {solution.machine_name && (
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Machine Name</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.machine_name}
                   </div>
-                )}
-                {solution.inventory.model_name && (
-                  <div>
-                    <span className="text-slate-500">Model:</span>
-                    <p className="text-slate-800">
-                      {solution.inventory.model_name}
-                    </p>
+                </div>
+              )}
+              {solution.machine_type && (
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Machine Type</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.machine_type}
                   </div>
-                )}
-                {solution.inventory.firmware_version && (
-                  <div>
-                    <span className="text-slate-500">Firmware Version:</span>
-                    <p className="text-slate-800">
-                      {solution.inventory.firmware_version}
-                    </p>
+                </div>
+              )}
+              {solution.component && (
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Component</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.component}
                   </div>
-                )}
-                {solution.inventory.metadata?.machine_type && (
-                  <div>
-                    <span className="text-slate-500">Machine Type:</span>
-                    <p className="text-slate-800">
-                      {solution.inventory.metadata.machine_type}
-                    </p>
+                </div>
+              )}
+              {solution.model_number && (
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Model Number</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.model_number}
                   </div>
-                )}
-                {solution.inventory.metadata?.error_code && (
-                  <div>
-                    <span className="text-slate-500">Error Code:</span>
-                    <p className="text-slate-800">
-                      {solution.inventory.metadata.error_code}
-                    </p>
+                </div>
+              )}
+              {solution.error_code && (
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Error Code</div>
+                  <div className="font-medium text-slate-800">
+                    {solution.error_code}
                   </div>
-                )}
-                {Object.entries(solution.inventory.specifications || {}).map(
-                  ([key, value]) => (
-                    <div key={key}>
-                      <span className="text-slate-500">{key}:</span>
-                      <p className="text-slate-800">{String(value)}</p>
-                    </div>
-                  )
-                )}
-              </div>
-              {solution.inventory.metadata && (
-                <div className="mt-3 text-xs flex items-center gap-3 text-slate-500">
-                  {solution.inventory.metadata.installation_date && (
-                    <div className="flex items-center gap-1">
-                      <CalendarDays className="w-3 h-3" />
-                      <span>
-                        Installed:{" "}
-                        {new Date(
-                          solution.inventory.metadata.installation_date
-                        ).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                  {solution.inventory.metadata.last_service && (
-                    <div className="flex items-center gap-1">
-                      <Wrench className="w-3 h-3" />
-                      <span>
-                        Last Service:{" "}
-                        {new Date(
-                          solution.inventory.metadata.last_service
-                        ).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
-          )}
+          </div>
+
+          {/* Operational Details */}
+          <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium text-slate-800">
+                Operational Details
+              </h4>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="bg-white/70 p-3 rounded-lg">
+                <div className="text-sm text-slate-500">Resolution Type</div>
+                <div className="font-medium text-slate-800">
+                  {solution.resolution_type || "N/A"}
+                </div>
+              </div>
+              <div className="bg-white/70 p-3 rounded-lg">
+                <div className="text-sm text-slate-500">Downtime Impact</div>
+                <div className="font-medium text-slate-800">
+                  {solution.downtime_impact || "N/A"}
+                </div>
+              </div>
+              {solution.created_at && (
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Created</div>
+                  <div className="font-medium text-slate-800">
+                    {new Date(solution.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              )}
+              {solution.updated_at && (
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-sm text-slate-500">Last Updated</div>
+                  <div className="font-medium text-slate-800">
+                    {new Date(solution.updated_at).toLocaleDateString()}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="text-slate-700 mb-4">
             <Markdown>{solution.description}</Markdown>
           </div>
+
           {/* Solution Steps Preview */}
           <div className="bg-white/70 p-4 rounded-lg mb-4">
             <h4 className="font-medium text-slate-800 mb-2">Solution Steps:</h4>

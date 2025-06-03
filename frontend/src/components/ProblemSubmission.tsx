@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useImageUpload } from "@/hooks/use-image-upload";
-import {
-  SolutionWithMatch,
-  useSolutionSearch,
-} from "@/hooks/use-solution-search";
+import { Solution, useSolutionSearch } from "@/hooks/use-solution-search";
 
 import { ImageUploadSection } from "./ImageUploadSection";
 import { InvestigationSkeleton } from "./InvestigationSkeleton";
@@ -20,7 +17,7 @@ import { VoiceInput } from "./VoiceInput";
 export const ProblemSubmission = () => {
   const [problem, setProblem] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [detailSolution, setDetailSolution] = useState<SolutionWithMatch>(null);
+  const [detailSolution, setDetailSolution] = useState<Solution>(null);
 
   const {
     uploadedImages,
@@ -170,7 +167,7 @@ export const ProblemSubmission = () => {
           onOpenChange={setIsDetailModalOpen}
           onSolutionUpdate={async (updated) => {
             // Preserve the matchScore when updating
-            const updatedWithMatch: SolutionWithMatch = {
+            const updatedWithMatch: Solution = {
               ...updated,
               matchScore: detailSolution?.matchScore?.toString() || "1",
             };

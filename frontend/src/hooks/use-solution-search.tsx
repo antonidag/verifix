@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import { useSolutionEvents } from "./use-solution-events";
 
-export interface SolutionWithMatch extends SolutionModel {
+export interface Solution extends SolutionModel {
   matchScore: string;
   inventory?: InventoryBase;
 }
@@ -15,7 +15,7 @@ export interface SolutionWithMatch extends SolutionModel {
 export const useSolutionSearch = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [isInvestigating, setIsInvestigating] = useState(false);
-  const [solutions, setSolutions] = useState<SolutionWithMatch[]>([]);
+  const [solutions, setSolutions] = useState<Solution[]>([]);
   const [solutionId, setSolutionId] = useState<string | null>(null);
 
   const { status } = useSolutionEvents(solutionId, (solution, inventory) => {

@@ -40,16 +40,18 @@ Provided text:
         print(f"Error extracting component info: {e}")
         return {}
 
-async def store_model_info(report: str) -> str:
+async def store_model_info(report: str, solution_data: Dict[str, Any]) -> str:
     component_info = await extract_component_info(report)
 
     inventory_data = {
-        'manufacturer': component_info.get('manufacturer', 'Unknown'),
+        'manufacturer': solution_data.get('manufacturer', component_info.get('manufacturer', 'Unknown')),
         'model_name': component_info.get('model_name', 'Unknown'),
-        'component_type': component_info.get('component_type', 'Unknown'),
+        'component_type': solution_data.get('component', component_info.get('component_type', 'Unknown')),
         'firmware_version': component_info.get('firmware_version'),
         'specifications': component_info.get('specifications', {}),
         'metadata': {
+            'machine_type': solution_data.get('machine_type'),
+            'error_code': solution_data.get('error_code'),
             'installation_date': component_info.get('installation_date'),
             'last_service': component_info.get('last_service')
         }

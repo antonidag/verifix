@@ -155,21 +155,20 @@ export const KnowledgeDialog = ({
             </div>
 
             {/* Technical Details */}
-            <div>
-              <h3 className="font-semibold text-slate-800 mb-3">
-                Technical Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {solution.error_code && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Error Code</div>
-                    <div className="font-medium text-slate-800">
-                      {solution.error_code}
-                    </div>
-                  </div>
+            <div className="bg-slate-50/70 p-4 rounded-lg mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-slate-800">
+                  Technical Details
+                </h4>
+                {solution.manufacturer && (
+                  <Badge variant="outline" className="bg-slate-100">
+                    {solution.manufacturer}
+                  </Badge>
                 )}
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 {solution.machine_name && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="bg-white/70 p-3 rounded-lg">
                     <div className="text-sm text-slate-500">Machine Name</div>
                     <div className="font-medium text-slate-800">
                       {solution.machine_name}
@@ -177,34 +176,34 @@ export const KnowledgeDialog = ({
                   </div>
                 )}
                 {solution.machine_type && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="bg-white/70 p-3 rounded-lg">
                     <div className="text-sm text-slate-500">Machine Type</div>
                     <div className="font-medium text-slate-800">
                       {solution.machine_type}
                     </div>
                   </div>
                 )}
-                {solution.manufacturer && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Manufacturer</div>
+                {solution.component && (
+                  <div className="bg-white/70 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Component</div>
                     <div className="font-medium text-slate-800">
-                      {solution.manufacturer}
+                      {solution.component}
                     </div>
                   </div>
                 )}
                 {solution.model_number && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="bg-white/70 p-3 rounded-lg">
                     <div className="text-sm text-slate-500">Model Number</div>
                     <div className="font-medium text-slate-800">
                       {solution.model_number}
                     </div>
                   </div>
                 )}
-                {solution.component && (
-                  <div className="bg-slate-50 p-3 rounded-lg">
-                    <div className="text-sm text-slate-500">Component</div>
+                {solution.error_code && (
+                  <div className="bg-white/70 p-3 rounded-lg">
+                    <div className="text-sm text-slate-500">Error Code</div>
                     <div className="font-medium text-slate-800">
-                      {solution.component}
+                      {solution.error_code}
                     </div>
                   </div>
                 )}

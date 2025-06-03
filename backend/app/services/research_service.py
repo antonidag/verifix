@@ -28,7 +28,7 @@ async def process_research_report(question: str, researcher: GPTResearcher, solu
 
         # Store model info and create embeddings
         solutions.update(solution_id, {'status': 'storing'})
-        inventory_id = await store_model_info(report)
+        inventory_id = await store_model_info(report, solution_data)
         solution_data['inventory_id'] = inventory_id
 
         embedding = embed_text(question)
