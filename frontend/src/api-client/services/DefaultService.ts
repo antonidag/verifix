@@ -45,6 +45,18 @@ export class DefaultService {
         });
     }
     /**
+     * Get recent solutions
+     * Retrieve the 5 most recent solutions from the database
+     * @returns SolutionModel Successful Response
+     * @throws ApiError
+     */
+    public listRecentSolutions(): CancelablePromise<Array<SolutionModel>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/v1/solutions/recent',
+        });
+    }
+    /**
      * Get solution by ID
      * Retrieve a specific solution by its ID
      * @param solutionId
@@ -172,15 +184,24 @@ export class DefaultService {
         });
     }
     /**
-     * Get recent solutions
-     * Retrieve the 5 most recent solutions from the database
+     * Verify a solution
+     * Mark a solution as verified after manual review
+     * @param solutionId
      * @returns SolutionModel Successful Response
      * @throws ApiError
      */
-    public listRecentSolutions(): CancelablePromise<Array<SolutionModel>> {
+    public verifySolution(
+        solutionId: string,
+    ): CancelablePromise<SolutionModel> {
         return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/v1/solutions/recent',
+            method: 'POST',
+            url: '/api/v1/solutions/{solution_id}/verify',
+            path: {
+                'solution_id': solutionId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
         });
     }
     /**

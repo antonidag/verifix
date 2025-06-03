@@ -4,10 +4,6 @@
 /* eslint-disable */
 export type InventoryBase = {
     /**
-     * ID of the associated solution
-     */
-    solution_id: string;
-    /**
      * Equipment manufacturer (e.g., 'Siemens', 'ABB')
      */
     manufacturer: string;

@@ -29,6 +29,10 @@ export type SolutionModel = {
      */
     solution_steps?: (Array<string> | null);
     /**
+     * Current status of the investigation: analyzing, processing, identifying, validating, storing, complete, or error
+     */
+    status?: (string | null);
+    /**
      * Whether the solution has been verified
      */
     verified?: boolean;
@@ -72,6 +76,10 @@ export type SolutionModel = {
      * Links to related documentation and resources
      */
     links?: (Array<LinkModel> | null);
+    /**
+     * ID of the associated inventory item
+     */
+    inventory_id?: (string | null);
     /**
      * Creation date of the solution
      */

@@ -177,6 +177,16 @@ export const ProblemSubmission = () => {
           solution={detailSolution}
           open={isDetailModalOpen}
           onOpenChange={setIsDetailModalOpen}
+          onSolutionUpdate={async (updated) => {
+            // Preserve the matchScore when updating
+            const updatedWithMatch: SolutionWithMatch = {
+              ...updated,
+              matchScore: detailSolution?.matchScore?.toString() || "1",
+            };
+            setDetailSolution(updatedWithMatch);
+            const imageData = await convertFirstImageToBase64();
+            handleSearch(problem, imageData); // Refresh the search results
+          }}
         />
       </div>
     </section>

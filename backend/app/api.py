@@ -12,6 +12,7 @@ from models import (
     SolutionModel, QuestionModel, ChatResponseModel, InventoryBase
 )
 from db import solutions, questions, inventory
+from datetime import datetime
 
 router = APIRouter()
 
@@ -221,3 +222,24 @@ async def solution_status(solution_id: str):
             await asyncio.sleep(1)  # Check every second
 
     return EventSourceResponse(event_generator())
+
+@router.post("/solutions/{solution_id}/verify",
+            response_model=SolutionModel,
+            summary="Verify a solution",
+            description="Mark a solution as verified after manual review",
+            operation_id="verifySolution")
+async def verify_solution(solution_id: str):
+    """Verify a solution after manual review."""
+    solution = solutions.get(solution_id)
+    if not solution:
+        raise HTTPException(status_code=404, detail=f"Solution id: {solution_id} not found")
+
+    updated = solutions.update(solution_id, {
+        'verified': True,
+        'updated_at': datetime.utcnow()
+    })
+
+    if not updated:
+        raise HTTPException(status_code=500, detail="Failed to update solution")
+
+    return solutions.get(solution_id)

@@ -15,7 +15,7 @@ const Index = () => {
       <KnowledgeBase />
       <Features />
       <Footer />
-      <LiveChat />
+      {/* <LiveChat /> */}
     </div>
   );
 };
