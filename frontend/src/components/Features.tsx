@@ -50,9 +50,6 @@ export const HeroFeatures = () => (
         How It Works
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-14 relative">
-        {/* Connecting Lines (hidden on mobile) */}
-        <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -z-10 transform -translate-y-1/2" />
-
         {/* Step 1 */}
         <div className="relative">
           <div className="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-slate-200 hover:shadow-lg transition-all text-center">
