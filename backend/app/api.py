@@ -243,3 +243,29 @@ async def verify_solution(solution_id: str):
         raise HTTPException(status_code=500, detail="Failed to update solution")
 
     return solutions.get(solution_id)
+
+@router.delete("/solutions/{solution_id}",
+             summary="Delete a solution",
+             description="Delete a solution and its related inventory and questions",
+             operation_id="deleteSolution")
+async def delete_solution(solution_id: str):
+    """Delete a solution and its related data."""
+    solution = solutions.get(solution_id)
+    if not solution:
+        raise HTTPException(status_code=404, detail=f"Solution id: {solution_id} not found")
+
+    # Delete related inventory if exists
+    if solution.get('inventory_id'):
+        inventory.delete(solution['inventory_id'])
+
+    # Delete related questions
+    questions_list = questions.list_all()
+    for question in questions_list:
+        if question.get('solution_id') == solution_id:
+            questions.delete(question['id'])
+
+    # Delete the solution
+    if not solutions.delete(solution_id):
+        raise HTTPException(status_code=500, detail="Failed to delete solution")
+
+    return {"message": "Solution and related data deleted successfully"}

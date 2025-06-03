@@ -78,6 +78,27 @@ export class DefaultService {
         });
     }
     /**
+     * Delete a solution
+     * Delete a solution and its related inventory and questions
+     * @param solutionId
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public deleteSolution(
+        solutionId: string,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/v1/solutions/{solution_id}',
+            path: {
+                'solution_id': solutionId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
      * Get all solutions
      * Retrieve all solutions from the database
      * @returns SolutionModel Successful Response

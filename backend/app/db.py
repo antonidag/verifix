@@ -97,6 +97,15 @@ class FirestoreSolution:
             return True
         return False
 
+    def delete(self, solution_id: str) -> bool:
+        """Delete a solution by ID"""
+        try:
+            self.collection.document(solution_id).delete()
+            return True
+        except Exception as e:
+            print(f"Error deleting solution: {str(e)}")
+            return False
+
 class FirestoreQuestion:
     def __init__(self):
         self.collection = get_db().collection('questions')
@@ -179,6 +188,15 @@ class FirestoreQuestion:
         # Return top N matches
         return matches[:limit]
 
+    def delete(self, question_id: str) -> bool:
+        """Delete a question by ID"""
+        try:
+            self.collection.document(question_id).delete()
+            return True
+        except Exception as e:
+            print(f"Error deleting question: {str(e)}")
+            return False
+
 class FirestoreInventory:
     def __init__(self):
         self.collection = get_db().collection('inventory')
@@ -217,6 +235,15 @@ class FirestoreInventory:
             if inventory_item:
                 results.append(inventory_item)
         return results
+
+    def delete(self, inventory_id: str) -> bool:
+        """Delete an inventory item by ID"""
+        try:
+            self.collection.document(inventory_id).delete()
+            return True
+        except Exception as e:
+            print(f"Error deleting inventory item: {str(e)}")
+            return False
 
 # Create instances for global use
 solutions = FirestoreSolution()

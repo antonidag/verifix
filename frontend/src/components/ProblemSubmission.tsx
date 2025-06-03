@@ -187,6 +187,11 @@ export const ProblemSubmission = () => {
             const imageData = await convertFirstImageToBase64();
             handleSearch(problem, imageData); // Refresh the search results
           }}
+          onSolutionDelete={() => {
+            setIsDetailModalOpen(false);
+            clearSearch();
+            clearForm();
+          }}
         />
       </div>
     </section>

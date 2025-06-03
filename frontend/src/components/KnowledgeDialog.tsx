@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Link2,
   Loader2,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";
@@ -22,6 +23,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 
 interface KnowledgeDialogProps {
@@ -29,6 +40,7 @@ interface KnowledgeDialogProps {
   onOpenChange: (open: boolean) => void;
   solution?: SolutionModel;
   onSolutionUpdate?: (solution: SolutionModel) => void;
+  onSolutionDelete?: () => void;
 }
 
 const copyToClipboard = (solution: SolutionModel) => {
@@ -44,8 +56,11 @@ export const KnowledgeDialog = ({
   onOpenChange,
   solution,
   onSolutionUpdate,
+  onSolutionDelete,
 }: KnowledgeDialogProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const handleVerify = async () => {
     if (!solution) return;
@@ -66,6 +81,30 @@ export const KnowledgeDialog = ({
       });
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!solution) return;
+
+    setIsDeleting(true);
+    try {
+      await api.default.deleteSolution(solution.id);
+      toast({
+        title: "Solution deleted",
+        description: "The solution has been permanently deleted.",
+      });
+      onSolutionDelete?.();
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Deletion failed",
+        description: "Failed to delete the solution. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteAlert(false);
     }
   };
 
@@ -285,35 +324,7 @@ export const KnowledgeDialog = ({
               </div>
             )}
 
-            {/* Statistics for verified solutions */}
-            {solution.verified ? (
-              <div>
-                <h3 className="font-semibold text-slate-800 mb-3">
-                  Solution Statistics
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-green-50 p-3 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {solution.confidence ? solution.confidence : 0}%
-                    </div>
-                    <div className="text-xs text-green-700">Match Rate</div>
-                  </div>
-                  {/* Note: These statistics might need to be added to the API model if needed */}
-                  <div className="bg-blue-50 p-3 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-blue-600">-</div>
-                    <div className="text-xs text-blue-700">Times Used</div>
-                  </div>
-                  <div className="bg-purple-50 p-3 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-purple-600">-</div>
-                    <div className="text-xs text-purple-700">Success Rate</div>
-                  </div>
-                  <div className="bg-orange-50 p-3 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-orange-600">-</div>
-                    <div className="text-xs text-orange-700">User Rating</div>
-                  </div>
-                </div>
-              </div>
-            ) : (
+            {!solution.verified && (
               <div className="flex items-start gap-2 p-4 bg-orange-50 rounded-lg border border-orange-200">
                 <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
                 <div>
@@ -353,9 +364,43 @@ export const KnowledgeDialog = ({
                   {isVerifying ? "Verifying..." : "Verify Solution"}
                 </Button>
               )}
+              <Button
+                variant="destructive"
+                onClick={() => setShowDeleteAlert(true)}
+                disabled={isDeleting}
+                className="sm:ml-auto"
+              >
+                {isDeleting ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4 mr-2" />
+                )}
+                {isDeleting ? "Deleting..." : "Delete Solution"}
+              </Button>
             </div>
           </div>
         )}
+
+        <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this
+                solution and all related data from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                Delete Solution
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );
